@@ -104,7 +104,7 @@ const SalesReport = () => {
           <h2 className="text-xl font-bold text-gray-800 mb-4">Sales Trend</h2>
           <div className="h-80">
             {salesTrend.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <BarChart data={salesTrend}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="_id" />
@@ -127,7 +127,7 @@ const SalesReport = () => {
           <h2 className="text-xl font-bold text-gray-800 mb-4">Sales by Category</h2>
           <div className="h-80">
             {categorySales.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <PieChart>
                   <Pie
                     data={categorySales}
