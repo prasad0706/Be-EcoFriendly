@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, X, AlertCircle } from 'lucide-react';
+import { Upload, X, AlertCircle, FileSpreadsheet } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Button from '../common/Button';
 import * as XLSX from 'xlsx';
@@ -39,22 +39,19 @@ const BulkUploadModal = ({ isOpen, onClose, onUpload }) => {
           return;
         }
 
-        // Validate required columns
         const requiredColumns = ['name', 'description', 'price', 'category', 'stock'];
         const validationErrors = [];
 
         jsonData.forEach((row, index) => {
-          const rowNum = index + 2; // +2 because of header row and 1-based indexing
+          const rowNum = index + 2;
           const rowErrors = [];
 
-          // Check required fields
           requiredColumns.forEach(col => {
             if (!row[col] || row[col].toString().trim() === '') {
               rowErrors.push(`${col} is required`);
             }
           });
 
-          // Validate price and stock are numbers
           if (row.price && isNaN(parseFloat(row.price))) {
             rowErrors.push('Price must be a valid number');
           }
@@ -62,10 +59,9 @@ const BulkUploadModal = ({ isOpen, onClose, onUpload }) => {
             rowErrors.push('Stock must be a valid number');
           }
 
-          // Validate category
           const validCategories = ['Reusable Products', 'Organic Foods', 'Eco-Friendly Home', 'Sustainable Fashion', 'Zero Waste', 'Natural Beauty', 'Green Tech', 'Other'];
           if (row.category && !validCategories.includes(row.category)) {
-            rowErrors.push(`Invalid category. Allowed: ${validCategories.join(', ')}`);
+            rowErrors.push(`Invalid category.`);
           }
 
           if (rowErrors.length > 0) {
@@ -79,7 +75,6 @@ const BulkUploadModal = ({ isOpen, onClose, onUpload }) => {
           return;
         }
 
-        // Format data for preview
         const formattedData = jsonData.map(row => ({
           name: row.name?.toString().trim() || '',
           description: row.description?.toString().trim() || '',
@@ -89,37 +84,30 @@ const BulkUploadModal = ({ isOpen, onClose, onUpload }) => {
           stock: parseInt(row.stock),
           featured: row.featured?.toString().toLowerCase() === 'true' || false,
           tags: row.tags ? row.tags.toString().split(',').map(t => t.trim()).filter(Boolean) : [],
-          images: [] // Images won't be uploaded in bulk - only product data
+          images: []
         }));
 
         setPreviewData(formattedData);
         setErrors([]);
-        toast.success(`Loaded ${formattedData.length} products for preview`);
+        toast.success(`Loaded ${formattedData.length} products`);
       } catch (error) {
-        console.error('Error parsing file:', error);
-        toast.error('Error parsing Excel file. Please check the format.');
+        toast.error('Error parsing file');
         setSelectedFile(null);
         setPreviewData(null);
       }
     };
-
     reader.readAsBinaryString(file);
   };
 
   const handleUpload = async () => {
-    if (!previewData || previewData.length === 0) {
-      toast.error('No products to upload');
-      return;
-    }
-
+    if (!previewData || previewData.length === 0) return;
     setIsLoading(true);
     try {
       await onUpload(previewData);
       resetForm();
       onClose();
     } catch (error) {
-      console.error('Upload error:', error);
-      toast.error(error.message || 'Failed to upload products');
+      toast.error('Product import failed');
     } finally {
       setIsLoading(false);
     }
@@ -139,161 +127,114 @@ const BulkUploadModal = ({ isOpen, onClose, onUpload }) => {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4 text-left">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col"
           >
-            <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-800">Bulk Upload Products</h2>
-              <button onClick={handleCancel} className="text-gray-500 hover:text-gray-700">
-                <X className="h-6 w-6" />
+            <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">Import Products</h2>
+              <button onClick={handleCancel} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+                <X className="h-6 w-6 text-gray-400" />
               </button>
             </div>
 
-            <div className="p-6 space-y-6">
-              {/* File Upload Section */}
-              {!previewData && (
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Step 1: Select Excel File</h3>
-                  
-                  <div className="mb-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Required Columns:</h4>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• <strong>name</strong> - Product name</li>
-                      <li>• <strong>description</strong> - Product description</li>
-                      <li>• <strong>price</strong> - Price in rupees (number)</li>
-                      <li>• <strong>category</strong> - Reusable Products, Organic Foods, Eco-Friendly Home, Sustainable Fashion, Zero Waste, Natural Beauty, Green Tech, Other</li>
-                      <li>• <strong>stock</strong> - Stock quantity (number)</li>
-                    </ul>
-                    <h4 className="text-sm font-medium text-gray-700 mt-4 mb-2">Optional Columns:</h4>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• <strong>originalPrice</strong> - Original price in rupees</li>
-                      <li>• <strong>featured</strong> - true or false</li>
-                      <li>• <strong>tags</strong> - Comma separated tags</li>
-                    </ul>
-                  </div>
-
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8">
-                    <input
-                      type="file"
-                      accept=".xlsx,.xls,.csv"
-                      onChange={handleFileSelect}
-                      className="hidden"
-                      id="bulk-upload-file"
-                    />
-                    <label
-                      htmlFor="bulk-upload-file"
-                      className="flex flex-col items-center cursor-pointer"
-                    >
-                      <Upload className="h-12 w-12 text-gray-500 mb-2" />
-                      <span className="text-lg font-medium text-gray-700">Click to upload Excel file</span>
-                      <span className="text-sm text-gray-500 mt-1">Supported formats: .xlsx, .xls, .csv</span>
-                    </label>
-                  </div>
-
-                  {selectedFile && (
-                    <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-green-800">{selectedFile.name}</p>
-                        <p className="text-xs text-green-600">File selected successfully</p>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setSelectedFile(null);
-                          setPreviewData(null);
-                        }}
-                        className="text-green-600 hover:text-green-800"
-                      >
-                        <X className="h-5 w-5" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Preview Section */}
-              {previewData && (
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Step 2: Preview Products</h3>
-                  
-                  {errors.length > 0 && (
-                    <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                      <div className="flex items-start">
-                        <AlertCircle className="h-5 w-5 text-red-600 mr-3 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <h4 className="font-semibold text-red-800 mb-2">Validation Errors Found:</h4>
-                          <ul className="text-sm text-red-700 space-y-1">
-                            {errors.map((error, idx) => (
-                              <li key={idx}>Row {error.row}: {error.errors.join(', ')}</li>
+            <div className="flex-1 overflow-y-auto p-8">
+              {!previewData ? (
+                <div className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                      <h3 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wider">Instructions</h3>
+                      <div className="space-y-4">
+                        <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                          <p className="text-xs font-bold text-gray-400 mb-2 uppercase">Required Columns</p>
+                          <div className="flex flex-wrap gap-2">
+                            {['name', 'description', 'price', 'category', 'stock'].map(c => (
+                              <span key={c} className="px-2 py-1 bg-white border border-gray-200 rounded-lg text-[10px] font-bold text-gray-600">{c}</span>
                             ))}
-                          </ul>
+                          </div>
+                        </div>
+                        <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                          <p className="text-xs font-bold text-gray-400 mb-2 uppercase">Optional Columns</p>
+                          <div className="flex flex-wrap gap-2">
+                            {['originalPrice', 'featured', 'tags'].map(c => (
+                              <span key={c} className="px-2 py-1 bg-white border border-gray-200 rounded-lg text-[10px] font-bold text-gray-600">{c}</span>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </div>
+
+                    <div className="relative border-2 border-dashed border-gray-200 rounded-[2.5rem] p-10 hover:border-primary/50 transition-colors text-center flex flex-col items-center justify-center">
+                      <input
+                        type="file"
+                        accept=".xlsx,.xls,.csv"
+                        onChange={handleFileSelect}
+                        className="absolute inset-0 opacity-0 cursor-pointer"
+                      />
+                      <div className="p-4 bg-primary/10 rounded-2xl text-primary mb-4">
+                        <Upload className="h-8 w-8" />
+                      </div>
+                      <h4 className="font-bold text-gray-900">Choose Excel File</h4>
+                      <p className="text-xs text-gray-400 mt-2 font-medium">Drop your file here or click to browse</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Preview Data</h3>
+                    <button onClick={resetForm} className="text-xs font-bold text-primary hover:underline">Change File</button>
+                  </div>
+
+                  {errors.length > 0 && (
+                    <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start space-x-3 text-red-600">
+                      <AlertCircle className="h-5 w-5 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-bold">Validation errors found in {errors.length} rows</p>
+                        <p className="text-xs opacity-80 mt-1">Please correct your file and try again.</p>
+                      </div>
+                    </div>
                   )}
 
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead className="bg-gray-100 border-b">
+                  <div className="border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-gray-50 border-b border-gray-100">
                         <tr>
-                          <th className="px-4 py-2 text-left font-semibold text-gray-800">#</th>
-                          <th className="px-4 py-2 text-left font-semibold text-gray-800">Name</th>
-                          <th className="px-4 py-2 text-left font-semibold text-gray-800">Category</th>
-                          <th className="px-4 py-2 text-left font-semibold text-gray-800">Price</th>
-                          <th className="px-4 py-2 text-left font-semibold text-gray-800">Stock</th>
+                          <th className="px-4 py-3 font-bold text-gray-400 uppercase">Product</th>
+                          <th className="px-4 py-3 font-bold text-gray-400 uppercase">Category</th>
+                          <th className="px-4 py-3 font-bold text-gray-400 uppercase">Price</th>
+                          <th className="px-4 py-3 font-bold text-gray-400 uppercase">Stock</th>
                         </tr>
                       </thead>
-                      <tbody>
-                        {previewData.map((product, index) => (
-                          <tr key={index} className="border-b hover:bg-gray-50">
-                            <td className="px-4 py-3 text-gray-600">{index + 1}</td>
-                            <td className="px-4 py-3 text-gray-900 font-medium max-w-xs truncate">{product.name}</td>
-                            <td className="px-4 py-3 text-gray-600">{product.category}</td>
-                            <td className="px-4 py-3 text-gray-900">₹{product.price.toFixed(2)}</td>
-                            <td className="px-4 py-3 text-gray-600">{product.stock}</td>
+                      <tbody className="divide-y divide-gray-100">
+                        {previewData.slice(0, 10).map((p, i) => (
+                          <tr key={i}>
+                            <td className="px-4 py-3 font-bold text-gray-900 truncate max-w-[200px]">{p.name}</td>
+                            <td className="px-4 py-3 text-gray-500">{p.category}</td>
+                            <td className="px-4 py-3 font-bold">{p.price.toFixed(2)}</td>
+                            <td className="px-4 py-3 font-bold">{p.stock}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
-                  </div>
-
-                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-sm text-blue-800 font-medium">
-                      Ready to upload <strong>{previewData.length}</strong> products
-                    </p>
+                    {previewData.length > 10 && (
+                      <div className="px-4 py-2 bg-gray-50 text-[10px] font-bold text-gray-400 uppercase text-center border-t border-gray-100">
+                        Showing first 10 rows of {previewData.length} total
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Footer with Actions */}
-            <div className="sticky bottom-0 bg-white border-t px-6 py-4 flex items-center justify-between gap-3">
-              <Button
-                variant="outline"
-                onClick={handleCancel}
-                disabled={isLoading}
-              >
-                Cancel
-              </Button>
-              
-              {previewData ? (
-                <Button
-                  onClick={handleUpload}
-                  disabled={isLoading || previewData.length === 0}
-                  className={isLoading ? 'opacity-50 cursor-not-allowed' : ''}
-                >
-                  {isLoading ? 'Uploading...' : `Upload Products (${previewData.length})`}
-                </Button>
-              ) : (
-                <Button
-                  disabled={!selectedFile}
-                  onClick={() => {}}
-                  className={!selectedFile ? 'opacity-50 cursor-not-allowed' : ''}
-                >
-                  {selectedFile ? 'File Selected' : 'Select File First'}
+            <div className="px-8 py-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50">
+              <button onClick={handleCancel} className="px-6 py-2 text-sm font-bold text-gray-500 hover:text-gray-900">Cancel</button>
+              {previewData && (
+                <Button onClick={handleUpload} loading={isLoading} disabled={errors.length > 0}>
+                  Import {previewData.length} Products
                 </Button>
               )}
             </div>

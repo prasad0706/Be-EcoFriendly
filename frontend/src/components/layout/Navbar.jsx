@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, User, Heart, Menu, X, Leaf, LogOut, LayoutDashboard } from 'lucide-react';
@@ -13,6 +13,13 @@ const Navbar = () => {
   const { cartItemsCount } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -28,19 +35,20 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-40">
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'
+      }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
             <motion.div
-              whileHover={{ rotate: 360 }}
-              transition={{ duration: 0.5 }}
+              whileHover={{ rotate: 15 }}
+              transition={{ duration: 0.3 }}
             >
-              <Leaf className="h-8 w-8 text-green" />
+              <Leaf className="h-8 w-8 text-primary" />
             </motion.div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-primary to-green bg-clip-text text-transparent">
-              Be-EcoFriendly
+            <span className="text-2xl font-bold text-gray-900">
+              Be-Eco<span className="text-primary font-black">Friendly</span>
             </span>
           </Link>
 
@@ -50,111 +58,99 @@ const Navbar = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`font-medium transition-colors duration-300 relative group ${
-                  location.pathname === link.path
+                className={`font-semibold transition-colors duration-300 relative group ${location.pathname === link.path
                     ? 'text-primary'
-                    : 'text-gray-700 hover:text-primary'
-                }`}
+                    : 'text-gray-600 hover:text-primary'
+                  }`}
               >
                 {link.name}
-                <span className={`absolute bottom-0 left-0 h-0.5 bg-primary transition-all duration-300 ${
-                  location.pathname === link.path ? 'w-full' : 'w-0 group-hover:w-full'
-                }`}></span>
+                <span className={`absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300 ${location.pathname === link.path ? 'w-full' : 'w-0 group-hover:w-full'
+                  }`}></span>
               </Link>
             ))}
           </div>
 
           {/* Right Side Icons */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
+            {/* Wishlist */}
+            {isAuthenticated && (
+              <Link to="/wishlist" className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <Heart className="h-6 w-6 text-gray-600" />
+              </Link>
+            )}
+
             {/* Cart */}
-            <Link to="/cart" className="relative">
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="p-2 hover:bg-mint rounded-full transition-colors"
-              >
-                <ShoppingCart className="h-6 w-6 text-gray-700" />
+            <Link to="/cart" className="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
+              <ShoppingCart className="h-6 w-6 text-gray-600" />
+              <AnimatePresence>
                 {cartItemsCount > 0 && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="absolute -top-1 -right-1 bg-green text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center"
+                    exit={{ scale: 0 }}
+                    className="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-white"
                   >
                     {cartItemsCount}
                   </motion.span>
                 )}
-              </motion.div>
+              </AnimatePresence>
             </Link>
 
-            {/* Wishlist */}
-            {isAuthenticated && (
-              <Link to="/wishlist">
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="p-2 hover:bg-mint rounded-full transition-colors"
-                >
-                  <Heart className="h-6 w-6 text-gray-700" />
-                </motion.div>
-              </Link>
-            )}
+            <div className="h-6 w-px bg-gray-200 mx-2 hidden md:block" />
 
             {/* User Menu */}
             {isAuthenticated ? (
-              <div className="relative hidden md:block">
+              <div className="relative">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center space-x-2 p-2 hover:bg-mint rounded-full transition-colors"
+                  className="flex items-center space-x-2 p-1 pl-3 bg-gray-50 border border-gray-100 rounded-full hover:bg-white transition-colors"
                 >
-                  <User className="h-6 w-6 text-gray-700" />
+                  <span className="text-sm font-semibold text-gray-700 hidden lg:block mr-1">{user?.name?.split(' ')[0]}</span>
+                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
+                    <User className="h-4 w-4" />
+                  </div>
                 </motion.button>
 
                 <AnimatePresence>
                   {userMenuOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50"
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-3 z-50 overflow-hidden"
                     >
-                      <div className="px-4 py-2 border-b">
-                        <p className="font-semibold text-gray-800">{user?.name}</p>
-                        <p className="text-sm text-gray-500">{user?.email}</p>
+                      <div className="px-5 py-3 border-b border-gray-50 mb-2">
+                        <p className="font-bold text-gray-900 truncate">{user?.name}</p>
+                        <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                       </div>
-                      
+
                       <Link
                         to="/profile"
-                        className="block px-4 py-2 hover:bg-mint transition-colors"
+                        className="flex items-center space-x-3 px-5 py-3 hover:bg-gray-50 transition-colors text-gray-600 font-semibold"
                         onClick={() => setUserMenuOpen(false)}
                       >
-                        <div className="flex items-center space-x-2">
-                          <User className="h-4 w-4" />
-                          <span>Profile</span>
-                        </div>
+                        <User className="h-4 w-4" />
+                        <span>Profile</span>
                       </Link>
 
                       {isAdmin && (
                         <Link
                           to="/admin"
-                          className="block px-4 py-2 hover:bg-mint transition-colors"
+                          className="flex items-center space-x-3 px-5 py-3 hover:bg-gray-50 transition-colors text-primary font-semibold"
                           onClick={() => setUserMenuOpen(false)}
                         >
-                          <div className="flex items-center space-x-2">
-                            <LayoutDashboard className="h-4 w-4" />
-                            <span>Admin Dashboard</span>
-                          </div>
+                          <LayoutDashboard className="h-4 w-4" />
+                          <span>Admin Dashboard</span>
                         </Link>
                       )}
 
                       <button
                         onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 hover:bg-mint transition-colors text-red-600"
+                        className="w-full flex items-center space-x-3 px-5 py-3 hover:bg-gray-50 transition-colors text-red-500 font-semibold text-left"
                       >
-                        <div className="flex items-center space-x-2">
-                          <LogOut className="h-4 w-4" />
-                          <span>Logout</span>
-                        </div>
+                        <LogOut className="h-4 w-4" />
+                        <span>Logout</span>
                       </button>
                     </motion.div>
                   )}
@@ -166,6 +162,7 @@ const Navbar = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => navigate('/login')}
+                  className="border-none hover:bg-gray-100"
                 >
                   Login
                 </Button>
@@ -181,13 +178,9 @@ const Navbar = () => {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2"
+              className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              {mobileMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
@@ -197,82 +190,52 @@ const Navbar = () => {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white border-t"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="md:hidden mx-4 mt-2 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden"
           >
-            <div className="px-4 py-4 space-y-3">
+            <div className="px-6 py-6 space-y-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`block py-2 font-medium transition-colors ${
-                    location.pathname === link.path
-                      ? 'text-primary font-bold'
-                      : 'text-gray-700 hover:text-primary'
-                  }`}
+                  className={`block py-2 text-lg font-bold transition-colors ${location.pathname === link.path ? 'text-primary' : 'text-gray-600'
+                    }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {link.name}
                 </Link>
               ))}
 
-              {isAuthenticated ? (
-                <>
-                  <Link
-                    to="/profile"
-                    className="block py-2 text-gray-700 hover:text-primary font-medium transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Profile
-                  </Link>
-                  <Link
-                    to="/wishlist"
-                    className="block py-2 text-gray-700 hover:text-primary font-medium transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Wishlist
-                  </Link>
-                  {isAdmin && (
+              <div className="pt-4 border-t border-gray-50 space-y-4">
+                {isAuthenticated ? (
+                  <>
                     <Link
-                      to="/admin"
-                      className="block py-2 text-gray-700 hover:text-primary font-medium transition-colors"
+                      to="/profile"
+                      className="block font-bold text-gray-600"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Admin Dashboard
+                      Profile
                     </Link>
-                  )}
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full text-left py-2 text-red-600 font-medium"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <div className="space-y-2 pt-2">
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => {
-                      navigate('/login');
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    Login
-                  </Button>
-                  <Button
-                    className="w-full"
-                    onClick={() => {
-                      navigate('/register');
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    Sign Up
-                  </Button>
-                </div>
-              )}
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left font-bold text-red-500"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4">
+                    <Button variant="outline" onClick={() => { navigate('/login'); setMobileMenuOpen(false); }}>
+                      Login
+                    </Button>
+                    <Button onClick={() => { navigate('/register'); setMobileMenuOpen(false); }}>
+                      Sign Up
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
           </motion.div>
         )}

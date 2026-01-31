@@ -1,13 +1,13 @@
 import { forwardRef } from 'react';
 
-const Input = forwardRef(({ 
-  label, 
-  error, 
-  type = 'text', 
-  placeholder = '', 
+const Input = forwardRef(({
+  label,
+  error,
+  type = 'text',
+  placeholder = '',
   className = '',
   icon: Icon,
-  ...props 
+  ...props
 }, ref) => {
   return (
     <div className="w-full">
@@ -26,9 +26,8 @@ const Input = forwardRef(({
           ref={ref}
           type={type}
           placeholder={placeholder}
-          className={`input-field ${Icon ? 'pl-10' : ''} ${
-            error ? 'border-red-500 focus:ring-red-500' : ''
-          } ${className}`}
+          className={`input-field ${Icon ? 'pl-10' : ''} ${error ? 'border-red-500 focus:ring-red-500' : ''
+            } ${className}`}
           {...props}
         />
       </div>

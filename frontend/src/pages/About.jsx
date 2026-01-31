@@ -1,174 +1,122 @@
 import { motion } from 'framer-motion';
-import { Leaf, Recycle, Users, Award } from 'lucide-react';
+import { Leaf, Recycle, Globe, Users, Shield, Target } from 'lucide-react';
 
 const About = () => {
-  const values = [
-    {
-      icon: <Leaf className="h-8 w-8 text-green" />,
-      title: "Sustainability",
-      description: "We're committed to promoting eco-friendly products that minimize environmental impact."
-    },
-    {
-      icon: <Recycle className="h-8 w-8 text-green" />,
-      title: "Circular Economy",
-      description: "Supporting brands that embrace recycling, upcycling, and waste reduction practices."
-    },
-    {
-      icon: <Users className="h-8 w-8 text-green" />,
-      title: "Community",
-      description: "Building a community of conscious consumers who care about our planet's future."
-    },
-    {
-      icon: <Award className="h-8 w-8 text-green" />,
-      title: "Quality",
-      description: "Curating high-quality sustainable products that stand the test of time."
-    }
+  const stats = [
+    { label: 'Products', value: '2k+', icon: Leaf },
+    { label: 'Users', value: '15k+', icon: Users },
+    { label: 'CO2 Saved', value: '50t', icon: Target },
+    { label: 'Regions', value: '12', icon: Globe },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-teal to-green">
-      <div className="container mx-auto px-4 py-16">
-        {/* Hero Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-16"
-        >
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-            Our Mission
-          </h1>
-          <p className="text-xl text-white max-w-3xl mx-auto">
-            Empowering conscious consumers with sustainable choices for a greener tomorrow
-          </p>
-        </motion.div>
-
-        {/* Story Section */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-16">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">Our Story</h2>
-              <p className="text-gray-600 mb-4">
-                Founded in 2023, Be-EcoFriendly emerged from a simple idea: making sustainable living 
-                accessible to everyone. We noticed that while eco-friendly products existed, finding 
-                quality options was often challenging and overwhelming.
-              </p>
-              <p className="text-gray-600 mb-4">
-                Our team of environmental enthusiasts and tech experts came together to create a 
-                platform that curates the best sustainable products from ethical brands worldwide.
-              </p>
-              <p className="text-gray-600">
-                Today, we're proud to support thousands of conscious consumers in their journey 
-                toward a more sustainable lifestyle, one purchase at a time.
-              </p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="bg-mint rounded-xl p-8 flex items-center justify-center"
-            >
-              <div className="text-center">
-                <Leaf className="h-24 w-24 text-green mx-auto mb-4" />
-                <p className="text-2xl font-bold text-gray-800">100% Eco-Friendly</p>
-                <p className="text-gray-600">Products Curated</p>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Values Section */}
-        <div className="mb-16">
-          <motion.h2
+    <div className="pt-24 min-h-screen bg-white">
+      {/* Hero Section */}
+      <section className="py-20 bg-mesh relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-3xl font-bold text-white text-center mb-12"
+            className="text-center max-w-3xl mx-auto"
           >
-            Our Core Values
-          </motion.h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {values.map((value, index) => (
+            <span className="inline-block py-1 px-3 rounded-full bg-mint text-primary text-xs font-bold uppercase tracking-widest mb-6">
+              Our Vision
+            </span>
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+              Empowering a Sustainable <span className="text-primary">Lifestyle</span>
+            </h1>
+            <p className="text-lg text-gray-600 font-medium leading-relaxed">
+              Be-EcoFriendly is more than just an e-commerce platform. We are a community-driven movement dedicated to making eco-conscious living accessible, stylish, and impactful.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-16 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white rounded-xl shadow-lg p-6 text-center"
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                className="text-center"
               >
-                <div className="flex justify-center mb-4">
-                  {value.icon}
+                <div className="inline-flex items-center justify-center p-3 bg-gray-50 rounded-2xl mb-4">
+                  <stat.icon className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">{value.title}</h3>
-                <p className="text-gray-600">{value.description}</p>
+                <div className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
+                <div className="text-sm font-semibold text-gray-500 uppercase tracking-wider">{stat.label}</div>
               </motion.div>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* Team Section */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-3xl font-bold text-gray-800 text-center mb-12"
-          >
-            Meet Our Team
-          </motion.h2>
-          <div className="grid md:grid-cols-3 gap-8">
+      {/* Mission Section */}
+      <section className="py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-center"
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
             >
-              <div className="bg-mint rounded-full w-32 h-32 mx-auto mb-4 flex items-center justify-center">
-                <Users className="h-16 w-16 text-green" />
+              <h2 className="text-3xl font-bold text-gray-900 mb-8">Our Mission</h2>
+              <div className="space-y-6">
+                <div className="flex items-start space-x-4">
+                  <div className="flex-shrink-0 p-2 bg-primary/10 rounded-lg">
+                    <Recycle className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-800 mb-2">Sustainable Sourcing</h3>
+                    <p className="text-gray-600 font-medium leading-relaxed">
+                      Every product in our collection is strictly vetted for environmental impact, ethical production, and material quality.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-4">
+                  <div className="flex-shrink-0 p-2 bg-primary/10 rounded-lg">
+                    <Globe className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-800 mb-2">Community Impact</h3>
+                    <p className="text-gray-600 font-medium leading-relaxed">
+                      We partner with local artisans and eco-focused startups to foster a regenerative economy.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-4">
+                  <div className="flex-shrink-0 p-2 bg-primary/10 rounded-lg">
+                    <Shield className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-800 mb-2">Transparency</h3>
+                    <p className="text-gray-600 font-medium leading-relaxed">
+                      We provide detailed ecological footprints for our items, ensuring you know the story behind every purchase.
+                    </p>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-xl font-bold text-gray-800">Alex Johnson</h3>
-              <p className="text-green font-medium mb-2">Founder & CEO</p>
-              <p className="text-gray-600">
-                Environmental scientist turned entrepreneur with a passion for sustainable innovation.
-              </p>
             </motion.div>
+
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="text-center"
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="bg-gray-100 rounded-3xl p-12 aspect-square flex items-center justify-center relative overflow-hidden shadow-inner"
             >
-              <div className="bg-mint rounded-full w-32 h-32 mx-auto mb-4 flex items-center justify-center">
-                <Users className="h-16 w-16 text-green" />
+              <Leaf className="h-64 w-64 text-primary opacity-10 absolute -bottom-10 -right-10 rotate-12" />
+              <div className="relative z-10 text-center">
+                <div className="text-6xl font-bold text-primary mb-4 italic">EST. 2024</div>
+                <div className="text-xl font-bold text-gray-800 uppercase tracking-[0.3em]">Be-EcoFriendly</div>
               </div>
-              <h3 className="text-xl font-bold text-gray-800">Maria Garcia</h3>
-              <p className="text-green font-medium mb-2">Head of Sustainability</p>
-              <p className="text-gray-600">
-                Expert in circular economy and ethical sourcing with 10+ years of industry experience.
-              </p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-              className="text-center"
-            >
-              <div className="bg-mint rounded-full w-32 h-32 mx-auto mb-4 flex items-center justify-center">
-                <Users className="h-16 w-16 text-green" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-800">Sam Wilson</h3>
-              <p className="text-green font-medium mb-2">Tech Lead</p>
-              <p className="text-gray-600">
-                Full-stack developer passionate about creating technology for positive environmental impact.
-              </p>
             </motion.div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 };

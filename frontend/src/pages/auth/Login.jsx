@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
-import { Mail, Lock, Leaf } from 'lucide-react';
+import { Mail, Lock, LogIn, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -17,40 +18,35 @@ const Login = () => {
     try {
       setLoading(true);
       await login(data.email, data.password);
+      toast.success('Welcome back!');
       navigate('/');
     } catch (error) {
       console.error('Login error:', error);
+      toast.error('Invalid email or password.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-teal to-green flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-mesh flex items-center justify-center py-20 px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="max-w-md w-full"
       >
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
-          {/* Logo */}
-          <div className="flex justify-center mb-6">
-            <motion.div
-              whileHover={{ rotate: 360 }}
-              transition={{ duration: 0.5 }}
-            >
-              <Leaf className="h-16 w-16 text-green" />
-            </motion.div>
-          </div>
-
+        <div className="bg-white rounded-[2.5rem] shadow-xl p-10 md:p-12 relative overflow-hidden border border-gray-100">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center justify-center p-3 bg-mint rounded-2xl mb-6">
+              <LogIn className="h-8 w-8 text-primary" />
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Welcome Back
-            </h2>
-            <p className="text-gray-600">
-              Login to continue your eco-friendly journey
+            </h1>
+            <p className="text-gray-500 font-medium">
+              Join the movement for sustainable living
             </p>
           </div>
 
@@ -59,74 +55,58 @@ const Login = () => {
             <Input
               label="Email Address"
               type="email"
-              placeholder="your@email.com"
+              placeholder="you@example.com"
               icon={Mail}
               {...register('email', {
                 required: 'Email is required',
                 pattern: {
                   value: /^\S+@\S+$/i,
-                  message: 'Invalid email address',
+                  message: 'Invalid email format',
                 },
               })}
               error={errors.email?.message}
             />
 
-            <Input
-              label="Password"
-              type="password"
-              placeholder="••••••••"
-              icon={Lock}
-              {...register('password', {
-                required: 'Password is required',
-                minLength: {
-                  value: 6,
-                  message: 'Password must be at least 6 characters',
-                },
-              })}
-              error={errors.password?.message}
-            />
-
-            <div className="flex items-center justify-between">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  className="rounded text-primary focus:ring-primary"
-                />
-                <span className="ml-2 text-sm text-gray-600">Remember me</span>
-              </label>
-              <Link
-                to="/forgot-password"
-                className="text-sm text-primary hover:text-teal"
-              >
-                Forgot password?
-              </Link>
+            <div className="space-y-2">
+              <Input
+                label="Password"
+                type="password"
+                placeholder="••••••••"
+                icon={Lock}
+                {...register('password', {
+                  required: 'Password is required',
+                  minLength: {
+                    value: 6,
+                    message: 'Password must be at least 6 characters',
+                  },
+                })}
+                error={errors.password?.message}
+              />
+              <div className="flex justify-end">
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-semibold text-primary hover:text-green-600 transition-colors"
+                >
+                  Forgot password?
+                </Link>
+              </div>
             </div>
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full py-4 text-lg font-bold"
               loading={loading}
             >
-              Sign In
+              <span className="mr-2">Sign In</span>
+              <ArrowRight className="h-5 w-5" />
             </Button>
           </form>
 
-          {/* Divider */}
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  Don't have an account?
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Register Link */}
-          <div className="mt-6 text-center">
+          {/* Redirect */}
+          <div className="mt-10 pt-8 border-t border-gray-50 text-center">
+            <p className="text-gray-500 font-medium mb-4">
+              Don't have an account?
+            </p>
             <Link to="/register">
               <Button variant="outline" className="w-full">
                 Create Account

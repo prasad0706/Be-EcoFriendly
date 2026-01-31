@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trash2, Star, MessageSquare, User, Package, Calendar, Search, Filter, MoreHorizontal, Quote } from 'lucide-react';
+import { Trash2, Star, MessageSquare, Package, Calendar, Quote } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../utils/api';
 import Button from '../../components/common/Button';
@@ -14,30 +14,29 @@ const AdminReviews = () => {
     queryFn: async () => {
       const res = await api.get('/admin/reviews?limit=100');
       return res.data.data;
-    },
-    refetchInterval: 10000,
+    }
   });
 
   const deleteMutation = useMutation({
     mutationFn: ({ productId, reviewId }) => api.delete(`/admin/reviews/${productId}/${reviewId}`),
     onSuccess: () => {
       queryClient.invalidateQueries(['adminReviews']);
-      toast.success('Feedback purged from system');
+      toast.success('Review deleted successfully');
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || 'Purge failed');
+      toast.error(error.response?.data?.message || 'Failed to delete review');
     }
   });
 
   const handleDelete = (productId, reviewId) => {
-    if (window.confirm('Permanent deletion of this feedback item?')) {
+    if (window.confirm('Are you sure you want to delete this review?')) {
       deleteMutation.mutate({ productId, reviewId });
     }
   };
 
   const renderStars = (rating) => {
     return (
-      <div className="flex items-center space-x-1">
+      <div className="flex items-center space-x-0.5">
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
@@ -51,79 +50,74 @@ const AdminReviews = () => {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="space-y-10 pb-10">
+    <div className="pb-10 space-y-8">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tight">Sentiments Hub</h1>
-          <p className="text-gray-500 font-medium mt-1">Monitor community feedback and quality signals.</p>
+          <h1 className="text-3xl font-bold text-gray-900">Product Reviews</h1>
+          <p className="text-gray-500 font-medium">Monitor and manage customer feedback.</p>
         </div>
 
-        <div className="bg-white/50 backdrop-blur-md px-6 py-3 rounded-2xl border border-gray-100 flex items-center space-x-4">
+        <div className="bg-white border border-gray-100 rounded-2xl px-6 py-3 shadow-sm flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-            <span className="text-xl font-black text-gray-900">4.8</span>
+            <span className="text-xl font-bold text-gray-900">4.8</span>
           </div>
-          <span className="text-gray-300">|</span>
-          <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{data?.total || 0} Total Reviews</span>
+          <div className="w-px h-6 bg-gray-100" />
+          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{data?.total || 0} Total Reviews</span>
         </div>
       </div>
 
-      {/* Reviews Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {/* Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <AnimatePresence>
-          {data?.reviews?.map((review, index) => (
+          {data?.reviews?.map((review) => (
             <motion.div
               key={review._id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl group hover:shadow-2xl transition-all duration-500 relative overflow-hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:shadow-md transition-all relative overflow-hidden group"
             >
-              <Quote className="absolute -top-6 -right-6 w-32 h-32 text-gray-50 opacity-[0.03] rotate-12" />
-
               <div className="relative z-10">
-                <div className="flex items-start justify-between mb-8">
+                <div className="flex items-start justify-between mb-6">
                   <div className="flex items-center space-x-4">
-                    <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center font-black text-gray-400 border border-gray-100">
+                    <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center font-bold text-gray-400 border border-gray-100">
                       {review.userName?.[0] || 'A'}
                     </div>
                     <div>
-                      <h3 className="font-black text-gray-900">{review.userName || 'Anonymous Member'}</h3>
-                      <div className="flex items-center space-x-2 mt-1">
+                      <h3 className="font-bold text-gray-900">{review.userName || 'Anonymous Customer'}</h3>
+                      <div className="mt-1">
                         {renderStars(review.rating)}
-                        <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest ml-2">Verified</span>
                       </div>
                     </div>
                   </div>
 
                   <button
                     onClick={() => handleDelete(review.productId, review._id)}
-                    className="p-3 bg-red-50 text-red-400 rounded-xl opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white"
+                    className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
                   >
                     <Trash2 className="h-5 w-5" />
                   </button>
                 </div>
 
-                <div className="mb-8">
-                  <p className="text-gray-700 leading-relaxed font-medium italic">
-                    "{review.comment || 'No comment provided for this rating.'}"
+                <div className="mb-6">
+                  <Quote className="h-6 w-6 text-gray-100 mb-2" />
+                  <p className="text-gray-700 font-medium leading-relaxed">
+                    {review.comment || 'No comment provided.'}
                   </p>
                 </div>
 
-                <div className="pt-8 border-t border-gray-50 flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-blue-50 rounded-lg">
-                      <Package className="h-4 w-4 text-blue-500" />
-                    </div>
-                    <span className="text-xs font-black text-gray-900 uppercase tracking-tighter max-w-[150px] truncate">
+                <div className="pt-6 border-t border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center space-x-2 text-primary">
+                    <Package className="h-4 w-4" />
+                    <span className="text-xs font-bold uppercase tracking-tight truncate max-w-[200px]">
                       {review.productName}
                     </span>
                   </div>
 
-                  <div className="flex items-center space-x-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                  <div className="flex items-center space-x-2 text-xs font-bold text-gray-400 uppercase">
                     <Calendar className="h-3.5 w-3.5" />
-                    <span>{new Date(review.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                    <span>{new Date(review.createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
               </div>
@@ -132,12 +126,10 @@ const AdminReviews = () => {
         </AnimatePresence>
 
         {data?.reviews?.length === 0 && (
-          <div className="lg:col-span-2 py-32 bg-white rounded-[3rem] border border-dashed border-gray-100 flex flex-col items-center justify-center text-center">
-            <div className="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center mb-6">
-              <MessageSquare className="h-10 w-10 text-gray-200" />
-            </div>
-            <h3 className="text-2xl font-black text-gray-900 tracking-tight">Silence is Golden</h3>
-            <p className="text-gray-400 font-bold uppercase text-[10px] tracking-widest mt-2 px-8">No community sentiments have been recorded in the system yet.</p>
+          <div className="lg:col-span-2 py-24 bg-white rounded-3xl border border-dashed border-gray-200 text-center">
+            <MessageSquare className="h-12 w-12 text-gray-200 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-gray-900">No reviews found</h3>
+            <p className="text-gray-500 mt-1">There are no customer reviews to display yet.</p>
           </div>
         )}
       </div>
