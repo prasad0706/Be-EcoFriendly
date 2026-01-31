@@ -15,13 +15,18 @@ const AdminCustomers = () => {
 
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['adminCustomers'],
     queryFn: async () => {
       const res = await api.get('/admin/users?limit=100');
       return res.data.data;
     },
-    refetchInterval: 5000, // Real-time updates
+    refetchInterval: 3000, // Real-time updates every 3 seconds
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchOnMount: true,
+    staleTime: 0, // Always consider data stale
+    cacheTime: 0, // Don't cache data
   });
 
   const updateUserRoleMutation = useMutation({
@@ -44,6 +49,19 @@ const AdminCustomers = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
+  // Calculate statistics
+  const totalUsers = data?.total || 0;
+  const adminUsers = data?.users?.filter(user => user.role === 'admin') || [];
+  const customerUsers = data?.users?.filter(user => user.role === 'customer') || [];
+  
+  // Calculate new users this month
+  const now = new Date();
+  const newThisMonth = data?.users?.filter(user => {
+    const createdDate = new Date(user.createdAt);
+    return createdDate.getMonth() === now.getMonth() && 
+           createdDate.getFullYear() === now.getFullYear();
+  }) || [];
+  
   const filteredCustomers = data?.users?.filter(customer => {
     const matchesSearch = customer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          customer.email?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -51,13 +69,34 @@ const AdminCustomers = () => {
     return matchesSearch && matchesRole;
   }) || [];
 
-  if (isLoading) return <Loading />;
+  if (isLoading && !data) return <Loading />;
+  
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+        <p className="text-red-800 font-medium mb-4">Unable to load customer data</p>
+        <p className="text-red-600 text-sm mb-4">Please check your internet connection and try again</p>
+        <button 
+          onClick={() => refetch()}
+          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-800">Customers Management</h1>
         <div className="flex items-center space-x-4">
+          <button
+            onClick={() => refetch()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+          >
+            <span>Refresh Data</span>
+          </button>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
@@ -82,19 +121,29 @@ const AdminCustomers = () => {
 
       {/* Customers Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white rounded-lg shadow-md p-6 relative">
+          {isLoading && (
+            <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center rounded-lg">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            </div>
+          )}
           <div className="flex items-center">
             <div className="p-3 bg-blue-100 rounded-lg">
               <User className="h-6 w-6 text-blue-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm text-gray-600">Total Customers</p>
-              <p className="text-2xl font-bold text-gray-800">{data?.total || 0}</p>
+              <p className="text-2xl font-bold text-gray-800">{customerUsers.length}</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white rounded-lg shadow-md p-6 relative">
+          {isLoading && (
+            <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center rounded-lg">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            </div>
+          )}
           <div className="flex items-center">
             <div className="p-3 bg-green-100 rounded-lg">
               <Shield className="h-6 w-6 text-green-600" />
@@ -102,13 +151,18 @@ const AdminCustomers = () => {
             <div className="ml-4">
               <p className="text-sm text-gray-600">Admin Users</p>
               <p className="text-2xl font-bold text-gray-800">
-                {data?.users?.filter(u => u.role === 'admin').length || 0}
+                {adminUsers.length}
               </p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white rounded-lg shadow-md p-6 relative">
+          {isLoading && (
+            <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center rounded-lg">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            </div>
+          )}
           <div className="flex items-center">
             <div className="p-3 bg-purple-100 rounded-lg">
               <Calendar className="h-6 w-6 text-purple-600" />
@@ -116,12 +170,7 @@ const AdminCustomers = () => {
             <div className="ml-4">
               <p className="text-sm text-gray-600">New This Month</p>
               <p className="text-2xl font-bold text-gray-800">
-                {data?.users?.filter(u => {
-                  const createdDate = new Date(u.createdAt);
-                  const now = new Date();
-                  return createdDate.getMonth() === now.getMonth() && 
-                         createdDate.getFullYear() === now.getFullYear();
-                }).length || 0}
+                {newThisMonth.length}
               </p>
             </div>
           </div>
@@ -294,21 +343,13 @@ const AdminCustomers = () => {
                   }`}>
                     {selectedCustomer.role || 'customer'}
                   </span>
-                  {selectedCustomer.role !== 'admin' ? (
+                  {selectedCustomer.role !== 'admin' && (
                     <Button
                       onClick={() => handleRoleChange(selectedCustomer._id, 'admin')}
                       className="flex items-center space-x-2"
                     >
                       <Shield className="h-4 w-4" />
                       <span>Make Admin</span>
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={() => handleRoleChange(selectedCustomer._id, 'customer')}
-                      className="flex items-center space-x-2 bg-yellow-500 hover:bg-yellow-600"
-                    >
-                      <User className="h-4 w-4" />
-                      <span>Revoke Admin</span>
                     </Button>
                   )}
                 </div>
