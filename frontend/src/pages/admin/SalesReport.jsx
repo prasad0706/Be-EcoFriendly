@@ -6,7 +6,7 @@ import { TrendingUp, IndianRupee, ShoppingCart, CreditCard } from 'lucide-react'
 import api from '../../utils/api';
 import { formatCurrency } from '../../utils/currency';
 import { PRODUCT_CATEGORIES } from '../../utils/constants';
-import Loading from '../../components/common/Loading';
+import { DashboardSkeleton } from '../../components/common/SkeletonLoaders';
 
 const COLORS = ['#2FB973', '#4ade80', '#60a5fa', '#f87171', '#fbbf24'];
 
@@ -22,7 +22,7 @@ const SalesReport = () => {
     refetchInterval: 60000,
   });
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <DashboardSkeleton />;
 
   const summary = salesReport?.summary || {};
   const salesTrend = salesReport?.salesTrend || [];

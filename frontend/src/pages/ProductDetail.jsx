@@ -5,7 +5,7 @@ import { ShoppingCart, Heart, Star, Package, Truck, Shield } from 'lucide-react'
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
-import Loading from '../components/common/Loading';
+import { ProductDetailSkeleton } from '../components/common/SkeletonLoaders';
 import Button from '../components/common/Button';
 import toast from 'react-hot-toast';
 import ProductImage from '../components/product/ProductImage';
@@ -52,11 +52,7 @@ const ProductDetail = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loading size="lg" />
-      </div>
-    );
+    return <ProductDetailSkeleton />;
   }
 
   if (error || !product) {

@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import api from '../../utils/api';
 import { formatCurrency } from '../../utils/currency';
-import Loading from '../../components/common/Loading';
+import { DashboardSkeleton } from '../../components/common/SkeletonLoaders';
 
 const AdminDashboard = () => {
   const { data: stats, isLoading } = useQuery({
@@ -25,7 +25,7 @@ const AdminDashboard = () => {
     refetchInterval: 5000, // Real-time updates every 5 seconds
   });
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <DashboardSkeleton />;
 
   const statCards = [
     {

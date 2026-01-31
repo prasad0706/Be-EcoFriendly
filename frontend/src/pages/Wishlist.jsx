@@ -6,6 +6,7 @@ import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
 import Button from '../components/common/Button';
 import ProductCard from '../components/product/ProductCard';
+import { GridSkeleton } from '../components/common/SkeletonLoaders';
 
 const Wishlist = () => {
   const { wishlist, removeFromWishlist, loading } = useWishlist();
@@ -31,13 +32,10 @@ const Wishlist = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary via-teal to-green">
-        <div className="container mx-auto px-4 py-16">
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green"></div>
-            </div>
-          </div>
+      <div className="min-h-screen bg-white py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-8">My Wishlist</h1>
+          <GridSkeleton columns={4} />
         </div>
       </div>
     );

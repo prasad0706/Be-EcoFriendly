@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Search, Filter, SlidersHorizontal } from 'lucide-react';
 import api from '../utils/api';
 import ProductCard from '../components/product/ProductCard';
-import Loading from '../components/common/Loading';
+import { GridSkeleton } from '../components/common/SkeletonLoaders';
 import Button from '../components/common/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -141,9 +141,7 @@ const Shop = () => {
 
         {/* Products Grid */}
         {isLoading ? (
-          <div className="py-20">
-            <Loading size="lg" />
-          </div>
+          <GridSkeleton columns={4} />
         ) : data?.data?.length > 0 ? (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">

@@ -4,7 +4,7 @@ import { Trash2, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../utils/api';
 import Button from '../../components/common/Button';
-import Loading from '../../components/common/Loading';
+import { ListSkeleton } from '../../components/common/SkeletonLoaders';
 
 const AdminReviews = () => {
   const queryClient = useQueryClient();
@@ -48,7 +48,7 @@ const AdminReviews = () => {
     );
   };
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <ListSkeleton />;
 
   return (
     <div className="space-y-6">

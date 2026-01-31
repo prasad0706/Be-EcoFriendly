@@ -7,7 +7,7 @@ import api from '../../utils/api';
 import { formatCurrency } from '../../utils/currency';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
-import Loading from '../../components/common/Loading';
+import { GridSkeleton } from '../../components/common/SkeletonLoaders';
 import { Package } from 'lucide-react';
 import ProductImage from '../../components/product/ProductImage';
 import BulkUploadModal from '../../components/admin/BulkUploadModal';
@@ -212,7 +212,7 @@ const AdminProducts = () => {
     setShowModal(false);
   };
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <GridSkeleton columns={4} />;
 
   return (
     <div className="space-y-6">

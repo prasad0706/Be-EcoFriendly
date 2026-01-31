@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import api from '../../utils/api';
 import { formatCurrency } from '../../utils/currency';
 import Button from '../../components/common/Button';
-import Loading from '../../components/common/Loading';
+import { ListSkeleton } from '../../components/common/SkeletonLoaders';
 
 import { ORDER_STATUSES, PAYMENT_STATUSES } from '../../utils/constants';
 
@@ -67,7 +67,7 @@ const AdminOrders = () => {
     }
   };
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <ListSkeleton />;
 
   return (
     <div className="space-y-6">
