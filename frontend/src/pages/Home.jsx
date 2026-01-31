@@ -37,165 +37,220 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-mesh">
       {/* Hero Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <section className="relative overflow-hidden pt-32 pb-20">
+        {/* Animated Background Blobs */}
+        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/3 w-96 h-96 bg-green-eco/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/3 w-96 h-96 bg-primary-blue/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h1 className="text-4xl md:text-6xl font-bold text-green-600   mb-6">
+              <div className="inline-flex items-center space-x-2 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full border border-white/50 mb-6 shadow-sm">
+                <Leaf className="h-4 w-4 text-green-eco" />
+                <span className="text-sm font-medium text-gray-700">Join the Eco-Revolution</span>
+              </div>
+              <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 leading-tight mb-6">
                 Live Sustainably,
-                <span className="block">Shop Consciously</span>
+                <span className="block gradient-text">Shop Consciously</span>
               </h1>
-              <p className="text-xl text-gray-600 mb-8">
-                Discover eco-friendly alternatives that make a difference. Join thousands of conscious consumers making sustainable choices.
+              <p className="text-lg text-gray-600 mb-10 leading-relaxed max-w-xl">
+                Discover curated eco-friendly alternatives that don't compromise on quality. Join over 10,000 conscious consumers making a real impact today.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-5">
                 <Link to="/shop">
-                  <Button size="lg" className="bg-green text-white hover:bg-green-600">
-                    Shop Now
+                  <Button size="lg" className="btn-secondary group">
+                    <span>Shop All Products</span>
+                    <ShoppingBag className="ml-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
                   </Button>
                 </Link>
                 <Link to="/about">
-                  <Button size="lg" variant="outline" className="border-green text-green hover:bg-green/10 hover:border-green-600 hover:text-green-600">
-                    Learn More
+                  <Button size="lg" className="btn-outline">
+                    Our Mission
                   </Button>
                 </Link>
+              </div>
+
+              <div className="mt-12 flex items-center space-x-4">
+                <div className="flex -space-x-2">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-gray-200 overflow-hidden">
+                      <img src={`https://i.pravatar.cc/150?u=${i}`} alt="user" />
+                    </div>
+                  ))}
+                </div>
+                <div className="text-sm text-gray-600">
+                  <span className="font-bold text-gray-900">4.9/5</span> from 2,000+ reviews
+                </div>
               </div>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, ease: "easeOut" }}
               className="relative"
             >
-              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-8">
+              <div className="relative z-10 glass-card p-4 animate-float">
                 <img
-                  src="https://images.unsplash.com/photo-1585155770447-2f66e2a397b5?w=600&h=400&fit=crop"
-                  alt="Eco-friendly products"
-                  className="rounded-xl shadow-2xl w-full"
+                  src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&h=600&fit=crop"
+                  alt="Sustainable Lifestyle"
+                  className="rounded-xl shadow-lg w-full object-cover aspect-[4/3]"
                 />
-              </div>
-              <div className="absolute -bottom-6 -left-6 bg-white rounded-xl shadow-xl p-4">
-                <div className="flex items-center">
-                  <div className="bg-green/10 p-3 rounded-lg mr-3">
-                    <Leaf className="h-6 w-6 text-green" />
+
+                {/* Floating Elements */}
+                <motion.div
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 1 }}
+                  className="absolute -top-10 -left-10 glass p-5 rounded-2xl shadow-xl hidden md:block"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="bg-green-eco/20 p-2 rounded-lg">
+                      <TrendingUp className="h-6 w-6 text-green-eco" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 font-medium">Monthly Impact</p>
+                      <p className="text-lg font-bold text-gray-900">+24% Organic</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-bold text-gray-800">100% Sustainable</p>
-                    <p className="text-sm text-gray-600">Verified eco-products</p>
+                </motion.div>
+
+                <motion.div
+                  initial={{ x: 20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 1.2 }}
+                  className="absolute -bottom-10 -right-10 glass p-5 rounded-2xl shadow-xl hidden md:block"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="bg-primary-blue/20 p-2 rounded-lg">
+                      <Truck className="h-6 w-6 text-primary-blue" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 font-medium">Free Shipping</p>
+                      <p className="text-lg font-bold text-gray-900">Over ₹999</p>
+                    </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
+
+              {/* Decorative Circle */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] border border-gray-200 rounded-full -z-10 opacity-50" />
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16 bg-white">
+      {/* Stats Section with Glassmorphism */}
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="text-center"
-              >
-                <p className="text-3xl md:text-4xl font-bold text-primary mb-2">{stat.value}</p>
-                <p className="text-gray-600">{stat.label}</p>
-              </motion.div>
-            ))}
+          <div className="glass-card p-10 md:p-16">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+              {stats.map((stat, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <p className="text-4xl md:text-5xl font-black gradient-text mb-2">{stat.value}</p>
+                  <p className="text-sm font-semibold text-gray-500 uppercase tracking-widest">{stat.label}</p>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-gray-50">
+      {/* Features Section - Modern Cards */}
+      <section className="py-24 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-20">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-3xl md:text-4xl font-bold text-gray-800 mb-4"
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-4xl md:text-5xl font-bold text-gray-900 mb-6"
             >
-              Why Choose Us?
+              The Be-Eco Way
             </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-xl text-gray-600 max-w-3xl mx-auto"
-            >
-              We're committed to making sustainable living accessible and affordable for everyone.
-            </motion.p>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              We bridge the gap between luxury and sustainability, making it easy to live better without compromise.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
             {features.map((feature, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ y: -10 }}
-                className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all"
+                whileHover={{ y: -12 }}
+                className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 border border-white shadow-xl hover:shadow-2xl transition-all group"
               >
-                <div className="bg-green/10 p-3 rounded-lg w-fit mb-4">
+                <div className="bg-gradient-to-br from-green-eco/20 to-teal/10 p-4 rounded-2xl w-fit mb-6 group-hover:scale-110 transition-transform">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">{feature.title}</h3>
+                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+      {/* Testimonials Section - Premium Feel */}
+      <section className="py-24 bg-gray-900 text-white relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-green-eco rounded-full blur-[120px]" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary-blue rounded-full blur-[120px]" />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-20">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-3xl md:text-4xl font-bold text-gray-800 mb-4"
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-4xl md:text-5xl font-bold mb-6"
             >
-              What Our Customers Say
+              Real Stories from Real People
             </motion.h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {[1, 2, 3].map((item) => (
               <motion.div
                 key={item}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: item * 0.1 }}
-                className="bg-gray-50 rounded-2xl p-6"
+                className="glass-dark p-10 rounded-3xl border border-white/10 hover:border-white/20 transition-all group"
               >
-                <div className="flex items-center mb-4">
+                <div className="flex items-center mb-8">
                   {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <svg key={i} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ))}
                 </div>
-                <p className="text-gray-600 mb-4">
-                  "Switching to eco-friendly products has never been easier. The quality is exceptional and delivery was super fast!"
+                <p className="text-xl text-gray-300 mb-8 italic leading-relaxed">
+                  "Switching to Be-Eco has completely transformed my daily routine. The quality is far beyond what I expected from sustainable products."
                 </p>
                 <div className="flex items-center">
-                  <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
+                  <img src={`https://i.pravatar.cc/150?u=user${item}`} className="w-14 h-14 rounded-2xl border-2 border-green-eco/30 group-hover:scale-110 transition-transform" />
                   <div className="ml-4">
-                    <p className="font-semibold text-gray-800">Sarah Johnson</p>
-                    <p className="text-gray-600">Verified Customer</p>
+                    <p className="font-bold text-lg text-white">Alex Rivera</p>
+                    <p className="text-green-eco font-medium">Sustainable Explorer</p>
                   </div>
                 </div>
               </motion.div>
@@ -204,27 +259,34 @@ const Home = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-3xl mx-auto"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
-              Ready to Make a Difference?
-            </h2>
-            <p className="text-xl text-gray-600 mb-8">
-              Join our community of conscious consumers and start your sustainable journey today.
-            </p>
-            <Link to="/shop">
-              <Button size="lg" className="bg-green text-white hover:bg-green-600">
-                <ShoppingBag className="h-5 w-5 mr-2" />
-                Start Shopping
-              </Button>
-            </Link>
-          </motion.div>
+      {/* CTA Section - Bold & Impactful */}
+      <section className="py-24 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative overflow-hidden rounded-[3rem] bg-gradient-to-br from-green-eco to-primary-blue p-12 md:p-24 text-center">
+            <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2" />
+              <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2" />
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="relative z-10 max-w-3xl mx-auto text-white"
+            >
+              <h2 className="text-4xl md:text-6xl font-black mb-8">
+                Ready to Join the Revolution?
+              </h2>
+              <p className="text-xl text-white/90 mb-12 leading-relaxed">
+                Be part of a global movement towards a greener future. Your first step starts with a conscious choice.
+              </p>
+              <Link to="/shop">
+                <Button size="xl" className="bg-white text-gray-900 border-none px-12 py-5 rounded-2xl font-black text-xl hover:scale-105 transition-transform shadow-2xl">
+                  Start Shopping Now
+                </Button>
+              </Link>
+            </motion.div>
+          </div>
         </div>
       </section>
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
-import { Eye, Shield, User, Mail, Calendar, Search } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Eye, Shield, User, Mail, Calendar, Search, Filter, MoreHorizontal, UserCheck, UserPlus, TrendingUp, X, MapPin, AtSign, ShieldCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../utils/api';
 import { formatCurrency } from '../../utils/currency';
@@ -21,23 +21,18 @@ const AdminCustomers = () => {
       const res = await api.get('/admin/users?limit=100');
       return res.data.data;
     },
-    refetchInterval: 3000, // Real-time updates every 3 seconds
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    refetchOnMount: true,
-    staleTime: 0, // Always consider data stale
-    cacheTime: 0, // Don't cache data
+    refetchInterval: 10000,
   });
 
   const updateUserRoleMutation = useMutation({
     mutationFn: ({ userId, role }) => api.put(`/admin/users/${userId}/role`, { role }),
     onSuccess: () => {
       queryClient.invalidateQueries(['adminCustomers']);
-      toast.success('User role updated successfully');
+      toast.success('Permissions updated successfully');
       setSelectedCustomer(null);
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to update user role');
+      toast.error(error.response?.data?.message || 'Permission update failed');
     }
   });
 
@@ -46,206 +41,168 @@ const AdminCustomers = () => {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString();
+    return new Date(dateString).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
-  // Calculate statistics
-  const totalUsers = data?.total || 0;
-  const adminUsers = data?.users?.filter(user => user.role === 'admin') || [];
-  const customerUsers = data?.users?.filter(user => user.role === 'customer') || [];
-  
-  // Calculate new users this month
-  const now = new Date();
-  const newThisMonth = data?.users?.filter(user => {
-    const createdDate = new Date(user.createdAt);
-    return createdDate.getMonth() === now.getMonth() && 
-           createdDate.getFullYear() === now.getFullYear();
-  }) || [];
-  
   const filteredCustomers = data?.users?.filter(customer => {
     const matchesSearch = customer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         customer.email?.toLowerCase().includes(searchTerm.toLowerCase());
+      customer.email?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = filterRole ? customer.role === filterRole : true;
     return matchesSearch && matchesRole;
   }) || [];
 
+  // Stats calculation
+  const stats = {
+    total: data?.users?.length || 0,
+    admins: data?.users?.filter(u => u.role === 'admin').length || 0,
+    newThisMonth: data?.users?.filter(u => {
+      const d = new Date(u.createdAt);
+      const now = new Date();
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }).length || 0
+  };
+
   if (isLoading && !data) return <Loading />;
-  
-  if (error) {
-    return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-        <p className="text-red-800 font-medium mb-4">Unable to load customer data</p>
-        <p className="text-red-600 text-sm mb-4">Please check your internet connection and try again</p>
-        <button 
-          onClick={() => refetch()}
-          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-800">Customers Management</h1>
-        <div className="flex items-center space-x-4">
-          <button
+    <div className="space-y-10 pb-10">
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+        <div>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight">User Base Analytics</h1>
+          <p className="text-gray-500 font-medium mt-1">Direct oversight of your global community.</p>
+        </div>
+
+        <div className="flex items-center space-x-3">
+          <Button
             onClick={() => refetch()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+            className="bg-white text-gray-700 hover:bg-gray-50 border border-gray-100 px-6 py-3 rounded-2xl shadow-sm font-bold"
           >
-            <span>Refresh Data</span>
-          </button>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <input
-              type="text"
-              placeholder="Search customers..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-            />
-          </div>
-          <select
-            value={filterRole}
-            onChange={(e) => setFilterRole(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-          >
-            <option value="">All Roles</option>
-            <option value="customer">Customer</option>
-            <option value="admin">Admin</option>
-          </select>
+            Refresh Hub
+          </Button>
         </div>
       </div>
 
-      {/* Customers Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow-md p-6 relative">
-          {isLoading && (
-            <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center rounded-lg">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+      {/* Stats Bento Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl relative overflow-hidden group">
+          <div className="absolute -right-4 -bottom-4 bg-blue-50 w-32 h-32 rounded-full group-hover:scale-110 transition-transform duration-500" />
+          <div className="relative z-10">
+            <div className="bg-blue-600 w-12 h-12 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-600/20">
+              <User className="text-white h-6 w-6" />
             </div>
-          )}
-          <div className="flex items-center">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <User className="h-6 w-6 text-blue-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm text-gray-600">Total Customers</p>
-              <p className="text-2xl font-bold text-gray-800">{customerUsers.length}</p>
-            </div>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Active Community</p>
+            <h3 className="text-4xl font-black text-gray-900 tabular-nums">{stats.total}</h3>
           </div>
         </div>
-        
-        <div className="bg-white rounded-lg shadow-md p-6 relative">
-          {isLoading && (
-            <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center rounded-lg">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+
+        <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl relative overflow-hidden group">
+          <div className="absolute -right-4 -bottom-4 bg-green-50 w-32 h-32 rounded-full group-hover:scale-110 transition-transform duration-500" />
+          <div className="relative z-10">
+            <div className="bg-green-600 w-12 h-12 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-green-600/20">
+              <ShieldCheck className="text-white h-6 w-6" />
             </div>
-          )}
-          <div className="flex items-center">
-            <div className="p-3 bg-green-100 rounded-lg">
-              <Shield className="h-6 w-6 text-green-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm text-gray-600">Admin Users</p>
-              <p className="text-2xl font-bold text-gray-800">
-                {adminUsers.length}
-              </p>
-            </div>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Administrative Tier</p>
+            <h3 className="text-4xl font-black text-gray-900 tabular-nums">{stats.admins}</h3>
           </div>
         </div>
-        
-        <div className="bg-white rounded-lg shadow-md p-6 relative">
-          {isLoading && (
-            <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center rounded-lg">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+
+        <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl relative overflow-hidden group">
+          <div className="absolute -right-4 -bottom-4 bg-purple-50 w-32 h-32 rounded-full group-hover:scale-110 transition-transform duration-500" />
+          <div className="relative z-10">
+            <div className="bg-purple-600 w-12 h-12 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-purple-600/20">
+              <TrendingUp className="text-white h-6 w-6" />
             </div>
-          )}
-          <div className="flex items-center">
-            <div className="p-3 bg-purple-100 rounded-lg">
-              <Calendar className="h-6 w-6 text-purple-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm text-gray-600">New This Month</p>
-              <p className="text-2xl font-bold text-gray-800">
-                {newThisMonth.length}
-              </p>
-            </div>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">New Registrations</p>
+            <h3 className="text-4xl font-black text-gray-900 tabular-nums">+{stats.newThisMonth}</h3>
           </div>
         </div>
       </div>
 
-      {/* Customers Table */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      {/* Search & Filter */}
+      <div className="bg-white/50 backdrop-blur-md rounded-[2rem] p-4 flex flex-col md:flex-row gap-4 border border-white shadow-xl shadow-gray-200/50">
+        <div className="relative flex-1">
+          <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+          <input
+            type="text"
+            placeholder="Identify user by name or digital address..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-14 pr-6 py-4 bg-white rounded-2xl border-none focus:ring-2 focus:ring-gray-200 font-medium shadow-sm"
+          />
+        </div>
+
+        <select
+          value={filterRole}
+          onChange={(e) => setFilterRole(e.target.value)}
+          className="px-6 py-4 bg-white rounded-2xl border-none focus:ring-2 focus:ring-gray-200 font-bold text-gray-700 shadow-sm appearance-none min-w-[180px]"
+        >
+          <option value="">Role: All Access</option>
+          <option value="customer">Customer Access</option>
+          <option value="admin">Admin Privilege</option>
+        </select>
+      </div>
+
+      {/* User Ledger */}
+      <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-gray-50 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                <th className="px-8 py-6">Member Identity</th>
+                <th className="px-8 py-6">Digital Anchor</th>
+                <th className="px-8 py-6">Privilege Tier</th>
+                <th className="px-8 py-6">Tenure</th>
+                <th className="px-8 py-6 text-right">Access</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-50">
               {filteredCustomers.map((customer) => (
                 <motion.tr
                   key={customer._id}
                   layout
-                  className="hover:bg-gray-50"
+                  className="group hover:bg-gray-50/50 transition-all"
                 >
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white">
-                          {customer.name?.charAt(0) || 'U'}
-                        </div>
+                  <td className="px-8 py-6">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 rounded-[1.25rem] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center font-black text-gray-600 shadow-sm border border-white">
+                        {customer.name?.charAt(0) || 'U'}
                       </div>
-                      <div className="ml-4">
-                        <div className="font-medium text-gray-900">{customer.name || 'N/A'}</div>
+                      <div>
+                        <p className="font-black text-gray-900">{customer.name || 'Anonymous'}</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase mt-0.5">ID: {customer._id.slice(-6).toUpperCase()}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    <div className="flex items-center">
-                      <Mail className="h-4 w-4 mr-2 text-gray-400" />
-                      {customer.email || 'N/A'}
+                  <td className="px-8 py-6">
+                    <div className="flex items-center space-x-2 text-sm font-bold text-gray-500">
+                      <AtSign className="h-4 w-4 text-gray-300" />
+                      <span>{customer.email}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      customer.role === 'admin' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-blue-100 text-blue-800'
-                    }`}>
+                  <td className="px-8 py-6">
+                    <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-transparent ${customer.role === 'admin'
+                        ? 'bg-green-50 text-green-600 border-green-100'
+                        : 'bg-blue-50 text-blue-600 border-blue-100'
+                      }`}>
                       {customer.role || 'customer'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
+                  <td className="px-8 py-6 text-sm font-bold text-gray-400">
                     {formatDate(customer.createdAt)}
                   </td>
-                  <td className="px-6 py-4 text-sm">
-                    <div className="flex space-x-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
+                  <td className="px-8 py-6 text-right">
+                    <div className="flex justify-end space-x-2">
+                      <button
                         onClick={() => setSelectedCustomer(customer)}
+                        className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-gray-900 hover:shadow-md transition-all"
                       >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      {customer.role !== 'admin' && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleRoleChange(customer._id, 'admin')}
-                          className="text-green-600 border-green-600 hover:bg-green-50"
-                        >
-                          <Shield className="h-4 w-4" />
-                        </Button>
-                      )}
+                        <Eye className="h-5 w-5" />
+                      </button>
                     </div>
                   </td>
                 </motion.tr>
@@ -255,109 +212,119 @@ const AdminCustomers = () => {
         </div>
       </div>
 
-      {/* Customer Detail Modal */}
-      {selectedCustomer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-          >
-            <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-800">
-                Customer Details
-              </h2>
-              <button
-                onClick={() => setSelectedCustomer(null)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="p-6 space-y-6">
-              {/* Customer Info */}
-              <div className="flex items-center space-x-6">
-                <div className="flex-shrink-0 h-20 w-20">
-                  <div className="h-20 w-20 rounded-full bg-primary flex items-center justify-center text-white text-2xl font-bold">
+      {/* Customer Modal - Premium Redesign */}
+      <AnimatePresence>
+        {selectedCustomer && (
+          <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4 lg:p-10">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 30 }}
+              className="bg-white rounded-[3rem] shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+            >
+              <div className="px-12 py-12 border-b border-gray-100 shrink-0 flex items-center justify-between">
+                <div className="flex items-center space-x-8">
+                  <div className="w-24 h-24 rounded-[2.5rem] bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center text-3xl font-black text-white shadow-xl">
                     {selectedCustomer.name?.charAt(0) || 'U'}
                   </div>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-800">{selectedCustomer.name || 'N/A'}</h3>
-                  <p className="text-gray-600">{selectedCustomer.email || 'N/A'}</p>
-                  <span className={`inline-block mt-2 px-3 py-1 rounded-full text-sm font-medium ${
-                    selectedCustomer.role === 'admin' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-blue-100 text-blue-800'
-                  }`}>
-                    {selectedCustomer.role || 'customer'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Customer Details */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-gray-800 mb-3">Account Information</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">User ID:</span>
-                      <span className="font-mono">{selectedCustomer._id}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Email Verified:</span>
-                      <span>{selectedCustomer.isVerified ? 'Yes' : 'No'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Account Status:</span>
-                      <span>{selectedCustomer.isActive ? 'Active' : 'Inactive'}</span>
+                  <div>
+                    <h2 className="text-4xl font-black text-gray-900 tracking-tight">{selectedCustomer.name}</h2>
+                    <div className="flex items-center space-x-3 mt-2">
+                      <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${selectedCustomer.role === 'admin'
+                          ? 'bg-green-500 text-white'
+                          : 'bg-blue-600 text-white'
+                        }`}>
+                        {selectedCustomer.role || 'customer'} Tier
+                      </span>
+                      <span className="text-gray-300">•</span>
+                      <span className="text-gray-400 text-xs font-bold uppercase">Member since {new Date(selectedCustomer.createdAt).getFullYear()}</span>
                     </div>
                   </div>
                 </div>
+                <button onClick={() => setSelectedCustomer(null)} className="p-4 hover:bg-gray-100 rounded-[2rem] text-gray-400 hover:text-gray-900 transition-colors">
+                  <X className="h-8 w-8" />
+                </button>
+              </div>
 
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-gray-800 mb-3">Registration Details</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Joined:</span>
-                      <span>{formatDate(selectedCustomer.createdAt)}</span>
+              <div className="flex-1 overflow-y-auto px-12 py-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                  <div className="space-y-8">
+                    <div>
+                      <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Digital Identity</h4>
+                      <div className="space-y-4">
+                        <div className="p-6 bg-gray-50 rounded-[2rem] border border-gray-100/50 flex items-center space-x-4">
+                          <Mail className="h-6 w-6 text-gray-400" />
+                          <div>
+                            <p className="text-[10px] font-black text-gray-400 uppercase">Primary Email</p>
+                            <p className="font-bold text-gray-900">{selectedCustomer.email}</p>
+                          </div>
+                        </div>
+                        <div className="p-6 bg-gray-50 rounded-[2rem] border border-gray-100/50 flex items-center space-x-4">
+                          <MapPin className="h-6 w-6 text-gray-400" />
+                          <div>
+                            <p className="text-[10px] font-black text-gray-400 uppercase">Region Access</p>
+                            <p className="font-bold text-gray-900">Standard Global</p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Last Updated:</span>
-                      <span>{formatDate(selectedCustomer.updatedAt)}</span>
+
+                    <div className="p-8 bg-gray-900 rounded-[2.5rem] text-white">
+                      <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-6">Security & Auth</h4>
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center text-sm font-bold">
+                          <span className="text-white/60">Verification Status</span>
+                          <span className={selectedCustomer.isVerified ? 'text-green-400' : 'text-orange-400'}>
+                            {selectedCustomer.isVerified ? 'Syste-Verified' : 'Pending Verification'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm font-bold">
+                          <span className="text-white/60">Account Integrity</span>
+                          <span className="text-green-400">Stable</span>
+                        </div>
+                        <div className="pt-6 border-t border-white/10 flex justify-between items-center">
+                          <span className="text-[10px] text-white/40 uppercase">Identity Hash</span>
+                          <span className="text-[10px] font-mono text-white/20 uppercase">{selectedCustomer._id}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-8">
+                    <div className="bg-white border-2 border-dashed border-gray-100 rounded-[2.5rem] p-8 flex flex-col items-center justify-center text-center">
+                      <div className="bg-gray-50 w-16 h-16 rounded-[1.5rem] flex items-center justify-center mb-6">
+                        <Clock className="h-8 w-8 text-gray-300" />
+                      </div>
+                      <h4 className="text-lg font-black text-gray-900">Advanced Analytics Locked</h4>
+                      <p className="text-xs text-gray-400 font-bold mt-2 leading-relaxed px-6 uppercase tracking-tight">Full transaction history and behavioral data becomes available once first order is processed.</p>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Access Control Override</h4>
+                      <button
+                        disabled={updateUserRoleMutation.isPending}
+                        onClick={() => handleRoleChange(selectedCustomer._id, selectedCustomer.role === 'admin' ? 'customer' : 'admin')}
+                        className={`w-full p-6 rounded-[2rem] font-black text-sm uppercase tracking-widest transition-all shadow-xl hover:-translate-y-1 ${selectedCustomer.role === 'admin'
+                            ? 'bg-red-50 text-red-600 border border-red-100 hover:bg-red-100'
+                            : 'bg-gray-900 text-white hover:bg-black shadow-gray-900/20'
+                          }`}
+                      >
+                        {selectedCustomer.role === 'admin' ? 'Revoke System Admin' : 'Grant Administrative Privilege'}
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Role Management */}
-              <div className="border-t pt-4">
-                <h4 className="font-semibold text-gray-800 mb-3">Role Management</h4>
-                <div className="flex items-center space-x-4">
-                  <span>Current Role:</span>
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    selectedCustomer.role === 'admin' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-blue-100 text-blue-800'
-                  }`}>
-                    {selectedCustomer.role || 'customer'}
-                  </span>
-                  {selectedCustomer.role !== 'admin' && (
-                    <Button
-                      onClick={() => handleRoleChange(selectedCustomer._id, 'admin')}
-                      className="flex items-center space-x-2"
-                    >
-                      <Shield className="h-4 w-4" />
-                      <span>Make Admin</span>
-                    </Button>
-                  )}
-                </div>
+              <div className="px-12 py-10 bg-gray-50/50 border-t border-gray-100 flex justify-end shrink-0">
+                <Button onClick={() => setSelectedCustomer(null)} className="px-12 py-4 bg-gray-900 text-white rounded-2xl font-black text-sm">
+                  Dismiss Dossier
+                </Button>
               </div>
-            </div>
-          </motion.div>
-        </div>
-      )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

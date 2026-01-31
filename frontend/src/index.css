@@ -17,23 +17,65 @@ body {
 }
 
 @layer components {
+  .glass {
+    @apply bg-white/20 backdrop-blur-md border border-white/20 shadow-xl;
+  }
+
+  .glass-dark {
+    @apply bg-black/20 backdrop-blur-md border border-white/10 shadow-xl;
+  }
+
+  .glass-card {
+    @apply bg-white/40 backdrop-blur-lg border border-white/30 shadow-2xl rounded-2xl;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-green-eco to-primary-blue;
+  }
+
   .btn-primary {
-    @apply bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-opacity-90 transition-all duration-300 shadow-md hover:shadow-lg;
+    @apply bg-primary text-white px-6 py-3 rounded-xl font-semibold hover:bg-opacity-90 transition-all duration-300 shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 active:translate-y-0;
   }
 
   .btn-secondary {
-    @apply bg-green text-white px-6 py-3 rounded-lg font-medium hover:bg-opacity-90 transition-all duration-300 shadow-md hover:shadow-lg;
+    @apply bg-gradient-to-r from-green-eco to-teal text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-green/30 hover:-translate-y-0.5 active:translate-y-0;
   }
 
   .btn-outline {
-    @apply border-2 border-primary text-primary px-6 py-3 rounded-lg font-medium hover:bg-primary hover:text-white transition-all duration-300;
+    @apply border-2 border-primary/20 text-primary px-6 py-3 rounded-xl font-semibold hover:bg-primary/5 hover:border-primary transition-all duration-300;
   }
 
   .input-field {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all;
+    @apply w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all backdrop-blur-sm;
   }
 
-  .card {
-    @apply bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300;
+  .card-premium {
+    @apply bg-white rounded-2xl shadow-xl hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 border border-gray-100;
   }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-20px) rotate(2deg);
+  }
+
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.bg-mesh {
+  background-color: #f6fbf9;
+  background-image:
+    radial-gradient(at 0% 0%, hsla(158, 64%, 93%, 1) 0, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(208, 79%, 92%, 1) 0, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(178, 64%, 93%, 1) 0, transparent 50%);
 }
