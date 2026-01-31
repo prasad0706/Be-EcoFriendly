@@ -129,28 +129,34 @@ const AdminDashboard = () => {
               {stats?.recentOrders?.map((order) => (
                 <tr key={order._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                    #{order._id.slice(-8)}
+                    #{order._id?.slice(-8) || 'N/A'}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    {order.user?.name || 'N/A'}
+                    {order.user?.name || order.shippingAddress?.name || 'Guest'}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
-                    {formatCurrency(order.totalPrice)}
+                    {formatCurrency(order.totalPrice || 0)}
                   </td>
                   <td className="px-6 py-4 text-sm">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      order.orderStatus === 'Delivered' ? 'bg-green-100 text-green-800' :
-                      order.orderStatus === 'Processing' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-blue-100 text-blue-800'
-                    }`}>
-                      {order.orderStatus}
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${order.orderStatus === 'Delivered' ? 'bg-green-100 text-green-800' :
+                        order.orderStatus === 'Processing' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-blue-100 text-blue-800'
+                      }`}>
+                      {order.orderStatus || 'Pending'}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    {new Date(order.createdAt).toLocaleDateString()}
+                    {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}
                   </td>
                 </tr>
               ))}
+              {(!stats?.recentOrders || stats.recentOrders.length === 0) && (
+                <tr>
+                  <td colSpan="5" className="px-6 py-8 text-center text-gray-500 italic">
+                    No recent orders found
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

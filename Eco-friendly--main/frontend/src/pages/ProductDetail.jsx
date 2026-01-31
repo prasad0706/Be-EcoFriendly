@@ -8,6 +8,7 @@ import api from '../utils/api';
 import Loading from '../components/common/Loading';
 import Button from '../components/common/Button';
 import toast from 'react-hot-toast';
+import ProductImage from '../components/product/ProductImage';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -32,7 +33,7 @@ const ProductDetail = () => {
       toast.error('Please login to add items to cart');
       return;
     }
-    
+
     try {
       await addToCart(product._id, quantity);
       toast.success('Product added to cart!');
@@ -69,7 +70,7 @@ const ProductDetail = () => {
     );
   }
 
-  const discount = product.originalPrice 
+  const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
@@ -91,10 +92,9 @@ const ProductDetail = () => {
             <div className="space-y-4">
               {/* Main Image */}
               <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                <img
-                  src={product.images?.[selectedImage]?.url || '/placeholder-product.jpg'}
+                <ProductImage
+                  src={product.images?.[selectedImage]?.url}
                   alt={product.name}
-                  className="w-full h-full object-contain"
                 />
               </div>
 
@@ -105,14 +105,13 @@ const ProductDetail = () => {
                     <button
                       key={index}
                       onClick={() => setSelectedImage(index)}
-                      className={`w-20 h-20 rounded-lg overflow-hidden border-2 ${
-                        selectedImage === index ? 'border-primary' : 'border-gray-200'
-                      }`}
+                      className={`w-20 h-20 rounded-lg overflow-hidden border-2 ${selectedImage === index ? 'border-primary' : 'border-gray-200'
+                        }`}
                     >
-                      <img
+                      <ProductImage
                         src={image.url}
                         alt={`${product.name} ${index + 1}`}
-                        className="w-full h-full object-cover"
+                        aspectRatio="h-full"
                       />
                     </button>
                   ))}
@@ -127,18 +126,17 @@ const ProductDetail = () => {
                   {product.category}
                 </span>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
-                
+
                 {/* Rating */}
                 <div className="flex items-center mb-4">
                   <div className="flex items-center">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className={`h-5 w-5 ${
-                          i < Math.floor(product.ratings?.average || 0)
-                            ? 'text-yellow-400 fill-current'
-                            : 'text-gray-300'
-                        }`}
+                        className={`h-5 w-5 ${i < Math.floor(product.ratings?.average || 0)
+                          ? 'text-yellow-400 fill-current'
+                          : 'text-gray-300'
+                          }`}
                       />
                     ))}
                   </div>
@@ -235,7 +233,7 @@ const ProductDetail = () => {
                     <ShoppingCart className="h-5 w-5 mr-2" />
                     {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
                   </Button>
-                  
+
                   <Button
                     variant="outline"
                     onClick={handleAddToWishlist}
@@ -257,7 +255,7 @@ const ProductDetail = () => {
                     <p className="text-sm text-gray-600">On orders over ₹500</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start">
                   <Shield className="h-6 w-6 text-primary mt-1 mr-3 flex-shrink-0" />
                   <div>
@@ -265,7 +263,7 @@ const ProductDetail = () => {
                     <p className="text-sm text-gray-600">100% secure payment</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start">
                   <Package className="h-6 w-6 text-primary mt-1 mr-3 flex-shrink-0" />
                   <div>
@@ -281,7 +279,7 @@ const ProductDetail = () => {
           <div className="border-t border-gray-200">
             <div className="px-6 py-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Product Details</h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Description</h3>
@@ -289,7 +287,7 @@ const ProductDetail = () => {
                     <p>{product.description}</p>
                   </div>
                 </div>
-                
+
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Specifications</h3>
                   <dl className="space-y-3">

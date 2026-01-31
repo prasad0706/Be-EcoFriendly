@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, } from 'framer-motion';
 import { Plus, Edit, Trash2, Image as ImageIcon, X, Upload } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../utils/api';
@@ -8,17 +8,10 @@ import { formatCurrency } from '../../utils/currency';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Loading from '../../components/common/Loading';
+import { Package } from 'lucide-react';
+import ProductImage from '../../components/product/ProductImage';
 
-const CATEGORIES = [
-  'Reusable Products',
-  'Organic Foods',
-  'Eco-Friendly Home',
-  'Sustainable Fashion',
-  'Zero Waste',
-  'Natural Beauty',
-  'Green Tech',
-  'Other'
-];
+import { PRODUCT_CATEGORIES } from '../../utils/constants';
 
 const AdminProducts = () => {
   const [showModal, setShowModal] = useState(false);
@@ -201,11 +194,12 @@ const AdminProducts = () => {
             layout
             className="bg-white rounded-lg shadow-md overflow-hidden"
           >
-            <div className="relative h-48">
-              <img
-                src={product.images?.[0]?.url || '/placeholder.jpg'}
+            <div className="relative overflow-hidden bg-gray-100 h-64">
+              <ProductImage
+                src={product.images?.[0]?.url}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                className="group-hover:scale-110 transition-transform duration-500"
+                aspectRatio="h-full"
               />
               {product.featured && (
                 <span className="absolute top-2 right-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded">
@@ -238,6 +232,7 @@ const AdminProducts = () => {
                     }
                   }}
                   className="flex-1 text-red-600 border-red-600 hover:bg-red-50"
+                  disabled={deleteMutation.isPending}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -246,6 +241,17 @@ const AdminProducts = () => {
           </motion.div>
         ))}
       </div>
+
+      {data?.products?.length === 0 && (
+        <div className="text-center py-20 bg-white rounded-lg shadow-sm">
+          <Package className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-xl font-medium text-gray-600">No products found</h3>
+          <p className="text-gray-500 mt-2">Start by adding your first eco-friendly product!</p>
+          <Button onClick={() => setShowModal(true)} className="mt-6" variant="outline">
+            Add Product
+          </Button>
+        </div>
+      )}
 
       {/* Product Form Modal */}
       <AnimatePresence>
@@ -316,7 +322,7 @@ const AdminProducts = () => {
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
                     >
-                      {CATEGORIES.map(cat => (
+                      {PRODUCT_CATEGORIES.map(cat => (
                         <option key={cat} value={cat}>{cat}</option>
                       ))}
                     </select>

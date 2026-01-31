@@ -6,12 +6,13 @@ import { useAuth } from '../../context/AuthContext';
 import { useWishlist } from '../../context/WishlistContext';
 import toast from 'react-hot-toast';
 import Button from '../common/Button';
+import ProductImage from './ProductImage';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
   const { addToWishlist, isInWishlist } = useWishlist();
   const { isAuthenticated } = useAuth();
-  const discount = product.originalPrice 
+  const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
@@ -38,12 +39,13 @@ const ProductCard = ({ product }) => {
       <Link to={`/product/${product._id}`} className="block">
         {/* Image Container */}
         <div className="relative overflow-hidden bg-gray-100 h-64">
-          <img
-            src={product.images?.[0]?.url || '/placeholder-product.jpg'}
+          <ProductImage
+            src={product.images?.[0]?.url}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            className="group-hover:scale-110 transition-transform duration-500"
+            aspectRatio="h-full"
           />
-          
+
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-2">
             {discount > 0 && (
@@ -111,11 +113,10 @@ const ProductCard = ({ product }) => {
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`h-4 w-4 ${
-                    i < Math.floor(product.ratings?.average || 0)
-                      ? 'text-yellow-400 fill-current'
-                      : 'text-gray-300'
-                  }`}
+                  className={`h-4 w-4 ${i < Math.floor(product.ratings?.average || 0)
+                    ? 'text-yellow-400 fill-current'
+                    : 'text-gray-300'
+                    }`}
                 />
               ))}
             </div>

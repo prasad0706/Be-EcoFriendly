@@ -2,9 +2,14 @@ import { NavLink, Outlet, Navigate } from 'react-router-dom';
 import { LayoutDashboard, Package, ShoppingCart, Star, Users, LogOut, TrendingUp } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { motion } from 'framer-motion';
+import Loading from '../../components/common/Loading';
 
 const AdminLayout = () => {
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin, loading } = useAuth();
+
+  if (loading) {
+    return <Loading />;
+  }
 
   if (!isAdmin) {
     return <Navigate to="/" replace />;
@@ -38,10 +43,9 @@ const AdminLayout = () => {
                 to={item.path}
                 end={item.exact}
                 className={({ isActive }) =>
-                  `flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                    isActive
-                      ? 'bg-primary text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
+                  `flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${isActive
+                    ? 'bg-primary text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
                   }`
                 }
               >

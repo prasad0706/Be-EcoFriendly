@@ -12,7 +12,7 @@ exports.getDashboardStats = async (req, res) => {
     const totalProducts = await Product.countDocuments();
     const totalOrders = await Order.countDocuments();
     const totalUsers = await User.countDocuments();
-    
+
     const totalRevenue = await Order.aggregate([
       { $match: { paymentStatus: 'Paid' } },
       { $group: { _id: null, total: { $sum: '$totalPrice' } } }
@@ -21,9 +21,9 @@ exports.getDashboardStats = async (req, res) => {
     const pendingOrders = await Order.countDocuments({ orderStatus: 'Processing' });
     const deliveredOrders = await Order.countDocuments({ orderStatus: 'Delivered' });
 
-    // Recent orders
+    // Recent orders with specific user fields
     const recentOrders = await Order.find()
-      .populate('user', 'name email')
+      .populate('user', 'name email avatar')
       .sort({ createdAt: -1 })
       .limit(10);
 
@@ -296,7 +296,7 @@ exports.updateOrderStatus = async (req, res) => {
       order.paymentStatus = paymentStatus;
       if (paymentStatus === 'Paid') {
         order.isPaid = true;
-        order.paidAt = Date.now();
+        if (!order.paidAt) order.paidAt = Date.now();
       }
     }
 
@@ -444,7 +444,7 @@ exports.getAllUsers = async (req, res) => {
 exports.updateUserRole = async (req, res) => {
   try {
     const { role } = req.body;
-    
+
     // Validate role
     if (!['user', 'admin'].includes(role)) {
       return res.status(400).json({

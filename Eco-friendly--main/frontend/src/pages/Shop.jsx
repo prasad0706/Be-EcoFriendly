@@ -7,6 +7,8 @@ import Loading from '../components/common/Loading';
 import Button from '../components/common/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import { PRODUCT_CATEGORIES } from '../utils/constants';
+
 const Shop = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -14,16 +16,7 @@ const Shop = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [page, setPage] = useState(1);
 
-  const categories = [
-    'all',
-    'Reusable Products',
-    'Organic Foods',
-    'Eco-Friendly Home',
-    'Sustainable Fashion',
-    'Zero Waste',
-    'Natural Beauty',
-    'Green Tech',
-  ];
+  const categories = ['all', ...PRODUCT_CATEGORIES];
 
   const sortOptions = [
     { value: 'newest', label: 'Newest First' },
@@ -107,11 +100,10 @@ const Shop = () => {
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full font-medium transition-all ${
-                  selectedCategory === category
+                className={`px-4 py-2 rounded-full font-medium transition-all ${selectedCategory === category
                     ? 'bg-primary text-white'
                     : 'bg-white text-gray-700 hover:bg-gray-100'
-                }`}
+                  }`}
               >
                 {category === 'all' ? 'All Products' : category}
               </button>
@@ -134,11 +126,10 @@ const Shop = () => {
                       setSelectedCategory(category);
                       setShowFilters(false);
                     }}
-                    className={`px-4 py-2 rounded-full font-medium transition-all ${
-                      selectedCategory === category
+                    className={`px-4 py-2 rounded-full font-medium transition-all ${selectedCategory === category
                         ? 'bg-primary text-white'
                         : 'bg-white text-gray-700'
-                    }`}
+                      }`}
                   >
                     {category === 'all' ? 'All Products' : category}
                   </button>
@@ -176,11 +167,10 @@ const Shop = () => {
                     <button
                       key={i}
                       onClick={() => setPage(i + 1)}
-                      className={`px-4 py-2 rounded-lg ${
-                        page === i + 1
+                      className={`px-4 py-2 rounded-lg ${page === i + 1
                           ? 'bg-primary text-white'
                           : 'bg-white text-gray-700 hover:bg-gray-100'
-                      }`}
+                        }`}
                     >
                       {i + 1}
                     </button>

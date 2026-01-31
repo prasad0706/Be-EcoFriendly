@@ -7,7 +7,6 @@ const { supabase } = require('../config/supabase');
 // @access  Public
 exports.register = async (req, res) => {
   try {
-    console.log('Registration request received:', req.body);
     const { name, email, password } = req.body;
 
     // Check if user exists

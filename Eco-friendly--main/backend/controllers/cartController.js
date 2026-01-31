@@ -6,14 +6,11 @@ const Product = require('../models/Product');
 // @access  Private
 exports.getCart = async (req, res) => {
   try {
-    console.log('getCart called with user:', req.user._id);
+
     let cart = await Cart.findOne({ user: req.user._id }).populate('items.product');
-    console.log('Found cart:', cart);
 
     if (!cart) {
-      console.log('Creating new cart for user:', req.user._id);
       cart = await Cart.create({ user: req.user._id, items: [] });
-      console.log('Created new cart:', cart._id);
     }
 
     res.json({
@@ -35,14 +32,13 @@ exports.getCart = async (req, res) => {
 // @access  Private
 exports.addToCart = async (req, res) => {
   try {
-    console.log('addToCart called with user:', req.user._id);
-    console.log('Request body:', req.body);
-    
+
+
     const { productId, quantity = 1 } = req.body;
 
     const product = await Product.findById(productId);
     console.log('Found product:', product);
-    
+
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -58,7 +54,6 @@ exports.addToCart = async (req, res) => {
     }
 
     let cart = await Cart.findOne({ user: req.user._id });
-    console.log('Found existing cart:', cart);
 
     if (!cart) {
       console.log('Creating new cart for user:', req.user._id);
@@ -120,9 +115,9 @@ exports.updateCartItem = async (req, res) => {
       itemId: req.params.itemId,
       body: req.body
     });
-    
+
     const { quantity } = req.body;
-    
+
     // Validate quantity
     if (quantity < 1) {
       console.log('Invalid quantity:', quantity);
@@ -153,7 +148,7 @@ exports.updateCartItem = async (req, res) => {
       });
       return match;
     });
-    
+
     if (!item) {
       console.log('Item not found in cart:', req.params.itemId);
       return res.status(404).json({
@@ -164,7 +159,7 @@ exports.updateCartItem = async (req, res) => {
 
     const product = await Product.findById(item.product);
     console.log('Found product:', product?._id);
-    
+
     if (!product) {
       console.log('Product not found:', item.product);
       return res.status(404).json({
@@ -214,7 +209,7 @@ exports.removeFromCart = async (req, res) => {
       userId: req.user._id,
       itemId: req.params.itemId
     });
-    
+
     const cart = await Cart.findOne({ user: req.user._id });
     console.log('Found cart:', cart?._id);
 

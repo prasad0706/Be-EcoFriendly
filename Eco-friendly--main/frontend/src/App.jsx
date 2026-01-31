@@ -24,6 +24,7 @@ import AdminOrders from './pages/admin/AdminOrders';
 import AdminReviews from './pages/admin/AdminReviews';
 import AdminCustomers from './pages/admin/AdminCustomers';
 import SalesReport from './pages/admin/SalesReport';
+import MainLayout from './components/layout/MainLayout';
 import './index.css';
 
 const queryClient = new QueryClient({
@@ -54,89 +55,19 @@ function App() {
                 </Route>
 
                 {/* Public Routes */}
-                <Route path="/" element={
-                  <div className="flex flex-col min-h-screen">
-                    <Navbar />
-                    <main className="flex-grow">
-                      <Home />
-                    </main>
-                    <Footer />
-                  </div>
-                } />
-                <Route path="/shop" element={
-                  <div className="flex flex-col min-h-screen">
-                    <Navbar />
-                    <main className="flex-grow">
-                      <Shop />
-                    </main>
-                    <Footer />
-                  </div>
-                } />
-                <Route path="/about" element={
-                  <div className="flex flex-col min-h-screen">
-                    <Navbar />
-                    <main className="flex-grow">
-                      <About />
-                    </main>
-                    <Footer />
-                  </div>
-                } />
-                <Route path="/contact" element={
-                  <div className="flex flex-col min-h-screen">
-                    <Navbar />
-                    <main className="flex-grow">
-                      <Contact />
-                    </main>
-                    <Footer />
-                  </div>
-                } />
-                <Route path="/cart" element={
-                  <div className="flex flex-col min-h-screen">
-                    <Navbar />
-                    <main className="flex-grow">
-                      <Cart />
-                    </main>
-                    <Footer />
-                  </div>
-                } />
-                <Route path="/checkout" element={
-                  <div className="flex flex-col min-h-screen">
-                    <Navbar />
-                    <main className="flex-grow">
-                      <Checkout />
-                    </main>
-                    <Footer />
-                  </div>
-                } />
-                <Route path="/wishlist" element={
-                  <div className="flex flex-col min-h-screen">
-                    <Navbar />
-                    <main className="flex-grow">
-                      <Wishlist />
-                    </main>
-                    <Footer />
-                  </div>
-                } />
-                <Route path="/profile" element={
-                  <div className="flex flex-col min-h-screen">
-                    <Navbar />
-                    <main className="flex-grow">
-                      <Profile />
-                    </main>
-                    <Footer />
-                  </div>
-                } />
+                <Route element={<MainLayout />}>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/shop" element={<Shop />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/wishlist" element={<Wishlist />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/product/:id" element={<ProductDetail />} />
+                </Route>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/product/:id" element={
-                  <div className="flex flex-col min-h-screen">
-                    <Navbar />
-                    <main className="flex-grow">
-                      <ProductDetail />
-                    </main>
-                    <Footer />
-                  </div>
-                } />
               </Routes>
               <Toaster
                 position="top-right"

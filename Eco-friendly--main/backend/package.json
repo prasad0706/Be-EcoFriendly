@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "seed": "node seedProducts.js",
+    "seed": "node scripts/seedProducts.js",
+    "clear-db": "node scripts/clearDatabase.js",
+    "make-admin": "node scripts/makeAdmin.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

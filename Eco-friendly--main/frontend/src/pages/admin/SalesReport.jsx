@@ -5,6 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { TrendingUp, IndianRupee, ShoppingCart, CreditCard } from 'lucide-react';
 import api from '../../utils/api';
 import { formatCurrency } from '../../utils/currency';
+import { PRODUCT_CATEGORIES } from '../../utils/constants';
 import Loading from '../../components/common/Loading';
 
 const COLORS = ['#2FB973', '#4ade80', '#60a5fa', '#f87171', '#fbbf24'];
@@ -35,14 +36,11 @@ const SalesReport = () => {
 
   if (isLoading) return <Loading />;
 
-  // Calculate revenue by category
-  const categoryData = [
-    { name: 'Electronics', value: 400 },
-    { name: 'Clothing', value: 300 },
-    { name: 'Home Goods', value: 300 },
-    { name: 'Beauty', value: 200 },
-    { name: 'Other', value: 100 }
-  ];
+  // Calculate revenue by category (Placeholder improved with constants)
+  const categoryData = PRODUCT_CATEGORIES.slice(0, 5).map((cat, index) => ({
+    name: cat,
+    value: [400, 300, 300, 200, 100][index] || 50
+  }));
 
   return (
     <div className="space-y-6">

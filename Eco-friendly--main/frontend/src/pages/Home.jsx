@@ -28,6 +28,8 @@ const Home = () => {
   ];
 
   const stats = [
+    // Note: These are social proof placeholders. In a full production app, 
+    // these would be fetched from a dynamic stats API.
     { value: '10K+', label: 'Happy Customers' },
     { value: '500+', label: 'Eco Products' },
     { value: '50+', label: 'Partner Brands' },
@@ -65,7 +67,7 @@ const Home = () => {
                 </Link>
               </div>
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -73,9 +75,9 @@ const Home = () => {
               className="relative"
             >
               <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-8">
-                <img 
-                  src="https://images.unsplash.com/photo-1585155770447-2f66e2a397b5?w=600&h=400&fit=crop" 
-                  alt="Eco-friendly products" 
+                <img
+                  src="https://images.unsplash.com/photo-1585155770447-2f66e2a397b5?w=600&h=400&fit=crop"
+                  alt="Eco-friendly products"
                   className="rounded-xl shadow-2xl w-full"
                 />
               </div>

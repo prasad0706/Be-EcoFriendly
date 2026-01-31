@@ -8,8 +8,7 @@ import { formatCurrency } from '../../utils/currency';
 import Button from '../../components/common/Button';
 import Loading from '../../components/common/Loading';
 
-const ORDER_STATUSES = ['Processing', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'];
-const PAYMENT_STATUSES = ['Pending', 'Paid', 'Failed'];
+import { ORDER_STATUSES, PAYMENT_STATUSES } from '../../utils/constants';
 
 const AdminOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -115,15 +114,15 @@ const AdminOrders = () => {
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
                     <div>
-                      <p className="font-medium">{order.user?.name || order.shippingAddress?.name}</p>
-                      <p className="text-xs text-gray-500">{order.user?.email}</p>
+                      <p className="font-medium">{order.user?.name || order.shippingAddress?.name || 'Guest'}</p>
+                      <p className="text-xs text-gray-500">{order.user?.email || 'N/A'}</p>
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
                     <div>
-                      <p>{order.shippingAddress?.phone}</p>
+                      <p>{order.shippingAddress?.phone || 'N/A'}</p>
                       <p className="text-xs text-gray-500">
-                        {order.shippingAddress?.city}, {order.shippingAddress?.state}
+                        {order.shippingAddress?.city || 'N/A'}, {order.shippingAddress?.state || ''}
                       </p>
                     </div>
                   </td>
@@ -162,6 +161,11 @@ const AdminOrders = () => {
               ))}
             </tbody>
           </table>
+          {data?.orders?.length === 0 && (
+            <div className="text-center py-12 text-gray-500 bg-white">
+              No orders found matching the filter.
+            </div>
+          )}
         </div>
       </div>
 
