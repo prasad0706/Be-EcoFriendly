@@ -25,7 +25,6 @@ const sampleProducts = [
     }],
     stock: 50,
     featured: true,
-    ecoScore: 95,
     tags: ['bamboo', 'reusable', 'zero-waste'],
     specifications: {
       'Material': 'Natural Bamboo',
@@ -45,7 +44,6 @@ const sampleProducts = [
     }],
     stock: 100,
     featured: true,
-    ecoScore: 90,
     tags: ['cotton', 'organic', 'reusable'],
     specifications: {
       'Material': '100% Organic Cotton',
@@ -65,7 +63,6 @@ const sampleProducts = [
     }],
     stock: 75,
     featured: true,
-    ecoScore: 88,
     tags: ['stainless-steel', 'insulated', 'bpa-free'],
     specifications: {
       'Material': 'Stainless Steel',
@@ -84,7 +81,6 @@ const sampleProducts = [
     }],
     stock: 60,
     featured: false,
-    ecoScore: 92,
     tags: ['beeswax', 'reusable', 'natural'],
     specifications: {
       'Material': 'Organic Cotton & Beeswax',
@@ -104,7 +100,6 @@ const sampleProducts = [
     }],
     stock: 120,
     featured: false,
-    ecoScore: 94,
     tags: ['bamboo', 'biodegradable', 'dental'],
     specifications: {
       'Material': 'Bamboo Handle',
@@ -123,7 +118,6 @@ const sampleProducts = [
     }],
     stock: 30,
     featured: true,
-    ecoScore: 85,
     tags: ['solar', 'portable', 'renewable'],
     specifications: {
       'Power': '10000mAh',
@@ -142,7 +136,6 @@ const sampleProducts = [
     }],
     stock: 80,
     featured: false,
-    ecoScore: 91,
     tags: ['organic', 'tea', 'fair-trade'],
     specifications: {
       'Type': 'Green Tea',
@@ -162,7 +155,6 @@ const sampleProducts = [
     }],
     stock: 40,
     featured: true,
-    ecoScore: 87,
     tags: ['recycled', 'yoga', 'fitness'],
     specifications: {
       'Material': 'Recycled TPE',

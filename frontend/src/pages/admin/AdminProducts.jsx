@@ -10,11 +10,13 @@ import Input from '../../components/common/Input';
 import Loading from '../../components/common/Loading';
 import { Package } from 'lucide-react';
 import ProductImage from '../../components/product/ProductImage';
+import BulkUploadModal from '../../components/admin/BulkUploadModal';
 
 import { PRODUCT_CATEGORIES } from '../../utils/constants';
 
 const AdminProducts = () => {
   const [showModal, setShowModal] = useState(false);
+  const [showBulkUpload, setShowBulkUpload] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -24,7 +26,6 @@ const AdminProducts = () => {
     category: 'Reusable Products',
     stock: '',
     featured: false,
-    ecoScore: '',
     tags: '',
     images: []
   });
@@ -75,6 +76,46 @@ const AdminProducts = () => {
       toast.error(error.response?.data?.message || 'Failed to delete product');
     }
   });
+
+  const bulkUploadMutation = useMutation({
+    mutationFn: async (products) => {
+      let uploadedCount = 0;
+      let failedCount = 0;
+
+      for (const product of products) {
+        try {
+          await api.post('/admin/products', product);
+          uploadedCount++;
+        } catch (error) {
+          failedCount++;
+          console.error(`Failed to upload ${product.name}:`, error);
+        }
+      }
+
+      if (failedCount > 0) {
+        throw new Error(`Uploaded ${uploadedCount} products but ${failedCount} failed`);
+      }
+
+      return { uploadedCount, failedCount };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries(['adminProducts']);
+      toast.success(`Successfully uploaded ${data.uploadedCount} products!`);
+      setShowBulkUpload(false);
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to bulk upload products');
+    }
+  });
+
+  const handleBulkUpload = async (products) => {
+    return new Promise((resolve, reject) => {
+      bulkUploadMutation.mutate(products, {
+        onSuccess: () => resolve(),
+        onError: reject,
+      });
+    });
+  };
 
   const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
@@ -127,7 +168,6 @@ const AdminProducts = () => {
       price: parseFloat(formData.price),
       originalPrice: parseFloat(formData.originalPrice) || 0,
       stock: parseInt(formData.stock),
-      ecoScore: parseInt(formData.ecoScore) || 0,
       tags: formData.tags.split(',').map(tag => tag.trim()).filter(Boolean)
     };
 
@@ -148,7 +188,6 @@ const AdminProducts = () => {
       category: product.category,
       stock: product.stock,
       featured: product.featured,
-      ecoScore: product.ecoScore || '',
       tags: product.tags?.join(', ') || '',
       images: product.images || []
     });
@@ -165,7 +204,6 @@ const AdminProducts = () => {
       category: 'Reusable Products',
       stock: '',
       featured: false,
-      ecoScore: '',
       tags: '',
       images: []
     });
@@ -178,12 +216,21 @@ const AdminProducts = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <h1 className="text-3xl font-bold text-gray-800">Products Management</h1>
-        <Button onClick={() => setShowModal(true)} className="flex items-center space-x-2">
-          <Plus className="h-5 w-5" />
-          <span>Add Product</span>
-        </Button>
+        <div className="flex gap-3">
+          <Button 
+            onClick={() => setShowBulkUpload(true)} 
+            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700"
+          >
+            <Upload className="h-5 w-5" />
+            <span>Bulk Upload</span>
+          </Button>
+          <Button onClick={() => setShowModal(true)} className="flex items-center space-x-2">
+            <Plus className="h-5 w-5" />
+            <span>Add Product</span>
+          </Button>
+        </div>
       </div>
 
       {/* Products Grid */}
@@ -337,15 +384,6 @@ const AdminProducts = () => {
                 </div>
 
                 <Input
-                  label="Eco Score (0-100)"
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={formData.ecoScore}
-                  onChange={(e) => setFormData({ ...formData, ecoScore: e.target.value })}
-                />
-
-                <Input
                   label="Tags (comma separated)"
                   value={formData.tags}
                   onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
@@ -427,6 +465,13 @@ const AdminProducts = () => {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Bulk Upload Modal */}
+      <BulkUploadModal 
+        isOpen={showBulkUpload} 
+        onClose={() => setShowBulkUpload(false)}
+        onUpload={handleBulkUpload}
+      />
     </div>
   );
 };

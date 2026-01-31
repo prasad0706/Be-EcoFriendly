@@ -125,22 +125,6 @@ const ProductCard = ({ product }) => {
             </span>
           </div>
 
-          {/* Eco Score */}
-          {product.ecoScore > 0 && (
-            <div className="mb-3">
-              <div className="flex items-center justify-between text-xs mb-1">
-                <span className="text-gray-600">Eco Score</span>
-                <span className="text-green font-semibold">{product.ecoScore}/100</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-gradient-to-r from-green to-teal h-2 rounded-full transition-all duration-500"
-                  style={{ width: `${product.ecoScore}%` }}
-                ></div>
-              </div>
-            </div>
-          )}
-
           {/* Price */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-baseline gap-2">

@@ -39,7 +39,7 @@ const Home = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary via-teal to-green py-20">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -47,21 +47,21 @@ const Home = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+              <h1 className="text-4xl md:text-6xl font-bold text-green-600   mb-6">
                 Live Sustainably,
                 <span className="block">Shop Consciously</span>
               </h1>
-              <p className="text-xl text-white/90 mb-8">
+              <p className="text-xl text-gray-600 mb-8">
                 Discover eco-friendly alternatives that make a difference. Join thousands of conscious consumers making sustainable choices.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/shop">
-                  <Button size="lg" className="bg-white text-primary hover:bg-gray-100">
+                  <Button size="lg" className="bg-green text-white hover:bg-green-600">
                     Shop Now
                   </Button>
                 </Link>
                 <Link to="/about">
-                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+                  <Button size="lg" variant="outline" className="border-green text-green hover:bg-green/10 hover:border-green-600 hover:text-green-600">
                     Learn More
                   </Button>
                 </Link>
@@ -205,21 +205,21 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary to-green">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="max-w-3xl mx-auto"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
               Ready to Make a Difference?
             </h2>
-            <p className="text-xl text-white/90 mb-8">
+            <p className="text-xl text-gray-600 mb-8">
               Join our community of conscious consumers and start your sustainable journey today.
             </p>
             <Link to="/shop">
-              <Button size="lg" className="bg-white text-primary hover:bg-gray-100">
+              <Button size="lg" className="bg-green text-white hover:bg-green-600">
                 <ShoppingBag className="h-5 w-5 mr-2" />
                 Start Shopping
               </Button>

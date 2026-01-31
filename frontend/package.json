@@ -26,7 +26,8 @@
     "react-hot-toast": "^2.6.0",
     "react-router-dom": "^7.9.6",
     "recharts": "^3.5.1",
-    "vite": "^7.2.6"
+    "vite": "^7.2.6",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.22",
