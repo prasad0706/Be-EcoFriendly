@@ -20,14 +20,20 @@ const AdminCustomers = () => {
     queryFn: async () => {
       const res = await api.get('/admin/users?limit=100');
       return res.data.data;
-    }
+    },
+    refetchInterval: 2000, // Real-time updates every 2 seconds
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchOnMount: true,
+    staleTime: 0, // Always consider data stale
+    cacheTime: 0, // Don't cache data
   });
 
   const updateUserRoleMutation = useMutation({
     mutationFn: ({ userId, role }) => api.put(`/admin/users/${userId}/role`, { role }),
     onSuccess: () => {
-      queryClient.invalidateQueries(['adminCustomers']);
-      toast.success('Permissions updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['adminCustomers'] });
+      toast.success('User role updated successfully');
       setSelectedCustomer(null);
     },
     onError: (error) => {
@@ -40,13 +46,21 @@ const AdminCustomers = () => {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    return new Date(dateString).toLocaleDateString();
   };
 
+  // Calculate statistics - separate admin and customer users
+  const adminUsers = data?.users?.filter(user => user.role === 'admin') || [];
+  const customerUsers = data?.users?.filter(user => user.role === 'user' || user.role === 'customer') || [];
+  
+  // Calculate new users this month
+  const now = new Date();
+  const newThisMonth = data?.users?.filter(user => {
+    const createdDate = new Date(user.createdAt);
+    return createdDate.getMonth() === now.getMonth() && 
+           createdDate.getFullYear() === now.getFullYear();
+  }) || [];
+  
   const filteredCustomers = data?.users?.filter(customer => {
     const matchesSearch = customer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.email?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -67,12 +81,36 @@ const AdminCustomers = () => {
   if (isLoading && !data) return <Loading />;
 
   return (
-    <div className="pb-10 space-y-8">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Customers</h1>
-          <p className="text-gray-500 font-medium">Manage user accounts and permissions.</p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-gray-800">Customers Management</h1>
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => refetch()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+          >
+            <span>Refresh Data</span>
+          </button>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <input
+              type="text"
+              placeholder="Search customers..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+            />
+          </div>
+          <select
+            value={filterRole}
+            onChange={(e) => setFilterRole(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+          >
+            <option value="">All Roles</option>
+            <option value="user">User</option>
+            <option value="customer">Customer</option>
+            <option value="admin">Admin</option>
+          </select>
         </div>
 
         <Button variant="outline" onClick={() => refetch()}>
