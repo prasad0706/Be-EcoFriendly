@@ -12,35 +12,22 @@ const COLORS = ['#2FB973', '#4ade80', '#60a5fa', '#f87171', '#fbbf24'];
 
 const SalesReport = () => {
   const [timeRange, setTimeRange] = useState('7d');
-  const [chartData, setChartData] = useState([]);
 
-  const { data: stats, isLoading } = useQuery({
-    queryKey: ['adminStats'],
+  const { data: salesReport, isLoading } = useQuery({
+    queryKey: ['salesReport', timeRange],
     queryFn: async () => {
-      const res = await api.get('/admin/stats');
+      const res = await api.get(`/admin/sales-report?range=${timeRange}`);
       return res.data.data;
     },
-    refetchInterval: 5000,
+    refetchInterval: 60000,
   });
-
-  useEffect(() => {
-    if (stats?.salesData) {
-      const formattedData = stats.salesData.map(item => ({
-        date: item._id,
-        sales: item.sales,
-        orders: item.orders
-      }));
-      setChartData(formattedData);
-    }
-  }, [stats]);
 
   if (isLoading) return <Loading />;
 
-  // Calculate revenue by category (Placeholder improved with constants)
-  const categoryData = PRODUCT_CATEGORIES.slice(0, 5).map((cat, index) => ({
-    name: cat,
-    value: [400, 300, 300, 200, 100][index] || 50
-  }));
+  const summary = salesReport?.summary || {};
+  const salesTrend = salesReport?.salesTrend || [];
+  const categorySales = salesReport?.categorySales || [];
+  const topProducts = salesReport?.topProducts || [];
 
   return (
     <div className="space-y-6">
@@ -55,6 +42,7 @@ const SalesReport = () => {
             <option value="7d">Last 7 Days</option>
             <option value="30d">Last 30 Days</option>
             <option value="90d">Last 90 Days</option>
+            <option value="all">All Time</option>
           </select>
         </div>
       </div>
@@ -65,7 +53,7 @@ const SalesReport = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
-              <p className="text-2xl font-bold text-gray-800">{formatCurrency(stats?.totalRevenue || 0)}</p>
+              <p className="text-2xl font-bold text-gray-800">{formatCurrency(summary.totalRevenue || 0)}</p>
             </div>
             <div className="p-3 bg-green-100 rounded-lg">
               <IndianRupee className="h-6 w-6 text-green-600" />
@@ -77,7 +65,7 @@ const SalesReport = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Orders</p>
-              <p className="text-2xl font-bold text-gray-800">{stats?.totalOrders || 0}</p>
+              <p className="text-2xl font-bold text-gray-800">{summary.totalOrders || 0}</p>
             </div>
             <div className="p-3 bg-blue-100 rounded-lg">
               <ShoppingCart className="h-6 w-6 text-blue-600" />
@@ -89,9 +77,7 @@ const SalesReport = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Avg. Order Value</p>
-              <p className="text-2xl font-bold text-gray-800">
-                {stats?.totalOrders ? formatCurrency(stats.totalRevenue / stats.totalOrders) : formatCurrency(0)}
-              </p>
+              <p className="text-2xl font-bold text-gray-800">{formatCurrency(summary.avgOrderValue || 0)}</p>
             </div>
             <div className="p-3 bg-purple-100 rounded-lg">
               <CreditCard className="h-6 w-6 text-purple-600" />
@@ -103,7 +89,7 @@ const SalesReport = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Conversion Rate</p>
-              <p className="text-2xl font-bold text-gray-800">24.5%</p>
+              <p className="text-2xl font-bold text-gray-800">{summary.conversionRate || 0}%</p>
             </div>
             <div className="p-3 bg-yellow-100 rounded-lg">
               <TrendingUp className="h-6 w-6 text-yellow-600" />
@@ -114,48 +100,58 @@ const SalesReport = () => {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Sales Trend Chart */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Sales Trend</h2>
           <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip formatter={(value) => [formatCurrency(value), 'Sales']} />
-                <Legend />
-                <Bar dataKey="sales" name="Sales" fill="#2FB973" />
-                <Bar dataKey="orders" name="Orders" fill="#60a5fa" />
-              </BarChart>
-            </ResponsiveContainer>
+            {salesTrend.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={salesTrend}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="_id" />
+                  <YAxis />
+                  <Tooltip formatter={(value) => [formatCurrency(value), 'Value']} />
+                  <Legend />
+                  <Bar dataKey="sales" name="Revenue" fill="#2FB973" />
+                  <Bar dataKey="orders" name="Orders" fill="#60a5fa" />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex items-center justify-center text-gray-400 italic">
+                No sales data for this period
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Category Distribution */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Sales by Category</h2>
           <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={categoryData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                >
-                  {categoryData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => [formatCurrency(value), 'Sales']} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+            {categorySales.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={categorySales}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  >
+                    {categorySales.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => [formatCurrency(value), 'Revenue']} />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex items-center justify-center text-gray-400 italic">
+                No category data available
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -175,41 +171,23 @@ const SalesReport = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr className="hover:bg-gray-50">
-                <td className="px-6 py-4 text-sm font-medium text-gray-900">Eco Water Bottle</td>
-                <td className="px-6 py-4 text-sm text-gray-600">Reusable Products</td>
-                <td className="px-6 py-4 text-sm text-gray-600">1,245</td>
-                <td className="px-6 py-4 text-sm font-medium text-gray-900">{formatCurrency(12450)}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">4.8 ★</td>
-              </tr>
-              <tr className="hover:bg-gray-50">
-                <td className="px-6 py-4 text-sm font-medium text-gray-900">Organic Cotton T-Shirt</td>
-                <td className="px-6 py-4 text-sm text-gray-600">Sustainable Fashion</td>
-                <td className="px-6 py-4 text-sm text-gray-600">980</td>
-                <td className="px-6 py-4 text-sm font-medium text-gray-900">{formatCurrency(9800)}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">4.6 ★</td>
-              </tr>
-              <tr className="hover:bg-gray-50">
-                <td className="px-6 py-4 text-sm font-medium text-gray-900">Bamboo Toothbrush Set</td>
-                <td className="px-6 py-4 text-sm text-gray-600">Zero Waste</td>
-                <td className="px-6 py-4 text-sm text-gray-600">756</td>
-                <td className="px-6 py-4 text-sm font-medium text-gray-900">{formatCurrency(3780)}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">4.7 ★</td>
-              </tr>
-              <tr className="hover:bg-gray-50">
-                <td className="px-6 py-4 text-sm font-medium text-gray-900">Solar Charger</td>
-                <td className="px-6 py-4 text-sm text-gray-600">Green Tech</td>
-                <td className="px-6 py-4 text-sm text-gray-600">523</td>
-                <td className="px-6 py-4 text-sm font-medium text-gray-900">{formatCurrency(7845)}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">4.5 ★</td>
-              </tr>
-              <tr className="hover:bg-gray-50">
-                <td className="px-6 py-4 text-sm font-medium text-gray-900">Recycled Paper Notebook</td>
-                <td className="px-6 py-4 text-sm text-gray-600">Eco-Friendly Home</td>
-                <td className="px-6 py-4 text-sm text-gray-600">412</td>
-                <td className="px-6 py-4 text-sm font-medium text-gray-900">{formatCurrency(2060)}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">4.4 ★</td>
-              </tr>
+              {topProducts.length > 0 ? (
+                topProducts.map((product, index) => (
+                  <tr key={index} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{product.name}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{product.category}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{product.unitsSold.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{formatCurrency(product.revenue)}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{product.rating ? `${product.rating} ★` : 'No rating'}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="px-6 py-8 text-center text-gray-500 italic">
+                    No top products found for this period
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

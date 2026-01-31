@@ -14,12 +14,13 @@ exports.getDashboardStats = async (req, res) => {
     const totalUsers = await User.countDocuments();
 
     const totalRevenue = await Order.aggregate([
-      { $match: { paymentStatus: 'Paid' } },
+      { $match: { isPaid: true } },
       { $group: { _id: null, total: { $sum: '$totalPrice' } } }
     ]);
 
-    const pendingOrders = await Order.countDocuments({ orderStatus: 'Processing' });
-    const deliveredOrders = await Order.countDocuments({ orderStatus: 'Delivered' });
+    // Since orderStatus isn't in common schema, count orders that aren't delivered as pending
+    const pendingOrders = await Order.countDocuments({ isDelivered: false });
+    const deliveredOrders = await Order.countDocuments({ isDelivered: true });
 
     // Recent orders with specific user fields
     const recentOrders = await Order.find()
@@ -37,7 +38,7 @@ exports.getDashboardStats = async (req, res) => {
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
     const salesData = await Order.aggregate([
-      { $match: { createdAt: { $gte: sevenDaysAgo }, paymentStatus: 'Paid' } },
+      { $match: { createdAt: { $gte: sevenDaysAgo }, isPaid: true } },
       {
         $group: {
           _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
@@ -60,6 +61,131 @@ exports.getDashboardStats = async (req, res) => {
         recentOrders,
         lowStockProducts,
         salesData
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+exports.getSalesReport = async (req, res) => {
+  try {
+    const { range = '7d' } = req.query;
+    const endDate = new Date();
+    let startDate = new Date();
+
+    if (range === '7d') startDate.setDate(endDate.getDate() - 7);
+    else if (range === '30d') startDate.setDate(endDate.getDate() - 30);
+    else if (range === '90d') startDate.setDate(endDate.getDate() - 90);
+    else startDate = new Date(0); // All time
+
+    const matchQuery = {
+      createdAt: { $gte: startDate, $lte: endDate },
+      isPaid: true
+    };
+
+    // 1. Sales Trend
+    const salesTrend = await Order.aggregate([
+      { $match: matchQuery },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+          sales: { $sum: '$totalPrice' },
+          orders: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    // 2. Sales by Category
+    const categorySales = await Order.aggregate([
+      { $match: matchQuery },
+      { $unwind: '$items' },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'items.product',
+          foreignField: '_id',
+          as: 'productInfo'
+        }
+      },
+      { $unwind: '$productInfo' },
+      {
+        $group: {
+          _id: '$productInfo.category',
+          value: { $sum: { $multiply: ['$items.quantity', '$items.price'] } }
+        }
+      },
+      { $project: { name: '$_id', value: 1, _id: 0 } },
+      { $sort: { value: -1 } }
+    ]);
+
+    // 3. Top Selling Products
+    const topProducts = await Order.aggregate([
+      { $match: matchQuery },
+      { $unwind: '$items' },
+      {
+        $group: {
+          _id: '$items.product',
+          unitsSold: { $sum: '$items.quantity' },
+          revenue: { $sum: { $multiply: ['$items.quantity', '$items.price'] } }
+        }
+      },
+      { $sort: { unitsSold: -1 } },
+      { $limit: 5 },
+      {
+        $lookup: {
+          from: 'products',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'product'
+        }
+      },
+      { $unwind: '$product' },
+      {
+        $project: {
+          name: '$product.name',
+          category: '$product.category',
+          unitsSold: 1,
+          revenue: 1,
+          rating: '$product.ratings.average'
+        }
+      }
+    ]);
+
+    // 4. Overall Stats for period
+    const totalUsers = await User.countDocuments();
+    const periodStats = await Order.aggregate([
+      { $match: matchQuery },
+      {
+        $group: {
+          _id: null,
+          totalRevenue: { $sum: '$totalPrice' },
+          totalOrders: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const stats = periodStats[0] || { totalRevenue: 0, totalOrders: 0 };
+
+    // Simple conversion rate proxy (Orders / Total Users)
+    const conversionRate = totalUsers > 0 ? ((stats.totalOrders / totalUsers) * 100).toFixed(1) : 0;
+
+    res.json({
+      success: true,
+      data: {
+        salesTrend,
+        categorySales,
+        topProducts,
+        summary: {
+          totalRevenue: stats.totalRevenue,
+          totalOrders: stats.totalOrders,
+          avgOrderValue: stats.totalOrders > 0 ? stats.totalRevenue / stats.totalOrders : 0,
+          conversionRate
+        }
       }
     });
   } catch (error) {

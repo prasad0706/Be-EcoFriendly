@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const {
   getDashboardStats,
+  getSalesReport,
   getAllProducts,
   createProduct,
   updateProduct,
@@ -35,8 +36,9 @@ const upload = multer({
 router.use(protect);
 router.use(admin);
 
-// Dashboard
+// Dashboard & Analytics
 router.get('/stats', getDashboardStats);
+router.get('/sales-report', getSalesReport);
 
 // Products
 router.route('/products')

@@ -63,6 +63,18 @@ const orderSchema = new mongoose.Schema({
     required: true,
     default: 0.0,
   },
+  orderStatus: {
+    type: String,
+    required: true,
+    enum: ['Processing', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'],
+    default: 'Processing',
+  },
+  paymentStatus: {
+    type: String,
+    required: true,
+    enum: ['Pending', 'Paid', 'Failed'],
+    default: 'Pending',
+  },
   isPaid: {
     type: Boolean,
     required: true,
@@ -90,7 +102,7 @@ const orderSchema = new mongoose.Schema({
 });
 
 // Update timestamp on save
-orderSchema.pre('save', function() {
+orderSchema.pre('save', function () {
   this.updatedAt = Date.now();
 });
 
