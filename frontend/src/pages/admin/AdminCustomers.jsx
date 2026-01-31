@@ -21,7 +21,7 @@ const AdminCustomers = () => {
       const res = await api.get('/admin/users?limit=100');
       return res.data.data;
     },
-    refetchInterval: 3000, // Real-time updates every 3 seconds
+    refetchInterval: 2000, // Real-time updates every 2 seconds
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
     refetchOnMount: true,
@@ -32,7 +32,7 @@ const AdminCustomers = () => {
   const updateUserRoleMutation = useMutation({
     mutationFn: ({ userId, role }) => api.put(`/admin/users/${userId}/role`, { role }),
     onSuccess: () => {
-      queryClient.invalidateQueries(['adminCustomers']);
+      queryClient.invalidateQueries({ queryKey: ['adminCustomers'] });
       toast.success('User role updated successfully');
       setSelectedCustomer(null);
     },
@@ -49,10 +49,9 @@ const AdminCustomers = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
-  // Calculate statistics
-  const totalUsers = data?.total || 0;
+  // Calculate statistics - separate admin and customer users
   const adminUsers = data?.users?.filter(user => user.role === 'admin') || [];
-  const customerUsers = data?.users?.filter(user => user.role === 'customer') || [];
+  const customerUsers = data?.users?.filter(user => user.role === 'user' || user.role === 'customer') || [];
   
   // Calculate new users this month
   const now = new Date();
@@ -113,6 +112,7 @@ const AdminCustomers = () => {
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
           >
             <option value="">All Roles</option>
+            <option value="user">User</option>
             <option value="customer">Customer</option>
             <option value="admin">Admin</option>
           </select>
