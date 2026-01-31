@@ -41,12 +41,6 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  ecoScore: {
-    type: Number,
-    min: 0,
-    max: 100,
-    default: 0,
-  },
   tags: [{
     type: String,
   }],

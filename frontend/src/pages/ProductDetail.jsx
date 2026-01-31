@@ -167,25 +167,6 @@ const ProductDetail = () => {
                   <p className="text-gray-700 leading-relaxed">{product.description}</p>
                 </div>
 
-                {/* Eco Score */}
-                {product.ecoScore > 0 && (
-                  <div className="mb-6 p-4 bg-green/5 rounded-lg border border-green/20">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-gray-900">Eco Score</h3>
-                      <span className="text-lg font-bold text-green">{product.ecoScore}/100</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div
-                        className="bg-gradient-to-r from-green to-teal h-3 rounded-full"
-                        style={{ width: `${product.ecoScore}%` }}
-                      ></div>
-                    </div>
-                    <p className="mt-2 text-sm text-gray-600">
-                      This product has a high environmental rating based on sustainability factors.
-                    </p>
-                  </div>
-                )}
-
                 {/* Stock Status */}
                 <div className="mb-6">
                   {product.stock > 0 ? (
@@ -299,12 +280,6 @@ const ProductDetail = () => {
                       <dt className="w-32 font-medium text-gray-900">Stock</dt>
                       <dd className="text-gray-700">{product.stock} units</dd>
                     </div>
-                    {product.ecoScore > 0 && (
-                      <div className="flex">
-                        <dt className="w-32 font-medium text-gray-900">Eco Score</dt>
-                        <dd className="text-gray-700">{product.ecoScore}/100</dd>
-                      </div>
-                    )}
                     {product.tags && product.tags.length > 0 && (
                       <div className="flex">
                         <dt className="w-32 font-medium text-gray-900">Tags</dt>

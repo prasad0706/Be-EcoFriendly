@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, User, Heart, Menu, X, Leaf, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -12,6 +12,7 @@ const Navbar = () => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const { cartItemsCount } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {
     await logout();
@@ -49,10 +50,16 @@ const Navbar = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className="text-gray-700 hover:text-primary font-medium transition-colors duration-300 relative group"
+                className={`font-medium transition-colors duration-300 relative group ${
+                  location.pathname === link.path
+                    ? 'text-primary'
+                    : 'text-gray-700 hover:text-primary'
+                }`}
               >
                 {link.name}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></span>
+                <span className={`absolute bottom-0 left-0 h-0.5 bg-primary transition-all duration-300 ${
+                  location.pathname === link.path ? 'w-full' : 'w-0 group-hover:w-full'
+                }`}></span>
               </Link>
             ))}
           </div>
@@ -200,7 +207,11 @@ const Navbar = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className="block py-2 text-gray-700 hover:text-primary font-medium transition-colors"
+                  className={`block py-2 font-medium transition-colors ${
+                    location.pathname === link.path
+                      ? 'text-primary font-bold'
+                      : 'text-gray-700 hover:text-primary'
+                  }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {link.name}
