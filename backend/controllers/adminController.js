@@ -699,7 +699,22 @@ exports.exportOrdersToExcel = async (req, res) => {
     
     // Set headers for file download
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="orders-${new Date().toISOString().split('T')[0]}.xlsx"`);
+    
+    // Create filename based on status
+    let fileName = 'orders';
+    if (req.query.status) {
+      const statusFileNameMap = {
+        'Processing': 'pending_orders',
+        'Shipped': 'shipped_orders',
+        'Delivered': 'delivered_orders',
+        'Cancelled': 'cancelled_orders'
+      };
+      fileName = statusFileNameMap[req.query.status] || 'orders';
+    } else if (req.query.filter) {
+      fileName = `${req.query.filter}_orders`;
+    }
+    
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}_${new Date().toISOString().split('T')[0]}.xlsx"`);
     
     // Send the file
     res.send(buffer);

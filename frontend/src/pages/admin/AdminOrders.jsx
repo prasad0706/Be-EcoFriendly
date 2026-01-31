@@ -70,7 +70,20 @@ const AdminOrders = () => {
   const handleDownloadExcel = async () => {
     try {
       let url = '/admin/orders/export';
+      let fileName = 'orders';
       
+      // Set filename based on active tab
+      const fileNameMap = {
+        'all': 'all_orders',
+        'pending': 'pending_orders',
+        'shipped': 'shipped_orders',
+        'delivered': 'delivered_orders',
+        'cancelled': 'cancelled_orders'
+      };
+      
+      fileName = fileNameMap[activeTab] || 'orders';
+      
+      // Add query parameters for filtering
       if (activeTab !== 'all') {
         const statusMap = {
           'pending': 'Processing',
@@ -85,20 +98,21 @@ const AdminOrders = () => {
         responseType: 'blob',
       });
       
-      // Create download link
+      // Create download link with dynamic filename
       const blob = new Blob([response.data], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
+      const dateStr = new Date().toISOString().split('T')[0];
       link.href = downloadUrl;
-      link.setAttribute('download', `orders-${new Date().toISOString().split('T')[0]}.xlsx`);
+      link.setAttribute('download', `${fileName}_${dateStr}.xlsx`);
       document.body.appendChild(link);
       link.click();
       link.remove();
       window.URL.revokeObjectURL(downloadUrl);
       
-      toast.success('Orders exported successfully!');
+      toast.success(`${fileName.replace('_', ' ')} exported successfully!`);
     } catch (error) {
       console.error('Export error:', error);
       toast.error('Failed to export orders');
