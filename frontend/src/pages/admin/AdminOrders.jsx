@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Eye, Package, Truck, CheckCircle, XCircle } from 'lucide-react';
+import { Eye, Package, Truck, CheckCircle, XCircle, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../utils/api';
 import { formatCurrency } from '../../utils/currency';
@@ -12,14 +12,37 @@ import { ORDER_STATUSES, PAYMENT_STATUSES } from '../../utils/constants';
 
 const AdminOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [filterStatus, setFilterStatus] = useState('');
+  const [activeTab, setActiveTab] = useState('all'); // all, pending, shipped, delivered, cancelled
 
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['adminOrders', filterStatus],
+  // Fetch order statistics for tabs
+  const { data: stats } = useQuery({
+    queryKey: ['orderStats'],
     queryFn: async () => {
-      const res = await api.get(`/admin/orders?status=${filterStatus}&limit=100`);
+      const res = await api.get('/admin/orders/stats');
+      return res.data.data;
+    },
+    refetchInterval: 5000, // Real-time updates
+  });
+
+  // Fetch orders based on active tab
+  const { data, isLoading } = useQuery({
+    queryKey: ['adminOrders', activeTab],
+    queryFn: async () => {
+      let url = '/admin/orders?limit=100';
+      
+      if (activeTab !== 'all') {
+        const statusMap = {
+          'pending': 'Processing',
+          'shipped': 'Shipped',
+          'delivered': 'Delivered',
+          'cancelled': 'Cancelled'
+        };
+        url += `&status=${statusMap[activeTab]}`;
+      }
+      
+      const res = await api.get(url);
       return res.data.data;
     },
     refetchInterval: 5000, // Real-time updates
@@ -42,6 +65,44 @@ const AdminOrders = () => {
       id: orderId,
       data: { orderStatus, paymentStatus }
     });
+  };
+
+  const handleDownloadExcel = async () => {
+    try {
+      let url = '/admin/orders/export';
+      
+      if (activeTab !== 'all') {
+        const statusMap = {
+          'pending': 'Processing',
+          'shipped': 'Shipped',
+          'delivered': 'Delivered',
+          'cancelled': 'Cancelled'
+        };
+        url += `?status=${statusMap[activeTab]}`;
+      }
+      
+      const response = await api.get(url, {
+        responseType: 'blob',
+      });
+      
+      // Create download link
+      const blob = new Blob([response.data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute('download', `orders-${new Date().toISOString().split('T')[0]}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+      
+      toast.success('Orders exported successfully!');
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Failed to export orders');
+    }
   };
 
   const getStatusColor = (status) => {
@@ -67,22 +128,77 @@ const AdminOrders = () => {
     }
   };
 
-  if (isLoading) return <Loading />;
+  if (isLoading && !data) return <Loading />;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-800">Orders Management</h1>
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-        >
-          <option value="">All Orders</option>
-          {ORDER_STATUSES.map(status => (
-            <option key={status} value={status}>{status}</option>
-          ))}
-        </select>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold text-gray-800">Orders Management</h1>
+          <Button
+            onClick={handleDownloadExcel}
+            className="flex items-center space-x-2 bg-green-600 hover:bg-green-700"
+          >
+            <Download className="h-4 w-4" />
+            <span>Download Excel</span>
+          </Button>
+        </div>
+        
+        {/* Order Tabs */}
+        <div className="bg-white rounded-lg shadow-md p-2">
+          <div className="flex flex-wrap gap-1">
+            <button
+              onClick={() => setActiveTab('all')}
+              className={`px-4 py-3 rounded-lg font-medium transition-colors ${
+                activeTab === 'all' 
+                  ? 'bg-primary text-white' 
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              All Orders ({stats?.allOrders ?? 0})
+            </button>
+            <button
+              onClick={() => setActiveTab('pending')}
+              className={`px-4 py-3 rounded-lg font-medium transition-colors ${
+                activeTab === 'pending' 
+                  ? 'bg-primary text-white' 
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              Pending ({stats?.pendingOrders ?? 0})
+            </button>
+            <button
+              onClick={() => setActiveTab('shipped')}
+              className={`px-4 py-3 rounded-lg font-medium transition-colors ${
+                activeTab === 'shipped' 
+                  ? 'bg-primary text-white' 
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              Shipped ({stats?.shippedOrders ?? 0})
+            </button>
+            <button
+              onClick={() => setActiveTab('delivered')}
+              className={`px-4 py-3 rounded-lg font-medium transition-colors ${
+                activeTab === 'delivered' 
+                  ? 'bg-primary text-white' 
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              Delivered ({stats?.deliveredOrders ?? 0})
+            </button>
+            <button
+              onClick={() => setActiveTab('cancelled')}
+              className={`px-4 py-3 rounded-lg font-medium transition-colors ${
+                activeTab === 'cancelled' 
+                  ? 'bg-primary text-white' 
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              Cancelled ({stats?.cancelledOrders ?? 0})
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Orders Table */}
@@ -163,7 +279,7 @@ const AdminOrders = () => {
           </table>
           {data?.orders?.length === 0 && (
             <div className="text-center py-12 text-gray-500 bg-white">
-              No orders found matching the filter.
+              No orders found in this category.
             </div>
           )}
         </div>

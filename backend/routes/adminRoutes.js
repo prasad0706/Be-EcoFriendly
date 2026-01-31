@@ -14,7 +14,9 @@ const {
   getAllReviews,
   deleteReview,
   getAllUsers,
-  updateUserRole
+  updateUserRole,
+  exportOrdersToExcel,
+  getOrderStats
 } = require('../controllers/adminController');
 const { protect, admin } = require('../middleware/auth');
 
@@ -53,6 +55,8 @@ router.post('/products/upload', upload.single('image'), uploadProductImage);
 
 // Orders
 router.get('/orders', getAllOrders);
+router.get('/orders/stats', getOrderStats);
+router.get('/orders/export', exportOrdersToExcel);
 router.put('/orders/:id', updateOrderStatus);
 
 // Reviews
