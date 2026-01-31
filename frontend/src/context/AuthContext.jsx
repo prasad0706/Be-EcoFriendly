@@ -59,6 +59,31 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const adminLogin = async (email, password) => {
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      const { data } = response.data;
+
+      // Check if user is admin
+      if (data.role !== 'admin') {
+        toast.error('Only admin accounts can access this portal');
+        throw new Error('Not an admin account');
+      }
+
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data));
+      localStorage.setItem('isAdminSession', 'true');
+      setUser(data);
+
+      toast.success('Admin login successful!');
+      return data;
+    } catch (error) {
+      const message = error.response?.data?.message || 'Admin login failed';
+      toast.error(message);
+      throw error;
+    }
+  };
+
   const logout = async () => {
     try {
       await api.post('/auth/logout');
@@ -66,6 +91,7 @@ export const AuthProvider = ({ children }) => {
 
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      localStorage.removeItem('isAdminSession');
       setUser(null);
 
       toast.success('Logged out successfully!');
@@ -74,6 +100,7 @@ export const AuthProvider = ({ children }) => {
       // Still clear local state even if API call fails
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      localStorage.removeItem('isAdminSession');
       setUser(null);
     }
   };
@@ -100,6 +127,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     register,
     login,
+    adminLogin,
     logout,
     updateUserProfile,
     isAuthenticated: !!user,

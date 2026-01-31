@@ -1,7 +1,7 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import Navbar from './components/layout/Navbar';
@@ -16,6 +16,7 @@ import Wishlist from './pages/Wishlist';
 import Profile from './pages/Profile';
 import ProductDetail from './pages/ProductDetail';
 import Login from './pages/auth/Login';
+import AdminLogin from './pages/auth/AdminLogin';
 import Register from './pages/auth/Register';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -36,6 +37,45 @@ const queryClient = new QueryClient({
   },
 });
 
+// Protected Admin Route Component
+const ProtectedAdminRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green"></div>
+      </div>
+    );
+  }
+
+  if (!user || user.role !== 'admin') {
+    return <Navigate to="/admin/login" replace />;
+  }
+
+  return children;
+};
+
+// Protected Customer Route Component (prevents admins from accessing customer pages)
+const ProtectedCustomerRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green"></div>
+      </div>
+    );
+  }
+
+  // If user is admin, redirect to admin dashboard
+  if (user && user.role === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+
+  return children;
+};
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -44,18 +84,36 @@ function App() {
           <WishlistProvider>
             <Router>
               <Routes>
-                {/* Admin Routes */}
-                <Route path="/admin" element={<AdminLayout />}>
-                  <Route index element={<AdminDashboard />} />
-                  <Route path="products" element={<AdminProducts />} />
-                  <Route path="orders" element={<AdminOrders />} />
-                  <Route path="customers" element={<AdminCustomers />} />
-                  <Route path="sales" element={<SalesReport />} />
-                  <Route path="reviews" element={<AdminReviews />} />
-                </Route>
+                {/* Admin Login Route */}
+                <Route path="/admin/login" element={<AdminLogin />} />
 
-                {/* Public Routes */}
-                <Route element={<MainLayout />}>
+                {/* Protected Admin Routes */}
+                <Route
+                  path="/admin/*"
+                  element={
+                    <ProtectedAdminRoute>
+                      <Routes>
+                        <Route path="/" element={<AdminLayout />}>
+                          <Route index element={<AdminDashboard />} />
+                          <Route path="products" element={<AdminProducts />} />
+                          <Route path="orders" element={<AdminOrders />} />
+                          <Route path="customers" element={<AdminCustomers />} />
+                          <Route path="sales" element={<SalesReport />} />
+                          <Route path="reviews" element={<AdminReviews />} />
+                        </Route>
+                      </Routes>
+                    </ProtectedAdminRoute>
+                  }
+                />
+
+                {/* Public Routes with Customer Protection */}
+                <Route
+                  element={
+                    <ProtectedCustomerRoute>
+                      <MainLayout />
+                    </ProtectedCustomerRoute>
+                  }
+                >
                   <Route path="/" element={<Home />} />
                   <Route path="/shop" element={<Shop />} />
                   <Route path="/about" element={<About />} />
