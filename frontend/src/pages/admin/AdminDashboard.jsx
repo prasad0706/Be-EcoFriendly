@@ -160,17 +160,17 @@ const AdminDashboard = () => {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-gray-900 p-8 rounded-3xl text-white shadow-lg relative overflow-hidden">
+          <div className="bg-white p-8 rounded-3xl text-black shadow-lg relative overflow-hidden">
             <h3 className="text-xl font-bold mb-6">Quick Actions</h3>
             <div className="grid grid-cols-1 gap-3">
-              <Link to="/admin/products" className="flex items-center justify-between p-4 bg-white/10 hover:bg-white/20 rounded-2xl border border-white/10 transition-all group">
+              <Link to="/admin/products" className="flex items-center justify-between p-4 bg-gray-500/10 hover:bg-white/20 rounded-2xl border border-white/10 transition-all group">
                 <div className="flex items-center space-x-3">
                   <Package className="h-5 w-5 opacity-60" />
                   <span className="text-sm font-bold">Manage Products</span>
                 </div>
                 <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-all" />
               </Link>
-              <Link to="/admin/customers" className="flex items-center justify-between p-4 bg-white/10 hover:bg-white/20 rounded-2xl border border-white/10 transition-all group">
+              <Link to="/admin/customers" className="flex items-center justify-between p-4 bg-gray-500/10 hover:bg-white/20 rounded-2xl border border-white/10 transition-all group">
                 <div className="flex items-center space-x-3">
                   <Users className="h-5 w-5 opacity-60" />
                   <span className="text-sm font-bold">View Customers</span>

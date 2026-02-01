@@ -358,7 +358,7 @@ const AdminOrders = () => {
 
                     {/* Money & Payment */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="p-8 bg-gray-900 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden group">
+                      <div className="p-8 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden group">
                         <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transition-transform group-hover:scale-110">
                           <TrendingUp className="h-32 w-32" />
                         </div>

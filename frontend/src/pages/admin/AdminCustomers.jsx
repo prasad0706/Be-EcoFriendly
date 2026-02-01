@@ -306,21 +306,21 @@ const AdminCustomers = () => {
                       </div>
                     </div>
 
-                    <div className="p-8 bg-gray-900 rounded-[3rem] text-white shadow-2xl relative overflow-hidden group">
+                    <div className="p-8 bg-gray-50/50 rounded-[3rem] text-gray-400 shadow-2xl relative overflow-hidden group">
                       <div className="absolute top-0 right-0 p-8 opacity-10 transition-transform group-hover:rotate-12 duration-700">
                         <ShieldCheck className="h-20 w-20 text-primary-blue" />
                       </div>
-                      <h5 className="text-[10px] font-black text-white/40 uppercase mb-8 tracking-[0.2em]">Matrix Clearances</h5>
+                      <h5 className="text-[10px] font-black text-gray-400 uppercase mb-8 tracking-[0.2em]">Matrix Clearances</h5>
                       <div className="space-y-6 relative z-10">
                         <div className="flex justify-between items-center">
-                          <span className="text-[10px] font-bold text-white/60 uppercase tracking-widest">Designation Status</span>
-                          <span className="px-4 py-1.5 bg-primary-blue text-white rounded-xl text-[10px] font-black uppercase shadow-lg shadow-primary-blue/20">{selectedCustomer.role}</span>
+                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Designation Status</span>
+                          <span className="px-4 py-1.5 bg-primary-blue text-gray-100 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-primary-blue/20">{selectedCustomer.role}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-[10px] font-bold text-white/60 uppercase tracking-widest">Entity Validation</span>
+                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Entity Validation</span>
                           <div className="flex items-center space-x-3">
-                            <span className="text-[10px] font-black text-white/80 uppercase">{selectedCustomer.isVerified ? 'Synchronized' : 'Pending Sync'}</span>
-                            <div className={`h-3 w-3 rounded-full ${selectedCustomer.isVerified ? 'bg-green-eco shadow-green-eco/50' : 'bg-orange-500 shadow-orange-500/50'} shadow-lg`} />
+                            <span className="text-[10px] font-black text-gray-400 uppercase">{selectedCustomer.isVerified ? 'Synchronized' : 'Pending Sync'}</span>
+                            <div className={`h-3 w-3 rounded-full ${selectedCustomer.isVerified ? 'bg-gray-500 shadow-gray-500/50' : 'bg-orange-500 shadow-orange-500/50'} shadow-lg`} />
                           </div>
                         </div>
                       </div>
