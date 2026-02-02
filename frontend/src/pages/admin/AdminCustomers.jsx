@@ -19,7 +19,7 @@ import {
   Users,
   Target,
   UserCheck,
-  Filter 
+  Filter
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../utils/api';
@@ -27,7 +27,10 @@ import { formatCurrency } from '../../utils/currency';
 import Button from '../../components/common/Button';
 import Loading from '../../components/common/Loading';
 
+import { useAuth } from '../../context/AuthContext';
+
 const AdminCustomers = () => {
+  const { user } = useAuth();
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('');
@@ -50,15 +53,26 @@ const AdminCustomers = () => {
 
   const updateUserRoleMutation = useMutation({
     mutationFn: ({ userId, role }) => api.put(`/admin/users/${userId}/role`, { role }),
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['adminCustomers'] });
       toast.success('User role updated successfully');
-      setSelectedCustomer(null);
+      // Update local state instead of closing
+      if (selectedCustomer && selectedCustomer._id === variables.userId) {
+        setSelectedCustomer({ ...selectedCustomer, role: variables.role });
+      }
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || 'Failed to update user role');
     }
   });
+
+  const formatRole = (role) => {
+    if (!role) return '';
+    return role
+      .replace('super_admin', 'super admin')
+      .replace('admin_', '')
+      .replace('_', ' ');
+  };
 
   const handleRoleChange = (userId, newRole) => {
     updateUserRoleMutation.mutate({ userId, role: newRole });
@@ -73,7 +87,7 @@ const AdminCustomers = () => {
   };
 
   // Calculate statistics
-  const adminUsers = data?.users?.filter(user => user.role === 'admin') || [];
+  const adminUsers = data?.users?.filter(user => user.role === 'super_admin' || user.role?.startsWith('admin_')) || [];
   const customerUsers = data?.users?.filter(user => user.role === 'user' || user.role === 'customer') || [];
 
   const now = new Date();
@@ -86,7 +100,11 @@ const AdminCustomers = () => {
   const filteredCustomers = data?.users?.filter(customer => {
     const matchesSearch = customer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.email?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = filterRole ? customer.role === filterRole : true;
+    const matchesRole = filterRole
+      ? (filterRole === 'admin'
+        ? (customer.role === 'super_admin' || customer.role?.startsWith('admin_'))
+        : customer.role === filterRole)
+      : true;
     return matchesSearch && matchesRole;
   }) || [];
 
@@ -176,8 +194,8 @@ const AdminCustomers = () => {
               key={role}
               onClick={() => setFilterRole(role)}
               className={`px-6 py-2.5 rounded-2xl text-[10px] font-bold uppercase tracking-widest transition-all ${filterRole === role
-                  ? 'bg-gray-900 text-white shadow-lg'
-                  : 'text-gray-500 hover:bg-gray-50'
+                ? 'bg-gray-900 text-white shadow-lg'
+                : 'text-gray-500 hover:bg-gray-50'
                 }`}
             >
               {role === '' ? 'All Tiers' : role}
@@ -223,11 +241,12 @@ const AdminCustomers = () => {
                     </div>
                   </td>
                   <td className="px-10 py-6 text-center">
-                    <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-[0.1em] border shadow-sm ${customer.role === 'admin'
-                        ? 'bg-green-eco/10 text-green-eco border-green-eco/20'
-                        : 'bg-primary-blue/10 text-primary-blue border-primary-blue/20'
+                    <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-[0.1em] border shadow-sm ${customer.role === 'super_admin' ? 'bg-purple-500/10 text-purple-600 border-purple-500/20' :
+                      customer.role?.startsWith('admin_') ? 'bg-green-eco/10 text-green-eco border-green-eco/20' :
+                        customer.role === 'customer' ? 'bg-blue-500/10 text-blue-600 border-blue-500/20' :
+                          'bg-gray-100 text-gray-500 border-gray-200'
                       }`}>
-                      {customer.role || 'customer'}
+                      {formatRole(customer.role || 'customer')}
                     </span>
                   </td>
                   <td className="px-10 py-6 text-xs font-bold text-gray-500 tabular-nums">
@@ -275,7 +294,7 @@ const AdminCustomers = () => {
                     <h2 className="text-4xl font-black text-gray-900 tracking-tighter">{selectedCustomer.name || 'Anonymous Entity'}</h2>
                     <div className="flex items-center space-x-3 mt-3">
                       <span className="px-3 py-1 bg-white/80 backdrop-blur-sm rounded-xl border border-white text-[10px] font-black text-gray-400 uppercase tracking-widest shadow-sm">UID: {selectedCustomer._id.slice(-8).toUpperCase()}</span>
-                      <span className={`px-3 py-1 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20`}>Tier: {selectedCustomer.role}</span>
+                      <span className={`px-3 py-1 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20`}>{formatRole(selectedCustomer.role)}</span>
                     </div>
                   </div>
                 </div>
@@ -314,7 +333,7 @@ const AdminCustomers = () => {
                       <div className="space-y-6 relative z-10">
                         <div className="flex justify-between items-center">
                           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Designation Status</span>
-                          <span className="px-4 py-1.5 bg-primary-blue text-gray-100 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-primary-blue/20">{selectedCustomer.role}</span>
+                          <span className="px-4 py-1.5 bg-primary-blue text-gray-100 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-primary-blue/20">{formatRole(selectedCustomer.role)}</span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Entity Validation</span>
@@ -357,20 +376,33 @@ const AdminCustomers = () => {
 
                     <div className="pt-10 border-t border-gray-100">
                       <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-6">Management Protocols</h4>
-                      <div className="space-y-4">
-                        <Button
-                          className="w-full h-16 flex justify-between items-center px-10 rounded-[2rem] text-xs font-black uppercase tracking-widest shadow-xl shadow-primary/10 group"
-                          variant={selectedCustomer.role === 'admin' ? 'outline' : 'primary'}
-                          onClick={() => handleRoleChange(selectedCustomer._id, selectedCustomer.role === 'admin' ? 'customer' : 'admin')}
-                          loading={updateUserRoleMutation.isPending}
-                        >
-                          <div className="flex items-center space-x-4">
-                            <Shield className={`h-5 w-5 ${selectedCustomer.role === 'admin' ? 'text-red-500' : 'text-white'}`} />
-                            <span>{selectedCustomer.role === 'admin' ? 'Revoke Authorization' : 'Grant Admin Override'}</span>
+                      {user?.role === 'super_admin' ? (
+                        <div className="space-y-4">
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Assign System Role</p>
+                          <div className="grid grid-cols-2 gap-3">
+                            {['user', 'customer', 'super_admin', 'admin_products', 'admin_orders', 'admin_customers', 'admin_sales', 'admin_reviews'].map((role) => (
+                              <button
+                                key={role}
+                                onClick={() => handleRoleChange(selectedCustomer._id, role)}
+                                disabled={updateUserRoleMutation.isPending}
+                                className={`px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border flex items-center justify-between group ${selectedCustomer.role === role
+                                  ? 'bg-gray-900 text-white border-gray-900 shadow-lg'
+                                  : 'bg-white text-gray-400 border-gray-100 hover:border-primary/50 hover:text-primary'
+                                  }`}
+                              >
+                                <span className="truncate mr-2">{formatRole(role)}</span>
+                                {selectedCustomer.role === role && <ShieldCheck className="h-3 w-3 text-green-eco" />}
+                              </button>
+                            ))}
                           </div>
-                          <ChevronRight className={`h-4 w-4 transition-transform group-hover:translate-x-1 ${selectedCustomer.role === 'admin' ? 'text-gray-300' : 'text-white/40'}`} />
-                        </Button>
-                      </div>
+                        </div>
+                      ) : (
+                        <div className="p-6 bg-gray-50/50 rounded-[2rem] border border-gray-100 text-center">
+                          <Shield className="h-8 w-8 text-gray-200 mx-auto mb-3" />
+                          <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Insufficient Privileges</p>
+                          <p className="text-gray-400/60 text-[10px] uppercase tracking-wider mt-1">Role Management Locked</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

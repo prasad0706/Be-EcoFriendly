@@ -16,13 +16,48 @@ const AdminLayout = () => {
   }
 
   const navItems = [
-    { name: 'Dashboard', path: '/admin', icon: LayoutDashboard, exact: true },
-    { name: 'Products', path: '/admin/products', icon: Package },
-    { name: 'Orders', path: '/admin/orders', icon: ShoppingCart },
-    { name: 'Customers', path: '/admin/customers', icon: Users },
-    { name: 'Sales Report', path: '/admin/sales', icon: TrendingUp },
-    { name: 'Reviews', path: '/admin/reviews', icon: Star },
+    {
+      name: 'Dashboard',
+      path: '/admin',
+      icon: LayoutDashboard,
+      exact: true,
+      allowedRoles: ['super_admin', 'admin_products', 'admin_orders', 'admin_customers', 'admin_sales', 'admin_reviews']
+    },
+    {
+      name: 'Products',
+      path: '/admin/products',
+      icon: Package,
+      allowedRoles: ['super_admin', 'admin_products']
+    },
+    {
+      name: 'Orders',
+      path: '/admin/orders',
+      icon: ShoppingCart,
+      allowedRoles: ['super_admin', 'admin_orders']
+    },
+    {
+      name: 'Customers',
+      path: '/admin/customers',
+      icon: Users,
+      allowedRoles: ['super_admin', 'admin_customers']
+    },
+    {
+      name: 'Sales Report',
+      path: '/admin/sales',
+      icon: TrendingUp,
+      allowedRoles: ['super_admin', 'admin_sales']
+    },
+    {
+      name: 'Reviews',
+      path: '/admin/reviews',
+      icon: Star,
+      allowedRoles: ['super_admin', 'admin_reviews']
+    },
   ];
+
+  const filteredNavItems = navItems.filter(item =>
+    item.allowedRoles.includes(user?.role)
+  );
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -41,7 +76,7 @@ const AdminLayout = () => {
 
           {/* Navigation */}
           <nav className="flex-1 px-4 py-4 space-y-1">
-            {navItems.map((item) => (
+            {filteredNavItems.map((item) => (
               <NavLink
                 key={item.path}
                 to={item.path}

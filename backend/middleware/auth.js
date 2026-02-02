@@ -20,7 +20,7 @@ exports.protect = async (req, res, next) => {
     console.log('Verifying token:', token);
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log('Decoded token:', decoded);
-    
+
     req.user = await User.findById(decoded.id).select('-password');
     console.log('Found user:', req.user);
 
@@ -43,7 +43,7 @@ exports.protect = async (req, res, next) => {
 
 // Admin only access
 exports.admin = (req, res, next) => {
-  if (req.user && req.user.role === 'admin') {
+  if (req.user && (req.user.role === 'admin' || req.user.role === 'super_admin' || req.user.role.startsWith('admin_'))) {
     next();
   } else {
     res.status(403).json({

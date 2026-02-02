@@ -573,10 +573,22 @@ exports.updateUserRole = async (req, res) => {
     const { role } = req.body;
 
     // Validate role
-    if (!['user', 'admin'].includes(role)) {
+    const validRoles = [
+      'user',
+      'admin',
+      'super_admin',
+      'customer',
+      'admin_products',
+      'admin_orders',
+      'admin_customers',
+      'admin_sales',
+      'admin_reviews'
+    ];
+
+    if (!validRoles.includes(role)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid role. Must be either "user" or "admin"'
+        message: 'Invalid role'
       });
     }
 
@@ -617,7 +629,7 @@ exports.getOrderStats = async (req, res) => {
     const shippedOrders = await Order.countDocuments({ orderStatus: 'Shipped' });
     const deliveredOrders = await Order.countDocuments({ orderStatus: 'Delivered' });
     const cancelledOrders = await Order.countDocuments({ orderStatus: 'Cancelled' });
-    
+
     res.json({
       success: true,
       data: {
@@ -642,20 +654,20 @@ exports.getOrderStats = async (req, res) => {
 exports.exportOrdersToExcel = async (req, res) => {
   try {
     const { status, filter } = req.query;
-    
+
     // Build query based on filters
     const query = {};
-    
+
     if (status) {
       query.orderStatus = status;
     }
-    
+
     if (filter === 'today') {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
-      
+
       query.createdAt = {
         $gte: today,
         $lt: tomorrow
@@ -663,12 +675,12 @@ exports.exportOrdersToExcel = async (req, res) => {
     } else if (filter === 'pending') {
       query.orderStatus = 'Processing';
     }
-    
+
     // Fetch orders with populated user data
     const orders = await Order.find(query)
       .populate('user', 'name email')
       .sort({ createdAt: -1 });
-    
+
     // Transform data for Excel
     const excelData = orders.map(order => ({
       'Order ID': order._id.toString(),
@@ -686,20 +698,20 @@ exports.exportOrdersToExcel = async (req, res) => {
         year: 'numeric'
       })
     }));
-    
+
     // Create workbook and worksheet
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(excelData);
-    
+
     // Add worksheet to workbook
     XLSX.utils.book_append_sheet(wb, ws, 'Orders');
-    
+
     // Generate buffer
     const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
-    
+
     // Set headers for file download
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    
+
     // Create filename based on status
     let fileName = 'orders';
     if (req.query.status) {
@@ -713,9 +725,9 @@ exports.exportOrdersToExcel = async (req, res) => {
     } else if (req.query.filter) {
       fileName = `${req.query.filter}_orders`;
     }
-    
+
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}_${new Date().toISOString().split('T')[0]}.xlsx"`);
-    
+
     // Send the file
     res.send(buffer);
   } catch (error) {
