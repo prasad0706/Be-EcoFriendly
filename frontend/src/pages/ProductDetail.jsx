@@ -12,6 +12,7 @@ import toast from 'react-hot-toast';
 import ProductImage from '../components/product/ProductImage';
 import { formatCurrency } from '../utils/currency';
 import { motion, AnimatePresence } from 'framer-motion';
+import Reviews from '../components/product/Reviews';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -189,8 +190,8 @@ const ProductDetail = () => {
                 <button
                   onClick={() => addToWishlist(product._id)}
                   className={`p-3 rounded-2xl border transition-all ${isInWishlist(product._id)
-                      ? 'bg-red-50 border-red-100 text-red-500'
-                      : 'bg-white border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50'
+                    ? 'bg-red-50 border-red-100 text-red-500'
+                    : 'bg-white border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50'
                     }`}
                 >
                   <Heart className={`h-6 w-6 ${isInWishlist(product._id) ? 'fill-current' : ''}`} />
@@ -227,6 +228,9 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Reviews Section */}
+      <Reviews product={product} />
     </div>
   );
 };

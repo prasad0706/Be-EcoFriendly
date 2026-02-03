@@ -74,6 +74,13 @@ const productSchema = new mongoose.Schema({
       max: 5,
     },
     comment: String,
+    images: [{
+      type: String
+    }],
+    verified: {
+      type: Boolean,
+      default: false
+    },
     createdAt: {
       type: Date,
       default: Date.now,

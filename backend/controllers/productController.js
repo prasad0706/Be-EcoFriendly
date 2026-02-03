@@ -1,4 +1,5 @@
 const Product = require('../models/Product');
+const Order = require('../models/Order');
 const imagekit = require('../config/imagekit');
 const { supabaseAdmin } = require('../config/supabase');
 
@@ -199,7 +200,7 @@ exports.deleteProduct = async (req, res) => {
 // @access  Private
 exports.addReview = async (req, res) => {
   try {
-    const { rating, comment } = req.body;
+    const { rating, comment, images } = req.body;
     const product = await Product.findById(req.params.id);
 
     if (!product) {
@@ -221,11 +222,20 @@ exports.addReview = async (req, res) => {
       });
     }
 
+    // Check if user has purchased the product
+    const deliveredOrder = await Order.findOne({
+      user: req.user._id,
+      'items.product': req.params.id,
+      orderStatus: 'Delivered'
+    });
+
     const review = {
       user: req.user._id,
       name: req.user.name,
       rating: Number(rating),
       comment,
+      images: images || [],
+      verified: !!deliveredOrder
     };
 
     product.reviews.push(review);
