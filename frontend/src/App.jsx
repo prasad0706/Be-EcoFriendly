@@ -25,6 +25,7 @@ import AdminReviews from './pages/admin/AdminReviews';
 import AdminCustomers from './pages/admin/AdminCustomers';
 import SalesReport from './pages/admin/SalesReport';
 import MainLayout from './components/layout/MainLayout';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 import './index.css';
 
 const queryClient = new QueryClient({
@@ -63,7 +64,11 @@ function App() {
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="/wishlist" element={<Wishlist />} />
-                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/profile" element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  } />
                   <Route path="/product/:id" element={<ProductDetail />} />
                 </Route>
                 <Route path="/login" element={<Login />} />
