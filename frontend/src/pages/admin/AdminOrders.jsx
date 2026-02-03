@@ -31,8 +31,9 @@ import { ORDER_STATUSES, PAYMENT_STATUSES } from '../../utils/constants';
 
 const AdminOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [activeTab, setActiveTab] = useState('all'); // all, pending, shipped, delivered, cancelled
+  const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [expandedUsers, setExpandedUsers] = useState({});
 
   const queryClient = useQueryClient();
 
@@ -157,6 +158,41 @@ const AdminOrders = () => {
       (order.shippingAddress?.fullName || order.shippingAddress?.name || '').toLowerCase().includes(searchStr);
   });
 
+  // Group orders by user content
+  const groupedOrders = filteredOrders?.reduce((acc, order) => {
+    // Use user ID or falling back to shipping name for guests
+    const userId = order.user?._id || order.shippingAddress?.email || 'guest';
+
+    if (!acc[userId]) {
+      acc[userId] = {
+        id: userId,
+        user: order.user || {
+          name: order.shippingAddress?.fullName || order.shippingAddress?.name || 'Guest',
+          email: order.shippingAddress?.email || 'No Email',
+          _id: 'guest'
+        },
+        orders: [],
+        totalSpent: 0,
+        lastOrderDate: order.createdAt
+      };
+    }
+
+    acc[userId].orders.push(order);
+    acc[userId].totalSpent += order.totalPrice;
+    if (new Date(order.createdAt) > new Date(acc[userId].lastOrderDate)) {
+      acc[userId].lastOrderDate = order.createdAt;
+    }
+
+    return acc;
+  }, {});
+
+  const toggleUserExpand = (userId) => {
+    setExpandedUsers(prev => ({
+      ...prev,
+      [userId]: !prev[userId]
+    }));
+  };
+
   if (isLoading && !data) return <Loading />;
 
   return (
@@ -205,8 +241,8 @@ const AdminOrders = () => {
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`px-6 py-3 rounded-2xl text-sm font-bold transition-all flex items-center space-x-3 ${activeTab === tab.id
-                ? 'bg-primary text-white shadow-xl shadow-primary/20'
-                : 'text-gray-500 hover:bg-white hover:text-gray-900 border border-transparent hover:border-gray-100'
+              ? 'bg-primary text-white shadow-xl shadow-primary/20'
+              : 'text-gray-500 hover:bg-white hover:text-gray-900 border border-transparent hover:border-gray-100'
               }`}
           >
             <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? 'text-white' : 'text-gray-400'}`} />
@@ -236,49 +272,93 @@ const AdminOrders = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100/50">
-              {filteredOrders?.map((order) => (
-                <tr key={order._id} className="hover:bg-primary/[0.02] transition-colors group">
-                  <td className="px-8 py-6">
-                    <span className="font-bold text-gray-900 text-sm tracking-tight">#{order._id.slice(-8).toUpperCase()}</span>
-                  </td>
-                  <td className="px-8 py-6">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-primary-blue text-white flex items-center justify-center font-bold text-xs shadow-lg shadow-primary/20">
-                        {(order.user?.name || order.shippingAddress?.fullName || order.shippingAddress?.name || 'G')[0]}
+              {groupedOrders && Object.values(groupedOrders).map((group) => (
+                <>
+                  {/* Parent User Row */}
+                  <tr
+                    key={group.id}
+                    onClick={() => toggleUserExpand(group.id)}
+                    className="cursor-pointer hover:bg-primary/[0.02] transition-colors border-l-4 border-transparent hover:border-primary"
+                  >
+                    <td className="px-8 py-5" colSpan="2">
+                      <div className="flex items-center space-x-4">
+                        <div className={`p-2 rounded-full transition-transform duration-300 ${expandedUsers[group.id] ? 'rotate-90 bg-primary/10 text-primary' : 'text-gray-400'}`}>
+                          <ChevronRight className="h-5 w-5" />
+                        </div>
+                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-primary-blue text-white flex items-center justify-center font-bold text-xs shadow-lg shadow-primary/20">
+                          {group.user.name.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="font-bold text-gray-900 text-sm">{group.user.name}</p>
+                          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">{group.user.email}</p>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <p className="font-bold text-gray-900 text-sm truncate">{order.user?.name || order.shippingAddress?.fullName || order.shippingAddress?.name || 'Guest User'}</p>
-                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">{order.user?.email || 'Unauthorized Email'}</p>
+                    </td>
+                    <td className="px-8 py-5">
+                      <div className="flex flex-col">
+                        <span className="font-extrabold text-gray-900 text-sm">{formatCurrency(group.totalSpent)}</span>
+                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-tight">Total Value</span>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <p className="font-extrabold text-gray-900 text-sm tracking-tight">{formatCurrency(order.totalPrice)}</p>
-                    <p className="text-[10px] text-primary font-bold uppercase tracking-widest mt-0.5">{order.items?.length || 0} Units</p>
-                  </td>
-                  <td className="px-8 py-6">
-                    <span className={`px-3 py-1 rounded-xl text-[10px] font-bold uppercase tracking-widest border shadow-sm ${getStatusStyle(order.paymentStatus)}`}>
-                      {order.paymentStatus}
-                    </span>
-                    <p className="text-[10px] text-gray-400 mt-1.5 font-bold uppercase tracking-tighter">{order.paymentMethod}</p>
-                  </td>
-                  <td className="px-8 py-6">
-                    <span className={`px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-[0.1em] border shadow-sm ${getStatusStyle(order.orderStatus)}`}>
-                      {order.orderStatus}
-                    </span>
-                  </td>
-                  <td className="px-8 py-6 text-xs font-bold text-gray-500 tabular-nums">
-                    {new Date(order.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </td>
-                  <td className="px-8 py-6 text-right">
-                    <button
-                      onClick={() => setSelectedOrder(order)}
-                      className="p-3 bg-gray-50 text-gray-400 rounded-2xl hover:bg-primary hover:text-white transition-all shadow-sm hover:shadow-lg hover:shadow-primary/20 active:scale-95 border border-gray-100 hover:border-primary"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </button>
-                  </td>
-                </tr>
+                    </td>
+                    <td className="px-8 py-5">
+                      <div className="flex items-center space-x-2">
+                        <span className="px-3 py-1 bg-primary/10 text-primary rounded-lg text-xs font-bold shadow-sm">
+                          {group.orders.length} orders
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-5" colSpan="3">
+                      <div className="flex items-center space-x-3 opacity-60">
+                        <Clock className="h-4 w-4 text-gray-400" />
+                        <span className="text-xs font-bold text-gray-500">
+                          Latest: {new Date(group.lastOrderDate).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+
+                  {/* Expanded Child Rows */}
+                  {expandedUsers[group.id] && group.orders.map(order => (
+                    <tr key={order._id} className="bg-gray-50/50 hover:bg-gray-50 relative group">
+                      <td className="px-8 py-4 pl-24">
+                        <div className="absolute left-10 top-0 bottom-0 w-px bg-gray-200 border-l border-dashed border-gray-300 h-full" />
+                        <div className="absolute left-10 top-1/2 w-8 h-px bg-gray-300 border-t border-dashed" />
+                        <span className="font-bold text-gray-700 text-xs tracking-tight bg-white px-2 py-1 rounded border border-gray-200">
+                          #{order._id.slice(-8).toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="px-8 py-4">
+                        {/* Client details hidden in child row as redundant */}
+                      </td>
+                      <td className="px-8 py-4">
+                        <p className="font-bold text-gray-900 text-xs">{formatCurrency(order.totalPrice)}</p>
+                        <p className="text-[10px] text-gray-400 uppercase">{order.items?.length || 0} items</p>
+                      </td>
+                      <td className="px-8 py-4">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${getStatusStyle(order.paymentStatus)}`}>
+                          {order.paymentStatus}
+                        </span>
+                        <span className="ml-2 text-[10px] text-gray-400 font-bold uppercase">{order.paymentMethod}</span>
+                      </td>
+                      <td className="px-8 py-4">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${getStatusStyle(order.orderStatus)}`}>
+                          {order.orderStatus}
+                        </span>
+                      </td>
+                      <td className="px-8 py-4 text-[10px] font-bold text-gray-500">
+                        {new Date(order.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-8 py-4 text-right">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setSelectedOrder(order); }}
+                          className="p-2 bg-white text-gray-400 rounded-xl hover:text-primary hover:shadow-md border border-gray-100 transition-all scale-90 hover:scale-100"
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </>
               ))}
             </tbody>
           </table>
