@@ -17,9 +17,14 @@ const Login = () => {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      await login(data.email, data.password);
+      const user = await login(data.email, data.password);
       toast.success('Welcome back!');
-      navigate('/');
+
+      if (user.role === 'admin' || user.role === 'super_admin' || (user.role && user.role.startsWith('admin_'))) {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (error) {
       console.error('Login error:', error);
       toast.error('Invalid email or password.');
