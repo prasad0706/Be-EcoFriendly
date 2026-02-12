@@ -14,13 +14,22 @@ const loginUser = async () => {
     });
 
     console.log('Login successful!');
+    console.log('User Role:', response.data.data.role);
     console.log('Token:', response.data.data.token);
     console.log('\nYou can use this token in your requests by setting the Authorization header:');
     console.log(`Authorization: Bearer ${response.data.data.token}`);
-    
+
     return response.data.data.token;
   } catch (error) {
-    console.error('Login failed:', error.response?.data || error.message);
+    if (error.response) {
+      console.error('Data:', error.response.data);
+      console.error('Status:', error.response.status);
+      console.error('Headers:', error.response.headers);
+    } else if (error.request) {
+      console.error('No response received:', error.request);
+    } else {
+      console.error('Error setting up request:', error.message);
+    }
     process.exit(1);
   }
 };

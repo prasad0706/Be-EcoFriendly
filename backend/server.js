@@ -16,14 +16,22 @@ const adminRoutes = require('./routes/adminRoutes');
 const app = express();
 
 // Connect to MongoDB
-connectDB();
+connectDB().then(() => {
+  // Start server only after DB connection
+  const PORT = process.env.PORT || 5001;
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+    console.log(`CORS enabled for development origins`);
+    console.log(`Backend URL should be: http://localhost:${PORT}`);
+  });
+});
 
 // CORS configuration
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    
+
     // List of allowed origins
     const allowedOrigins = [
       'http://localhost:5173',
@@ -33,7 +41,7 @@ const corsOptions = {
       'http://127.0.0.1:5174',
       'http://127.0.0.1:3000'
     ];
-    
+
     if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
       callback(null, true);
     } else {
@@ -79,9 +87,4 @@ app.use((req, res) => {
 app.use(errorHandler);
 
 // Start server
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-  console.log(`CORS enabled for development origins`);
-  console.log(`Backend URL should be: http://localhost:${PORT}`);
-});
+// Server start is handled in connectDB promise chain

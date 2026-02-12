@@ -86,6 +86,7 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log(`Login attempt for email: ${email}`);
 
     // Check if user exists and get password
     const user = await User.findOne({ email }).select('+password');
@@ -131,6 +132,7 @@ exports.login = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error('Login error:', error);
     res.status(500).json({
       success: false,
       message: error.message,
