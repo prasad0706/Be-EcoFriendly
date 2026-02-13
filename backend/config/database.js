@@ -1,4 +1,12 @@
 const mongoose = require('mongoose');
+const dns = require('dns');
+
+// Fix for ECONNREFUSED when resolving MongoDB Atlas SRV records on some networks (common on macOS/Node 18+)
+try {
+  dns.setServers(['8.8.8.8', '8.8.4.4']);
+} catch (e) {
+  console.warn('Note: Could not set custom DNS servers for MongoDB resolution.');
+}
 
 const connectDB = async () => {
   try {

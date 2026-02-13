@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ShoppingCart, Heart, Star, Eye } from 'lucide-react';
+import { ShoppingCart, Heart, Star, Eye, Leaf } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
@@ -69,6 +69,11 @@ const ProductCard = ({ product }) => {
             {product.featured && (
               <span className="px-3 py-1 bg-primary text-white text-[10px] font-bold uppercase tracking-wider rounded-lg shadow-md">
                 Featured
+              </span>
+            )}
+            {product.ecoScore > 80 && (
+              <span className="px-3 py-1 bg-accent text-white text-[10px] font-bold uppercase tracking-wider rounded-lg shadow-md flex items-center gap-1">
+                <Leaf className="h-3 w-3" /> {product.ecoScore} Eco
               </span>
             )}
           </div>

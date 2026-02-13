@@ -8,13 +8,26 @@ const { supabaseAdmin } = require('../config/supabase');
 // @access  Public
 exports.getProducts = async (req, res) => {
   try {
-    const { category, search, sort, page = 1, limit = 12, featured } = req.query;
+    const { 
+      category, 
+      search, 
+      sort, 
+      page = 1, 
+      limit = 12, 
+      featured,
+      minPrice,
+      maxPrice,
+      rating,
+      ecoScore,
+      inStock,
+      tags
+    } = req.query;
 
     // Build query
     const query = {};
 
     if (category && category !== 'all') {
-      query.category = category;
+      query.category = { $in: category.split(',') };
     }
 
     if (search) {
@@ -29,20 +42,51 @@ exports.getProducts = async (req, res) => {
       query.featured = true;
     }
 
+    // Advanced Filters
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = Number(minPrice);
+      if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    if (rating) {
+      query['ratings.average'] = { $gte: Number(rating) };
+    }
+
+    if (ecoScore) {
+      query.ecoScore = { $gte: Number(ecoScore) };
+    } else if (req.query.minEcoScore) {
+      query.ecoScore = { $gte: Number(req.query.minEcoScore) };
+    }
+
+    if (inStock === 'true') {
+      query.stock = { $gt: 0 };
+    }
+
+    if (tags) {
+      query.tags = { $in: tags.split(',') };
+    }
+
     // Sort options
     let sortOption = {};
     switch (sort) {
+      case 'price_asc':
       case 'price-asc':
         sortOption = { price: 1 };
         break;
+      case 'price_desc':
       case 'price-desc':
         sortOption = { price: -1 };
         break;
-      case 'name':
-        sortOption = { name: 1 };
-        break;
+      case 'rating_desc':
       case 'rating':
         sortOption = { 'ratings.average': -1 };
+        break;
+      case 'newest':
+        sortOption = { createdAt: -1 };
+        break;
+      case 'name':
+        sortOption = { name: 1 };
         break;
       default:
         sortOption = { createdAt: -1 };

@@ -16,9 +16,11 @@ const Button = ({
   const variants = {
     primary: 'bg-primary text-white hover:bg-opacity-90 shadow-md hover:shadow-lg',
     secondary: 'bg-green text-white hover:bg-opacity-90 shadow-md hover:shadow-lg',
-    outline: 'border-2 border-primary text-primary hover:bg-primary hover:text-white',
+    outline: 'border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors',
     ghost: 'text-primary hover:bg-primary hover:bg-opacity-10',
     danger: 'bg-red-500 text-white hover:bg-red-600 shadow-md hover:shadow-lg',
+    white: 'bg-white text-gray-900 hover:bg-gray-100 shadow-md hover:shadow-lg',
+    none: '',
   };
 
   const sizes = {

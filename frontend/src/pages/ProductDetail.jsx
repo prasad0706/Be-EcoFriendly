@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ShoppingCart, Heart, Star, Package, Truck, Shield, ArrowLeft, ChevronRight, Zap } from 'lucide-react';
+import { ShoppingCart, Heart, Star, Package, Truck, Shield, ArrowLeft, ChevronRight, Zap, Leaf, AlertTriangle, CheckCircle2, TrendingUp } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -169,6 +169,57 @@ const ProductDetail = () => {
                   {product.stock > 0 ? `${product.stock} items in stock` : 'Out of stock'}
                 </span>
               </div>
+
+              {/* Eco Score Dashboard */}
+              <div className="bg-background/50 rounded-3xl p-6 border border-accent/10 mb-8">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Leaf className="h-5 w-5 text-accent" />
+                    <h3 className="font-bold text-gray-900">Eco-Impact Score</h3>
+                  </div>
+                  <div className="flex items-baseline gap-1">
+                    <span className={`text-2xl font-black ${product.ecoScore > 70 ? 'text-accent' : 'text-orange-500'}`}>
+                      {product.ecoScore || 0}
+                    </span>
+                    <span className="text-xs font-bold text-gray-400">/ 100</span>
+                  </div>
+                </div>
+
+                <div className="w-full h-2 bg-gray-100 rounded-full mb-6 overflow-hidden">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${product.ecoScore}%` }}
+                    className={`h-full rounded-full ${
+                      product.ecoScore > 70 ? 'bg-accent' : product.ecoScore > 40 ? 'bg-orange-400' : 'bg-red-500'
+                    }`}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 bg-white rounded-2xl border border-gray-50">
+                    <div className="flex items-center gap-2 text-accent mb-2">
+                      <CheckCircle2 className="h-4 w-4" />
+                      <span className="text-[10px] font-black uppercase tracking-wider">Benefits</span>
+                    </div>
+                    <ul className="text-[11px] text-gray-500 font-medium space-y-1">
+                      <li>• Biodegradable</li>
+                      <li>• Zero Plastic</li>
+                      <li>• Ethically Made</li>
+                    </ul>
+                  </div>
+                  <div className="p-4 bg-white rounded-2xl border border-gray-50">
+                    <div className="flex items-center gap-2 text-red-400 mb-2">
+                      <AlertTriangle className="h-4 w-4" />
+                      <span className="text-[10px] font-black uppercase tracking-wider">Risks Avoided</span>
+                    </div>
+                    <ul className="text-[11px] text-gray-500 font-medium space-y-1">
+                      <li>• No Microplastics</li>
+                      <li>• Low Carbon Footprint</li>
+                      <li>• Safe Passions</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="mt-auto space-y-8">
@@ -230,7 +281,9 @@ const ProductDetail = () => {
       </div>
 
       {/* Reviews Section */}
-      <Reviews product={product} />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Reviews product={product} />
+      </div>
     </div>
   );
 };
