@@ -20,11 +20,16 @@ exports.getProducts = async (req, res) => {
       rating,
       ecoScore,
       inStock,
-      tags
+      tags,
+      exclude
     } = req.query;
 
     // Build query
     const query = {};
+
+    if (exclude) {
+      query._id = { $ne: exclude };
+    }
 
     if (category && category !== 'all') {
       query.category = { $in: category.split(',') };

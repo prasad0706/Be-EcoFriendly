@@ -65,13 +65,13 @@ const OrderDetailModal = ({ order, onClose, onUpdateStatus }) => {
                                     {order.items?.map((item, index) => (
                                         <div key={index} className="flex items-center space-x-6 p-5 bg-gray-50/50 rounded-3xl border border-transparent hover:border-primary/20 hover:bg-white transition-all group">
                                             <div className="relative">
-                                                <img src={item.image} alt="" className="w-20 h-20 object-cover rounded-2xl shadow-md transition-transform group-hover:scale-105" />
+                                                <img src={item.product?.images?.[0]?.url || item.image || 'https://via.placeholder.com/80'} alt="" className="w-20 h-20 object-cover rounded-2xl shadow-md transition-transform group-hover:scale-105" />
                                                 <span className="absolute -top-2 -right-2 w-8 h-8 bg-primary text-white text-xs font-bold rounded-xl flex items-center justify-center shadow-lg border-2 border-white">
                                                     {item.quantity}
                                                 </span>
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="font-bold text-gray-900 text-base truncate">{item.name}</p>
+                                                <p className="font-bold text-gray-900 text-base truncate">{item.product?.name || item.name}</p>
                                                 <p className="text-[10px] text-primary font-bold uppercase tracking-widest mt-1.5">
                                                     Unit Price: {formatCurrency(item.price)}
                                                 </p>

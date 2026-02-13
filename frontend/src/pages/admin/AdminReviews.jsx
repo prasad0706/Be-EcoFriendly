@@ -61,7 +61,7 @@ const AdminReviews = () => {
         <div className="bg-white border border-gray-100 rounded-2xl px-6 py-3 shadow-sm flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-            <span className="text-xl font-bold text-gray-900">4.8</span>
+            <span className="text-xl font-bold text-gray-900">{data?.averageRating || 0}</span>
           </div>
           <div className="w-px h-6 bg-gray-100" />
           <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{data?.total || 0} Total Reviews</span>

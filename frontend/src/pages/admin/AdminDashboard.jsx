@@ -19,7 +19,8 @@ import {
   IndianRupee,
   ArrowUpRight,
   ArrowDownRight,
-  ChevronRight
+  ChevronRight,
+  MessageSquare
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../../utils/api';
@@ -27,49 +28,45 @@ import { formatCurrency } from '../../utils/currency';
 import Loading from '../../components/common/Loading';
 
 const AdminDashboard = () => {
+  const [timeRange, setTimeRange] = useState('7d');
   const { data: stats, isLoading } = useQuery({
-    queryKey: ['adminStats'],
+    queryKey: ['adminStats', timeRange],
     queryFn: async () => {
-      const res = await api.get('/admin/stats');
+      const res = await api.get(`/admin/stats?range=${timeRange}`);
       return res.data.data;
     }
   });
 
   if (isLoading) return <Loading />;
 
-  // Mock data for trends
-  const revenueData = [
-    { name: 'Mon', value: 4000 },
-    { name: 'Tue', value: 3000 },
-    { name: 'Wed', value: 5000 },
-    { name: 'Thu', value: 2780 },
-    { name: 'Fri', value: 1890 },
-    { name: 'Sat', value: 2390 },
-    { name: 'Sun', value: 3490 },
-  ];
+  // Transform sales data for chart
+  const revenueData = stats?.salesData?.map(item => ({
+    name: new Date(item._id).toLocaleDateString('en-IN', { weekday: 'short' }),
+    value: item.sales
+  })) || [];
 
   const statCards = [
     {
       title: 'Total Revenue',
       value: formatCurrency(stats?.totalRevenue || 0),
-      change: '+12.5%',
-      isPositive: true,
+      change: `${stats?.growth?.revenue >= 0 ? '+' : ''}${stats?.growth?.revenue || 0}%`,
+      isPositive: (stats?.growth?.revenue || 0) >= 0,
       icon: IndianRupee,
       color: 'bg-primary',
     },
     {
       title: 'Active Orders',
-      value: stats?.totalOrders || 0,
-      change: '+3.2%',
-      isPositive: true,
+      value: stats?.pendingOrders || 0,
+      change: `${stats?.growth?.orders >= 0 ? '+' : ''}${stats?.growth?.orders || 0}%`,
+      isPositive: (stats?.growth?.orders || 0) >= 0,
       icon: ShoppingCart,
       color: 'bg-green-600',
     },
     {
       title: 'Customers',
       value: stats?.totalUsers || 0,
-      change: '-1.4%',
-      isPositive: false,
+      change: `${stats?.growth?.users >= 0 ? '+' : ''}${stats?.growth?.users || 0}%`,
+      isPositive: (stats?.growth?.users || 0) >= 0,
       icon: Users,
       color: 'bg-purple-600',
     }
@@ -80,12 +77,22 @@ const AdminDashboard = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard Overivew</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
           <p className="text-gray-500 font-medium">Welcome back to your store's control center.</p>
         </div>
         <div className="flex bg-white p-1 rounded-xl shadow-sm border border-gray-100">
-          <button className="px-4 py-2 bg-primary text-white rounded-lg text-xs font-bold">Last 7 Days</button>
-          <button className="px-4 py-2 text-gray-400 hover:text-gray-900 rounded-lg text-xs font-bold transition-all">Last 30 Days</button>
+          <button
+            onClick={() => setTimeRange('7d')}
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${timeRange === '7d' ? 'bg-primary text-white' : 'text-gray-400 hover:text-gray-900'}`}
+          >
+            Last 7 Days
+          </button>
+          <button
+            onClick={() => setTimeRange('30d')}
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${timeRange === '30d' ? 'bg-primary text-white' : 'text-gray-400 hover:text-gray-900'}`}
+          >
+            Last 30 Days
+          </button>
         </div>
       </div>
 
@@ -116,9 +123,9 @@ const AdminDashboard = () => {
         <div className="lg:col-span-2 bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-xl font-bold text-gray-900">Revenue Performance</h3>
-            <div className="flex items-center text-green-500 text-sm font-bold">
-              <TrendingUp className="h-4 w-4 mr-1" />
-              +18% growth
+            <div className={`flex items-center text-sm font-bold ${ (stats?.growth?.revenue || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+              <TrendingUp className={`h-4 w-4 mr-1 ${(stats?.growth?.revenue || 0) < 0 ? 'rotate-180' : ''}`} />
+              {stats?.growth?.revenue >= 0 ? '+' : ''}{stats?.growth?.revenue || 0}% growth
             </div>
           </div>
 
@@ -174,6 +181,13 @@ const AdminDashboard = () => {
                 <div className="flex items-center space-x-3">
                   <Users className="h-5 w-5 opacity-60" />
                   <span className="text-sm font-bold">View Customers</span>
+                </div>
+                <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-all" />
+              </Link>
+              <Link to="/admin/reviews" className="flex items-center justify-between p-4 bg-gray-500/10 hover:bg-white/20 rounded-2xl border border-white/10 transition-all group">
+                <div className="flex items-center space-x-3">
+                  <MessageSquare className="h-5 w-5 opacity-60" />
+                  <span className="text-sm font-bold">Manage Reviews</span>
                 </div>
                 <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-all" />
               </Link>

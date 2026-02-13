@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { TrendingUp, IndianRupee, ShoppingCart, CreditCard, ChevronDown } from 'lucide-react';
+import { TrendingUp, IndianRupee, ShoppingCart, CreditCard, ChevronDown, Star } from 'lucide-react';
 import api from '../../utils/api';
 import { formatCurrency } from '../../utils/currency';
 import Loading from '../../components/common/Loading';

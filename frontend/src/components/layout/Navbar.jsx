@@ -84,17 +84,17 @@ const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 transition-all duration-500 font-sans py-4 pointer-events-none">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pointer-events-auto">
-        <div className={`flex justify-between items-center p-1.5 rounded-full border transition-all duration-500 ${
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 pointer-events-auto">
+        <div className={`flex justify-between items-center p-2 rounded-full border transition-all duration-500 ${
           scrolled 
             ? 'bg-white/40 backdrop-blur-xl border-white/30 shadow-premium' 
             : 'bg-white/90 backdrop-blur-md border-white/20 shadow-lg'
         }`}>
           
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group pl-2">
+          <Link to="/" className="flex items-center space-x-3 group pl-4">
             <motion.div whileHover={{ rotate: 180 }} transition={{ duration: 0.6 }}>
-              <Leaf className={`h-8 w-8 ${scrolled ? 'text-primary' : 'text-primary'}`} />
+              <Leaf className={`h-9 w-9 ${scrolled ? 'text-primary' : 'text-primary'}`} />
             </motion.div>
             <span className={`text-2xl font-black tracking-tighter ${scrolled ? 'text-gray-900' : 'text-gray-900'}`}>
               Be-Eco<span className="text-accent">Friendly</span>
@@ -102,17 +102,17 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Links */}
-          <div className="hidden lg:flex items-center space-x-1">
-            <div className="relative group px-4">
-              <button className="flex items-center gap-1 font-bold text-gray-700 hover:text-accent py-2 transition-colors">
+          <div className="hidden lg:flex items-center space-x-4 xl:space-x-8">
+            <div className="relative group px-1">
+              <button className="flex items-center gap-1 font-bold text-gray-700 hover:text-accent py-2 transition-colors text-xs uppercase tracking-wider">
                 Categories <ChevronDown className="h-4 w-4 group-hover:rotate-180 transition-transform" />
               </button>
-              <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-premium border border-gray-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 py-4 z-50">
+              <div className="absolute top-full left-0 mt-2 w-60 bg-white rounded-2xl shadow-premium border border-gray-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 py-4 z-50">
                 {categories.map((cat, i) => (
                   <Link 
                     key={i} 
                     to={`/shop?category=${encodeURIComponent(cat)}`}
-                    className="block px-6 py-2.5 hover:bg-soft-green text-gray-600 hover:text-primary font-semibold transition-colors"
+                    className="block px-6 py-2 hover:bg-soft-green text-gray-600 hover:text-primary font-semibold transition-colors text-sm"
                   >
                     {cat}
                   </Link>
@@ -120,25 +120,49 @@ const Navbar = () => {
               </div>
             </div>
             
-            <Link to="/shop" className="px-4 py-2 font-bold text-gray-700 hover:text-accent transition-colors">Shop</Link>
-            <Link to="/shop?sort=newest" className="px-4 py-2 font-bold text-gray-700 hover:text-accent transition-colors">New Arrivals</Link>
-            <Link to="/shop?featured=true" className="px-4 py-2 font-bold text-gray-700 hover:text-accent transition-colors">Best Sellers</Link>
-            <Link to="/deals" className="px-4 py-2 font-bold text-accent hover:text-primary transition-colors">Deals</Link>
+            <Link to="/shop" className="px-1 py-2 font-bold text-gray-700 hover:text-accent transition-colors text-xs uppercase tracking-wider">Shop</Link>
+            <Link to="/shop?sort=newest" className="px-1 py-2 font-bold text-gray-700 hover:text-accent transition-colors text-xs uppercase tracking-wider whitespace-nowrap">New Arrivals</Link>
+            <Link to="/shop?featured=true" className="px-1 py-2 font-bold text-gray-700 hover:text-accent transition-colors text-xs uppercase tracking-wider whitespace-nowrap">Best Sellers</Link>
+            
+            <div className="relative group px-1">
+              <button className="flex items-center gap-1 font-bold text-gray-700 hover:text-accent py-2 transition-colors text-xs uppercase tracking-wider">
+                More <ChevronDown className="h-4 w-4 group-hover:rotate-180 transition-transform" />
+              </button>
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-60 bg-white rounded-3xl shadow-premium border border-gray-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 py-4 z-50 overflow-hidden">
+                {[
+                  { name: 'Daily Deals', path: '/deals' },
+                  { name: 'Blogs', path: '/blogs' },
+                  { name: 'Refer & Earn', path: '/refer-and-earn' },
+                  { name: 'Careers', path: '/careers' },
+                  { name: 'Social Responsibility', path: '/social-responsibility' },
+                  { name: 'Store Locator', path: '/store-locator' },
+                  { name: 'Be-Eco Community', path: '/community' },
+                ].map((item, i) => (
+                  <Link 
+                    key={i} 
+                    to={item.path}
+                    className="block px-8 py-2.5 hover:bg-soft-green text-gray-600 hover:text-primary font-bold text-xs transition-colors border-l-4 border-transparent hover:border-primary"
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Right Icons */}
-          <div className="flex items-center space-x-2 pr-1">
+          <div className="flex items-center space-x-3 pr-2">
             {/* Search Bar */}
-            <div className="relative hidden md:block" ref={searchRef}>
+            <div className="relative hidden xl:block" ref={searchRef}>
               <form onSubmit={handleSearch} className="relative group">
                 <input
                   type="text"
                   placeholder="Search eco gifts..."
-                  className="pl-12 pr-6 py-2.5 bg-background rounded-full border border-transparent focus:border-accent focus:bg-white w-48 lg:w-64 transition-all duration-300 font-medium"
+                  className="pl-10 pr-4 py-2 bg-background rounded-full border border-transparent focus:border-accent focus:bg-white w-32 xl:w-44 transition-all duration-300 font-medium text-xs"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-accent transition-colors" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-accent transition-colors" />
                 
                 {/* Suggestions Dropdown */}
                 <AnimatePresence>
@@ -153,13 +177,13 @@ const Navbar = () => {
                         <Link 
                           key={p._id}
                           to={`/product/${p._id}`}
-                          className="flex items-center gap-4 px-4 py-2 hover:bg-background transition-colors"
+                          className="flex items-center gap-3 px-4 py-1.5 hover:bg-background transition-colors"
                           onClick={() => setSuggestions([])}
                         >
-                          <img src={p.images?.[0]?.url} className="w-10 h-10 rounded-lg object-cover" />
+                          <img src={p.images?.[0]?.url} className="w-8 h-8 rounded-lg object-cover" />
                           <div>
-                            <p className="text-sm font-bold text-gray-900 line-clamp-1">{p.name}</p>
-                            <p className="text-xs text-accent font-bold">${p.price}</p>
+                            <p className="text-xs font-bold text-gray-900 line-clamp-1">{p.name}</p>
+                            <p className="text-[10px] text-accent font-bold">${p.price}</p>
                           </div>
                         </Link>
                       ))}
@@ -171,7 +195,7 @@ const Navbar = () => {
 
             <div className="h-4 w-px bg-gray-200 mx-2 hidden md:block" />
 
-            <Link to="/wishlist" className="relative p-2 text-gray-600 hover:text-accent rounded-full transition-colors group">
+            <Link to="/wishlist" className="relative p-2 text-gray-600 hover:text-accent rounded-full transition-colors group ml-2">
               <Heart className="h-6 w-6 group-hover:fill-accent transition-colors" />
               {wishlist.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-accent text-white text-[10px] font-black h-5 w-5 flex items-center justify-center rounded-full border-2 border-white">
@@ -194,11 +218,11 @@ const Navbar = () => {
                 onClick={() => !isAuthenticated && navigate('/login')}
                 className="p-2 text-gray-600 hover:text-accent rounded-full transition-colors flex items-center gap-2"
               >
-                <div className="w-8 h-8 rounded-full bg-soft-green flex items-center justify-center overflow-hidden border border-accent/20">
+                <div className="w-8 h-8 rounded-full bg-soft-green flex items-center justify-center overflow-hidden border border-accent/20 shrink-0">
                   {isAuthenticated ? (
-                    <img src={user?.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=" + user?.name} alt="" />
+                    <img src={user?.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=" + user?.name} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <User className="h-5 w-5 text-accent" />
+                    <User className="h-4 w-4 text-accent" />
                   )}
                 </div>
               </button>

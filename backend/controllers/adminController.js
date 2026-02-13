@@ -20,12 +20,13 @@ exports.getDashboardStats = async (req, res) => {
     ]);
 
     // Since orderStatus isn't in common schema, count orders that aren't delivered as pending
-    const pendingOrders = await Order.countDocuments({ isDelivered: false });
-    const deliveredOrders = await Order.countDocuments({ isDelivered: true });
+    const pendingOrders = await Order.countDocuments({ orderStatus: 'Processing' });
+    const deliveredOrders = await Order.countDocuments({ orderStatus: 'Delivered' });
 
     // Recent orders with specific user fields
     const recentOrders = await Order.find()
       .populate('user', 'name email avatar')
+      .populate('items.product', 'name images')
       .sort({ createdAt: -1 })
       .limit(10);
 
@@ -34,12 +35,44 @@ exports.getDashboardStats = async (req, res) => {
       .sort({ stock: 1 })
       .limit(10);
 
-    // Sales data for chart (last 7 days)
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const { range = '7d' } = req.query;
+    const days = range === '30d' ? 30 : 7;
 
+    // Calculate growth stats (Comparing current period vs previous period)
+    const endDate = new Date();
+    const midDate = new Date();
+    midDate.setDate(endDate.getDate() - days);
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - (days * 2));
+
+    const currentPeriodRevenue = await Order.aggregate([
+      { $match: { createdAt: { $gte: midDate }, isPaid: true } },
+      { $group: { _id: null, total: { $sum: '$totalPrice' } } }
+    ]);
+
+    const previousPeriodRevenue = await Order.aggregate([
+      { $match: { createdAt: { $gte: startDate, $lt: midDate }, isPaid: true } },
+      { $group: { _id: null, total: { $sum: '$totalPrice' } } }
+    ]);
+
+    const currentPeriodOrders = await Order.countDocuments({ createdAt: { $gte: midDate } });
+    const previousPeriodOrders = await Order.countDocuments({ createdAt: { $gte: startDate, $lt: midDate } });
+
+    const currentPeriodUsers = await User.countDocuments({ createdAt: { $gte: midDate } });
+    const previousPeriodUsers = await User.countDocuments({ createdAt: { $gte: startDate, $lt: midDate } });
+
+    const calculateGrowth = (current, previous) => {
+      if (previous === 0) return current > 0 ? 100 : 0;
+      return Number(((current - previous) / previous * 100).toFixed(1));
+    };
+
+    const revenueGrowth = calculateGrowth(currentPeriodRevenue[0]?.total || 0, previousPeriodRevenue[0]?.total || 0);
+    const ordersGrowth = calculateGrowth(currentPeriodOrders, previousPeriodOrders);
+    const usersGrowth = calculateGrowth(currentPeriodUsers, previousPeriodUsers);
+
+    // Sales data for chart
     const salesData = await Order.aggregate([
-      { $match: { createdAt: { $gte: sevenDaysAgo }, isPaid: true } },
+      { $match: { createdAt: { $gte: midDate }, isPaid: true } },
       {
         $group: {
           _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
@@ -61,7 +94,12 @@ exports.getDashboardStats = async (req, res) => {
         deliveredOrders,
         recentOrders,
         lowStockProducts,
-        salesData
+        salesData,
+        growth: {
+          revenue: revenueGrowth,
+          orders: ordersGrowth,
+          users: usersGrowth
+        }
       }
     });
   } catch (error) {
@@ -380,6 +418,7 @@ exports.getAllOrders = async (req, res) => {
 
     const orders = await Order.find(query)
       .populate('user', 'name email phone')
+      .populate('items.product', 'name images')
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
@@ -482,13 +521,19 @@ exports.getAllReviews = async (req, res) => {
     const endIndex = page * limit;
     const paginatedReviews = allReviews.slice(startIndex, endIndex);
 
+    // Calculate average rating
+    const averageRating = allReviews.length > 0
+      ? (allReviews.reduce((acc, rev) => acc + rev.rating, 0) / allReviews.length).toFixed(1)
+      : 0;
+ 
     res.json({
       success: true,
       data: {
         reviews: paginatedReviews,
         totalPages: Math.ceil(allReviews.length / limit),
         currentPage: page,
-        total: allReviews.length
+        total: allReviews.length,
+        averageRating
       }
     });
   } catch (error) {

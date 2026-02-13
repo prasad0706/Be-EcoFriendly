@@ -79,7 +79,7 @@ const AdminCustomers = () => {
   };
 
   // Calculate statistics
-  const adminUsers = data?.users?.filter(user => user.role === 'super_admin' || user.role?.startsWith('admin_')) || [];
+  const adminUsers = data?.users?.filter(user => user.role === 'admin' || user.role === 'super_admin' || user.role?.startsWith('admin_')) || [];
   const customerUsers = data?.users?.filter(user => user.role === 'user' || user.role === 'customer') || [];
 
   const now = new Date();
@@ -94,7 +94,7 @@ const AdminCustomers = () => {
       customer.email?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = filterRole
       ? (filterRole === 'admin'
-        ? (customer.role === 'super_admin' || customer.role?.startsWith('admin_'))
+        ? (customer.role === 'admin' || customer.role === 'super_admin' || customer.role?.startsWith('admin_'))
         : customer.role === filterRole)
       : true;
     return matchesSearch && matchesRole;
@@ -234,7 +234,7 @@ const AdminCustomers = () => {
                   </td>
                   <td className="px-10 py-6 text-center">
                     <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-[0.1em] border shadow-sm ${customer.role === 'super_admin' ? 'bg-purple-500/10 text-purple-600 border-purple-500/20' :
-                      customer.role?.startsWith('admin_') ? 'bg-green-eco/10 text-green-eco border-green-eco/20' :
+                      (customer.role === 'admin' || customer.role?.startsWith('admin_')) ? 'bg-green-eco/10 text-green-eco border-green-eco/20' :
                         customer.role === 'customer' ? 'bg-blue-500/10 text-blue-600 border-blue-500/20' :
                           'bg-gray-100 text-gray-500 border-gray-200'
                       }`}>

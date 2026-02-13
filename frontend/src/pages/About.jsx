@@ -10,7 +10,7 @@ const About = () => {
   ];
 
   return (
-    <div className="pt-24 min-h-screen bg-white">
+    <div className="pt-28 min-h-screen bg-white">
       {/* Hero Section */}
       <section className="py-20 bg-mesh relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

@@ -105,7 +105,7 @@ const Shop = () => {
   if (filters.inStock) activeChips.push({ key: 'inStock', label: 'In Stock' });
 
   return (
-    <div className="min-h-screen bg-white pt-32 pb-20">
+    <div className="min-h-screen bg-white pt-28 pb-20">
       <FilterDrawer 
         isOpen={isDrawerOpen} 
         onClose={() => setIsDrawerOpen(false)}

@@ -74,7 +74,7 @@ const Checkout = () => {
 
   if (!cart?.items || cart.items.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-40 pb-20 px-4">
+      <div className="min-h-screen bg-gray-50 pt-28 pb-20 px-4">
         <div className="max-w-xl mx-auto text-center">
           <div className="bg-white rounded-3xl shadow-sm p-16 border border-gray-100">
             <ShoppingBag className="h-16 w-16 text-gray-200 mx-auto mb-6" />
@@ -96,7 +96,7 @@ const Checkout = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-32 pb-20">
+    <div className="min-h-screen bg-gray-50 pt-28 pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
           <div>

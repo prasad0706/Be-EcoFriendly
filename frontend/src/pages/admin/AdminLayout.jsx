@@ -21,37 +21,37 @@ const AdminLayout = () => {
       path: '/admin',
       icon: LayoutDashboard,
       exact: true,
-      allowedRoles: ['super_admin', 'admin_products', 'admin_orders', 'admin_customers', 'admin_sales', 'admin_reviews']
+      allowedRoles: ['super_admin', 'admin', 'admin_products', 'admin_orders', 'admin_customers', 'admin_sales', 'admin_reviews']
     },
     {
       name: 'Products',
       path: '/admin/products',
       icon: Package,
-      allowedRoles: ['super_admin', 'admin_products']
+      allowedRoles: ['super_admin', 'admin', 'admin_products']
     },
     {
       name: 'Orders',
       path: '/admin/orders',
       icon: ShoppingCart,
-      allowedRoles: ['super_admin', 'admin_orders']
+      allowedRoles: ['super_admin', 'admin', 'admin_orders']
     },
     {
       name: 'Customers',
       path: '/admin/customers',
       icon: Users,
-      allowedRoles: ['super_admin', 'admin_customers']
+      allowedRoles: ['super_admin', 'admin', 'admin_customers']
     },
     {
       name: 'Sales Report',
       path: '/admin/sales',
       icon: TrendingUp,
-      allowedRoles: ['super_admin', 'admin_sales']
+      allowedRoles: ['super_admin', 'admin', 'admin_sales']
     },
     {
       name: 'Reviews',
       path: '/admin/reviews',
       icon: Star,
-      allowedRoles: ['super_admin', 'admin_reviews']
+      allowedRoles: ['super_admin', 'admin', 'admin_reviews']
     },
   ];
 

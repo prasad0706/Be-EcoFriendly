@@ -16,6 +16,12 @@ import Checkout from './pages/Checkout';
 import Wishlist from './pages/Wishlist';
 import Profile from './pages/Profile';
 import ProductDetail from './pages/ProductDetail';
+import Blogs from './pages/Blogs';
+import ReferEarn from './pages/ReferEarn';
+import Careers from './pages/Careers';
+import SocialResponsibility from './pages/SocialResponsibility';
+import StoreLocator from './pages/StoreLocator';
+import Community from './pages/Community';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import AdminLayout from './pages/admin/AdminLayout';
@@ -72,6 +78,12 @@ function App() {
                     </ProtectedRoute>
                   } />
                   <Route path="/product/:id" element={<ProductDetail />} />
+                  <Route path="/blogs" element={<Blogs />} />
+                  <Route path="/refer-and-earn" element={<ReferEarn />} />
+                  <Route path="/careers" element={<Careers />} />
+                  <Route path="/social-responsibility" element={<SocialResponsibility />} />
+                  <Route path="/store-locator" element={<StoreLocator />} />
+                  <Route path="/community" element={<Community />} />
                 </Route>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
