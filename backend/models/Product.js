@@ -47,6 +47,17 @@ const productSchema = new mongoose.Schema({
     min: 0,
     max: 100,
   },
+  carbonFootprint: {
+    type: Number, // in kg CO2e
+    default: 0,
+  },
+  lca: {
+    rawMaterials: { type: Number, default: 0 },
+    manufacturing: { type: Number, default: 0 },
+    transportation: { type: Number, default: 0 },
+    usage: { type: Number, default: 0 },
+    disposal: { type: Number, default: 0 },
+  },
   tags: [{
     type: String,
   }],

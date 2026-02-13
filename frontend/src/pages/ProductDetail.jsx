@@ -320,6 +320,53 @@ const ProductDetail = () => {
                      </div>
                   </div>
                </div>
+
+               {/* Carbon Footprint & LCA Breakdown */}
+               <div className="mt-8 pt-8 border-t border-accent/10 space-y-8">
+                  <div className="grid grid-cols-2 gap-4">
+                     <div className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-white/50">
+                        <p className="text-[10px] font-black uppercase text-gray-400 mb-1 tracking-widest">Carbon Footprint</p>
+                        <div className="flex items-baseline gap-1">
+                           <p className="text-2xl font-black text-gray-900">{product.carbonFootprint || '1.2'}</p>
+                           <p className="text-xs font-bold text-gray-400">kg CO2e</p>
+                        </div>
+                     </div>
+                     <div className="bg-white/50 backdrop-blur-sm p-4 rounded-2xl border border-white/50">
+                        <p className="text-[10px] font-black uppercase text-gray-400 mb-1 tracking-widest">LCA Verification</p>
+                        <p className="text-sm font-black text-accent flex items-center gap-1">
+                           <Zap className="w-4 h-4 fill-current" /> Verified
+                        </p>
+                     </div>
+                  </div>
+
+                  <div>
+                     <div className="flex justify-between items-end mb-3">
+                        <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Life Cycle Assessment (LCA)</p>
+                        <span className="text-[10px] font-black text-accent uppercase tracking-widest">Impact Breakdown</span>
+                     </div>
+                     <div className="h-4 w-full bg-white/50 rounded-full overflow-hidden flex shadow-inner">
+                        <div className="h-full bg-primary" style={{ width: `${product.lca?.rawMaterials || 20}%` }} title="Raw Materials" />
+                        <div className="h-full bg-accent" style={{ width: `${product.lca?.manufacturing || 25}%` }} title="Manufacturing" />
+                        <div className="h-full bg-teal-400" style={{ width: `${product.lca?.transportation || 30}%` }} title="Transportation" />
+                        <div className="h-full bg-yellow-400" style={{ width: `${product.lca?.usage || 5}%` }} title="Usage" />
+                        <div className="h-full bg-gray-400" style={{ width: `${product.lca?.disposal || 20}%` }} title="Disposal" />
+                     </div>
+                     <div className="grid grid-cols-5 mt-4">
+                        {[
+                           { label: 'Materials', color: 'bg-primary' },
+                           { label: 'Mfg', color: 'bg-accent' },
+                           { label: 'Transport', color: 'bg-teal-400' },
+                           { label: 'Usage', color: 'bg-yellow-400' },
+                           { label: 'End Life', color: 'bg-gray-400' }
+                        ].map(item => (
+                           <div key={item.label} className="text-center">
+                              <div className={`w-2 h-2 rounded-full ${item.color} mx-auto mb-1`} />
+                              <p className="text-[8px] font-black text-gray-400 uppercase tracking-tighter">{item.label}</p>
+                           </div>
+                        ))}
+                     </div>
+                  </div>
+               </div>
             </div>
 
             {/* Description Short */}

@@ -1,6 +1,6 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
-const Product = require('./models/Product');
+const Product = require('../models/Product');
 
 const connectDB = async () => {
   try {
@@ -25,6 +25,15 @@ const sampleProducts = [
     }],
     stock: 50,
     featured: true,
+    ecoScore: 92,
+    carbonFootprint: 0.4,
+    lca: {
+      rawMaterials: 10,
+      manufacturing: 15,
+      transportation: 50,
+      usage: 5,
+      disposal: 20
+    },
     tags: ['bamboo', 'reusable', 'zero-waste'],
     specifications: {
       'Material': 'Natural Bamboo',
@@ -44,6 +53,15 @@ const sampleProducts = [
     }],
     stock: 100,
     featured: true,
+    ecoScore: 88,
+    carbonFootprint: 1.2,
+    lca: {
+      rawMaterials: 30,
+      manufacturing: 20,
+      transportation: 40,
+      usage: 0,
+      disposal: 10
+    },
     tags: ['cotton', 'organic', 'reusable'],
     specifications: {
       'Material': '100% Organic Cotton',
@@ -63,6 +81,15 @@ const sampleProducts = [
     }],
     stock: 75,
     featured: true,
+    ecoScore: 95,
+    carbonFootprint: 2.1,
+    lca: {
+      rawMaterials: 60,
+      manufacturing: 25,
+      transportation: 10,
+      usage: 0,
+      disposal: 5
+    },
     tags: ['stainless-steel', 'insulated', 'bpa-free'],
     specifications: {
       'Material': 'Stainless Steel',
@@ -81,6 +108,15 @@ const sampleProducts = [
     }],
     stock: 60,
     featured: false,
+    ecoScore: 98,
+    carbonFootprint: 0.1,
+    lca: {
+      rawMaterials: 20,
+      manufacturing: 10,
+      transportation: 60,
+      usage: 0,
+      disposal: 10
+    },
     tags: ['beeswax', 'reusable', 'natural'],
     specifications: {
       'Material': 'Organic Cotton & Beeswax',
@@ -100,6 +136,15 @@ const sampleProducts = [
     }],
     stock: 120,
     featured: false,
+    ecoScore: 94,
+    carbonFootprint: 0.2,
+    lca: {
+      rawMaterials: 15,
+      manufacturing: 10,
+      transportation: 65,
+      usage: 0,
+      disposal: 10
+    },
     tags: ['bamboo', 'biodegradable', 'dental'],
     specifications: {
       'Material': 'Bamboo Handle',
@@ -118,6 +163,15 @@ const sampleProducts = [
     }],
     stock: 30,
     featured: true,
+    ecoScore: 85,
+    carbonFootprint: 4.5,
+    lca: {
+      rawMaterials: 70,
+      manufacturing: 20,
+      transportation: 5,
+      usage: 0,
+      disposal: 5
+    },
     tags: ['solar', 'portable', 'renewable'],
     specifications: {
       'Power': '10000mAh',
