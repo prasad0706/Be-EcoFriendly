@@ -51,6 +51,18 @@ const productSchema = new mongoose.Schema({
     type: Number, // in kg CO2e
     default: 0,
   },
+  netSavings: {
+    type: Number, // kg CO2e saved vs standard
+    default: 0,
+  },
+  waterSaved: {
+    type: Number, // Liters saved
+    default: 0,
+  },
+  treesEquivalent: {
+    type: Number, // Number of trees equivalent
+    default: 0,
+  },
   lca: {
     rawMaterials: { type: Number, default: 0 },
     manufacturing: { type: Number, default: 0 },

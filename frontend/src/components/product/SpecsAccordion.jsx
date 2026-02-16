@@ -25,9 +25,9 @@ const SpecsAccordion = ({ specifications, ecoScore }) => {
     },
     {
       id: 'eco',
-      title: 'Eco Impact Explanation',
+      title: 'Our Planet Story (LCA)',
       icon: Leaf,
-      content: ecoScore ? `This product has an Eco-Impact score of ${ecoScore}/100 based on its material transparency, manufacturing process, and end-of-life recyclability.` : 'No eco details available.'
+      content: `Measuring impact via the "Cradle to Grave" Framework. This product's eco-score of ${ecoScore}/100 accounts for Raw Material Extraction, Manufacturing energy, Distribution logistics, and End-of-Life recyclability. By choosing this sustained alternative, you are actively reducing carbon debt compared to industry standards.`
     }
   ];
 

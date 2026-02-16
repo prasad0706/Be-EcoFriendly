@@ -84,8 +84,14 @@ exports.createOrder = async (req, res) => {
       taxPrice,
       shippingPrice,
       totalPrice,
-      orderStatus: 'Processing',
-      paymentStatus: 'Pending',
+      orderStatus: 'Order Placed',
+      paymentStatus: 'Paid',
+      isPaid: true,
+      paidAt: new Date(),
+      trackingHistory: [
+        { status: 'Order Placed', timestamp: new Date(), comment: 'Order successfully placed.' },
+        { status: 'Payment Confirmed', timestamp: new Date(), comment: 'Payment received successfully.' }
+      ],
     };
 
     console.log('Order data to create:', JSON.stringify(orderData, null, 2));
@@ -248,6 +254,53 @@ exports.updateOrderToDelivered = async (req, res) => {
 
     order.isDelivered = true;
     order.deliveredAt = Date.now();
+    order.orderStatus = 'Delivered';
+    order.trackingHistory.push({
+      status: 'Delivered',
+      timestamp: new Date(),
+      comment: 'Order has been delivered.',
+    });
+
+    const updatedOrder = await order.save();
+
+    res.json({
+      success: true,
+      data: updatedOrder,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// @desc    Update order status
+// @route   PUT /api/orders/:id/status
+// @access  Private/Admin
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const { status, comment } = req.body;
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found',
+      });
+    }
+
+    order.orderStatus = status;
+    order.trackingHistory.push({
+      status,
+      timestamp: new Date(),
+      comment: comment || `Order status updated to ${status}`,
+    });
+
+    if (status === 'Delivered') {
+      order.isDelivered = true;
+      order.deliveredAt = Date.now();
+    }
 
     const updatedOrder = await order.save();
 

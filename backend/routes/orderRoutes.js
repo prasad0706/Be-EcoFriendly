@@ -7,6 +7,7 @@ const {
   getOrders,
   updateOrderToPaid,
   updateOrderToDelivered,
+  updateOrderStatus,
 } = require('../controllers/orderController');
 const { protect, admin } = require('../middleware/auth');
 
@@ -25,5 +26,8 @@ router.route('/:id/pay')
 
 router.route('/:id/deliver')
   .put(protect, admin, updateOrderToDelivered);
+
+router.route('/:id/status')
+  .put(protect, admin, updateOrderStatus);
 
 module.exports = router;

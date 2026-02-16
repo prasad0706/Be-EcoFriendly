@@ -130,6 +130,7 @@ const Navbar = () => {
               </button>
               <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-60 bg-white rounded-3xl shadow-premium border border-gray-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 py-4 z-50 overflow-hidden">
                 {[
+                  { name: 'About Us', path: '/about' },
                   { name: 'Daily Deals', path: '/deals' },
                   { name: 'Blogs', path: '/blogs' },
                   { name: 'Refer & Earn', path: '/refer-and-earn' },
@@ -284,8 +285,32 @@ const Navbar = () => {
               <div className="space-y-6 flex-1 overflow-y-auto">
                 <div className="pb-6 border-b border-gray-100">
                   <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Quick Links</h3>
+                  <Link to="/about" className="block text-2xl font-black text-gray-900 mb-4" onClick={() => setMobileMenuOpen(false)}>About Us</Link>
                   <Link to="/shop" className="block text-2xl font-black text-gray-900 mb-4" onClick={() => setMobileMenuOpen(false)}>Shop All</Link>
                   <Link to="/deals" className="block text-2xl font-black text-accent mb-4" onClick={() => setMobileMenuOpen(false)}>Hot Deals 🔥</Link>
+                  <Link to="/community" className="block text-2xl font-black text-primary mb-4" onClick={() => setMobileMenuOpen(false)}>Community</Link>
+                </div>
+
+                <div className="pb-6 border-b border-gray-100">
+                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Beyond Shopping</h3>
+                  <div className="grid grid-cols-1 gap-4">
+                    {[
+                      { name: 'Blogs', path: '/blogs' },
+                      { name: 'Refer & Earn', path: '/refer-and-earn' },
+                      { name: 'Careers', path: '/careers' },
+                      { name: 'Impact', path: '/social-responsibility' },
+                      { name: 'Store Locator', path: '/store-locator' }
+                    ].map((item, i) => (
+                      <Link 
+                        key={i} 
+                        to={item.path}
+                        className="text-lg font-bold text-gray-700 hover:text-primary transition-colors"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
 
                 <div>

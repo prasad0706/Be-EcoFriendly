@@ -110,7 +110,7 @@ const ReferEarn = () => {
               <div className="space-y-6">
                 {[
                   "No limits on successful referrals.",
-                  " 친구 get 15% off their first order.",
+                  "Friends get 15% off their first order.",
                   "Credit is applied automatically.",
                   "Valid for orders over $50."
                 ].map((rule, i) => (

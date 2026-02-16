@@ -22,6 +22,7 @@ import Careers from './pages/Careers';
 import SocialResponsibility from './pages/SocialResponsibility';
 import StoreLocator from './pages/StoreLocator';
 import Community from './pages/Community';
+import BlogDetail from './pages/BlogDetail';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import AdminLayout from './pages/admin/AdminLayout';
@@ -79,6 +80,7 @@ function App() {
                   } />
                   <Route path="/product/:id" element={<ProductDetail />} />
                   <Route path="/blogs" element={<Blogs />} />
+                  <Route path="/blog/:id" element={<BlogDetail />} />
                   <Route path="/refer-and-earn" element={<ReferEarn />} />
                   <Route path="/careers" element={<Careers />} />
                   <Route path="/social-responsibility" element={<SocialResponsibility />} />

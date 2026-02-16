@@ -4,6 +4,13 @@ const User = require('../models/User');
 const imagekit = require('../config/imagekit');
 const { supabase } = require('../config/supabase');
 const XLSX = require('xlsx');
+const { 
+  calculateCarbonFootprint, 
+  calculateEcoScore, 
+  calculateNetSavings,
+  calculateWaterSaved,
+  calculateTreesEquivalent
+} = require('../utils/ecoCalculator');
 
 // @desc    Get admin dashboard stats
 // @route   GET /api/admin/stats
@@ -19,8 +26,10 @@ exports.getDashboardStats = async (req, res) => {
       { $group: { _id: null, total: { $sum: '$totalPrice' } } }
     ]);
 
-    // Since orderStatus isn't in common schema, count orders that aren't delivered as pending
-    const pendingOrders = await Order.countDocuments({ orderStatus: 'Processing' });
+    // Updated pending status to include all stages before shipping
+    const pendingOrders = await Order.countDocuments({ 
+      orderStatus: { $in: ['Order Placed', 'Payment Confirmed', 'Processing'] } 
+    });
     const deliveredOrders = await Order.countDocuments({ orderStatus: 'Delivered' });
 
     // Recent orders with specific user fields
@@ -34,6 +43,29 @@ exports.getDashboardStats = async (req, res) => {
     const lowStockProducts = await Product.find({ stock: { $lt: 10 } })
       .sort({ stock: 1 })
       .limit(10);
+
+    // Calculate total eco impact across all paid orders
+    const ecoImpact = await Order.aggregate([
+      { $match: { isPaid: true } },
+      { $unwind: '$items' },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'items.product',
+          foreignField: '_id',
+          as: 'productDoc'
+        }
+      },
+      { $unwind: '$productDoc' },
+      {
+        $group: {
+          _id: null,
+          totalCo2Saved: { $sum: { $multiply: ['$items.quantity', { $ifNull: ['$productDoc.netSavings', 0] }] } },
+          totalWaterSaved: { $sum: { $multiply: ['$items.quantity', { $ifNull: ['$productDoc.waterSaved', 0] }] } },
+          totalTreesOffset: { $sum: { $multiply: ['$items.quantity', { $ifNull: ['$productDoc.treesEquivalent', 0] }] } }
+        }
+      }
+    ]);
 
     const { range = '7d' } = req.query;
     const days = range === '30d' ? 30 : 7;
@@ -95,6 +127,11 @@ exports.getDashboardStats = async (req, res) => {
         recentOrders,
         lowStockProducts,
         salesData,
+        ecoImpact: {
+          co2Saved: Number((ecoImpact[0]?.totalCo2Saved || 0).toFixed(2)),
+          waterSaved: Math.round(ecoImpact[0]?.totalWaterSaved || 0),
+          treesOffset: Number((ecoImpact[0]?.totalTreesOffset || 0).toFixed(2))
+        },
         growth: {
           revenue: revenueGrowth,
           orders: ordersGrowth,
@@ -280,7 +317,18 @@ exports.getAllProducts = async (req, res) => {
 // @access  Private/Admin
 exports.createProduct = async (req, res) => {
   try {
-    const product = await Product.create(req.body);
+    const productData = { ...req.body };
+    
+    // Auto-calculate eco metrics if LCA data is provided
+    if (productData.lca) {
+      productData.carbonFootprint = calculateCarbonFootprint(productData.lca);
+      productData.ecoScore = calculateEcoScore(productData.carbonFootprint, productData.category);
+      productData.netSavings = calculateNetSavings(productData.carbonFootprint, productData.category);
+      productData.waterSaved = calculateWaterSaved(productData.carbonFootprint, productData.category);
+      productData.treesEquivalent = calculateTreesEquivalent(productData.netSavings);
+    }
+
+    const product = await Product.create(productData);
 
     res.status(201).json({
       success: true,
@@ -300,9 +348,30 @@ exports.createProduct = async (req, res) => {
 // @access  Private/Admin
 exports.updateProduct = async (req, res) => {
   try {
+    const updateData = { ...req.body };
+    
+    // Auto-calculate eco metrics if LCA data is updated
+    if (updateData.lca || updateData.category) {
+      // We might need existing data if not all LCA stages are provided in update
+      const existingProduct = await Product.findById(req.params.id);
+      if (existingProduct) {
+        const fullLca = { 
+          ...(existingProduct.lca || {}), 
+          ...(updateData.lca || {}) 
+        };
+        const category = updateData.category || existingProduct.category;
+        
+        updateData.carbonFootprint = calculateCarbonFootprint(fullLca);
+        updateData.ecoScore = calculateEcoScore(updateData.carbonFootprint, category);
+        updateData.netSavings = calculateNetSavings(updateData.carbonFootprint, category);
+        updateData.waterSaved = calculateWaterSaved(updateData.carbonFootprint, category);
+        updateData.treesEquivalent = calculateTreesEquivalent(updateData.netSavings);
+      }
+    }
+
     const product = await Product.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updateData,
       { new: true, runValidators: true }
     );
 
@@ -457,12 +526,30 @@ exports.updateOrderStatus = async (req, res) => {
       });
     }
 
-    if (orderStatus) order.orderStatus = orderStatus;
+    if (orderStatus) {
+      order.orderStatus = orderStatus;
+      order.trackingHistory.push({
+        status: orderStatus,
+        timestamp: new Date(),
+        comment: `Order status updated to ${orderStatus} by administrator.`
+      });
+    }
+    
     if (paymentStatus) {
       order.paymentStatus = paymentStatus;
       if (paymentStatus === 'Paid') {
         order.isPaid = true;
-        if (!order.paidAt) order.paidAt = Date.now();
+        if (!order.paidAt) {
+          order.paidAt = Date.now();
+          // If tracking history doesn't have Payment Confirmed, add it
+          if (!order.trackingHistory.some(h => h.status === 'Payment Confirmed')) {
+            order.trackingHistory.push({
+              status: 'Payment Confirmed',
+              timestamp: new Date(),
+              comment: 'Payment has been confirmed.'
+            });
+          }
+        }
       }
     }
 
@@ -670,8 +757,12 @@ exports.getOrderStats = async (req, res) => {
   try {
     // Get counts for each status
     const allOrders = await Order.countDocuments();
-    const pendingOrders = await Order.countDocuments({ orderStatus: 'Processing' });
-    const shippedOrders = await Order.countDocuments({ orderStatus: 'Shipped' });
+    const pendingOrders = await Order.countDocuments({ 
+      orderStatus: { $in: ['Order Placed', 'Payment Confirmed', 'Processing'] } 
+    });
+    const shippedOrders = await Order.countDocuments({ 
+      orderStatus: { $in: ['Shipped', 'Out for Delivery'] } 
+    });
     const deliveredOrders = await Order.countDocuments({ orderStatus: 'Delivered' });
     const cancelledOrders = await Order.countDocuments({ orderStatus: 'Cancelled' });
 

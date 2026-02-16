@@ -11,8 +11,10 @@ const OrderDetailModal = ({ order, onClose, onUpdateStatus }) => {
         switch (status) {
             case 'Delivered': return 'bg-green-eco/10 text-green-eco border-green-eco/20';
             case 'Shipped': return 'bg-primary-blue/10 text-primary-blue border-primary-blue/20';
-            case 'Confirmed': return 'bg-teal/10 text-teal border-teal/20';
+            case 'Out for Delivery': return 'bg-teal-500/10 text-teal-500 border-teal-500/20';
             case 'Processing': return 'bg-orange-500/10 text-orange-500 border-orange-500/20';
+            case 'Order Placed': return 'bg-primary/10 text-primary border-primary/20';
+            case 'Payment Confirmed': return 'bg-mint text-primary border-primary/10';
             case 'Cancelled': return 'bg-red-500/10 text-red-500 border-red-500/20';
             case 'Paid': return 'bg-green-eco/10 text-green-eco border-green-eco/20';
             case 'Pending': return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';

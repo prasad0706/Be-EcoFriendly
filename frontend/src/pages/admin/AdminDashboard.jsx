@@ -20,7 +20,8 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   ChevronRight,
-  MessageSquare
+  MessageSquare,
+  Leaf
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../../utils/api';
@@ -34,7 +35,8 @@ const AdminDashboard = () => {
     queryFn: async () => {
       const res = await api.get(`/admin/stats?range=${timeRange}`);
       return res.data.data;
-    }
+    },
+    refetchInterval: 5000, // Update every 5 seconds for real-time feel
   });
 
   if (isLoading) return <Loading />;
@@ -116,6 +118,45 @@ const AdminDashboard = () => {
             <h3 className="text-3xl font-bold text-gray-900 mt-1">{stat.value}</h3>
           </div>
         ))}
+      </div>
+
+      {/* Eco Store Impact */}
+      <div className="bg-primary p-12 rounded-[3.5rem] relative overflow-hidden shadow-2xl">
+        <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
+           <div className="max-w-xs">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-white text-[10px] font-black uppercase tracking-widest mb-6">
+                 <Leaf className="h-3 w-3" /> Mission Status
+              </div>
+              <h2 className="text-4xl font-black text-white leading-none tracking-tighter mb-4">Total Planet <span className="opacity-50">Impact.</span></h2>
+              <p className="text-white/60 font-medium">Real-time aggregate of all sustainable choices made by our customers.</p>
+           </div>
+           
+           <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+              <div className="bg-white/10 backdrop-blur-md p-8 rounded-3xl border border-white/10">
+                 <div className="p-3 bg-white w-fit rounded-2xl text-primary mb-6">
+                    <TrendingUp className="h-6 w-6" />
+                 </div>
+                 <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-1">CO2 Saved</p>
+                 <h3 className="text-3xl font-bold text-white tracking-tight">{stats?.ecoImpact?.co2Saved || 0}kg</h3>
+              </div>
+              <div className="bg-white/10 backdrop-blur-md p-8 rounded-3xl border border-white/10">
+                 <div className="p-3 bg-white w-fit rounded-2xl text-blue-500 mb-6">
+                    <ShoppingCart className="h-6 w-6" />
+                 </div>
+                 <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-1">Water Saved</p>
+                 <h3 className="text-3xl font-bold text-white tracking-tight">{stats?.ecoImpact?.waterSaved || 0}L</h3>
+              </div>
+              <div className="bg-white/10 backdrop-blur-md p-8 rounded-3xl border border-white/10">
+                 <div className="p-3 bg-white w-fit rounded-2xl text-accent mb-6">
+                    <ArrowUpRight className="h-6 w-6" />
+                 </div>
+                 <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-1">Trees Offset</p>
+                 <h3 className="text-3xl font-bold text-white tracking-tight">{stats?.ecoImpact?.treesOffset || 0}</h3>
+              </div>
+           </div>
+        </div>
+        {/* Decorative Leaf */}
+        <Leaf className="absolute -bottom-20 -right-20 w-80 h-80 text-white/5 pointer-events-none rotate-12" />
       </div>
 
       {/* Analytics & Actions */}

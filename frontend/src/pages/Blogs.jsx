@@ -29,6 +29,24 @@ const BLOG_POSTS = [
     author: "Sarah Bloom",
     date: "Oct 05, 2025",
     image: "https://images.unsplash.com/photo-1513519245088-0e12902e35ca?q=80&w=1000&auto=format&fit=crop"
+  },
+  {
+    id: 4,
+    title: "Understanding Carbon Offsets: Do They Really Work?",
+    excerpt: "A deep dive into the world of carbon credits and how individuals can make a real difference in reducing their footprint.",
+    category: "Environment",
+    author: "Dr. David Thorne",
+    date: "Sep 28, 2025",
+    image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=1000&auto=format&fit=crop"
+  },
+  {
+    id: 5,
+    title: "Sustainable Fashion: Fast Fashion vs. Quality",
+    excerpt: "Why buying less and choosing better is the ultimate style statement for the modern eco-conscious consumer.",
+    category: "Fashion",
+    author: "Mia Rossi",
+    date: "Sep 20, 2025",
+    image: "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=1000&auto=format&fit=crop"
   }
 ];
 

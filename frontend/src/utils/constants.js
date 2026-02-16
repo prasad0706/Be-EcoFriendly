@@ -10,9 +10,11 @@ export const PRODUCT_CATEGORIES = [
 ];
 
 export const ORDER_STATUSES = [
+    'Order Placed',
+    'Payment Confirmed',
     'Processing',
-    'Confirmed',
     'Shipped',
+    'Out for Delivery',
     'Delivered',
     'Cancelled'
 ];

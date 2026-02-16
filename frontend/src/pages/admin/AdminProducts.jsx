@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Edit, Trash2, Image as ImageIcon, X, Upload, Search, Filter, LayoutGrid, List, Package } from 'lucide-react';
+import { Plus, Edit, Trash2, Image as ImageIcon, X, Upload, Search, Filter, LayoutGrid, List, Package,Leaf } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../utils/api';
 import { formatCurrency } from '../../utils/currency';
@@ -314,7 +314,8 @@ const AdminProducts = () => {
               <tr>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Product</th>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Category</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Pricing</th>
+                <th className="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Pricing</th>
+                <th className="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Impact Stats</th>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Stock</th>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Actions</th>
               </tr>
@@ -333,6 +334,22 @@ const AdminProducts = () => {
                   </td>
                   <td className="px-6 py-4 font-bold text-sm text-gray-600">{product.category}</td>
                   <td className="px-6 py-4 font-bold text-gray-900">{formatCurrency(product.price)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-primary" />
+                        <span className="text-xs font-black text-gray-900">{product.netSavings || 0}kg CO2</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-blue-500" />
+                        <span className="text-xs font-black text-gray-900">{product.waterSaved || 0}L Water</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-accent" />
+                        <span className="text-xs font-black text-gray-900">{product.treesEquivalent || 0} Trees</span>
+                      </div>
+                    </div>
+                  </td>
                   <td className="px-6 py-4">
                     <span className={`text-xs font-bold px-2 py-1 rounded-lg ${product.stock > 0 ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
                       {product.stock} units
@@ -453,6 +470,37 @@ const AdminProducts = () => {
                       checked={formData.featured}
                       onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
                     />
+                  </div>
+
+                  {/* Ecological Impact (LCA) Section */}
+                  <div className="p-6 bg-mint/10 border border-primary/20 rounded-[2rem] space-y-6">
+                    <div className="flex items-center gap-3 mb-2">
+                       <Leaf className="h-5 w-5 text-primary" />
+                       <h3 className="font-black text-gray-900 uppercase tracking-widest text-sm">Life Cycle Analysis (CO2e)</h3>
+                    </div>
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                       {[
+                         { label: 'Raw Materials', key: 'rawMaterials' },
+                         { label: 'Manufacturing', key: 'manufacturing' },
+                         { label: 'Transportation', key: 'transportation' },
+                         { label: 'Usage', key: 'usage' },
+                         { label: 'Disposal', key: 'disposal' }
+                       ].map(field => (
+                         <div key={field.key}>
+                           <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1.5">{field.label}</label>
+                           <input
+                             type="number"
+                             step="0.01"
+                             className="w-full px-4 py-2 bg-white border border-gray-100 rounded-xl focus:ring-1 focus:ring-primary font-bold text-sm"
+                             value={formData.lca?.[field.key] || 0}
+                             onChange={(e) => setFormData({
+                               ...formData,
+                               lca: { ...(formData.lca || {}), [field.key]: parseFloat(e.target.value) || 0 }
+                             })}
+                           />
+                         </div>
+                       ))}
+                    </div>
                   </div>
 
                   <div>

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ShoppingCart, Heart, Star, Package, ArrowLeft, ChevronRight, Zap, Leaf, ShoppingBag, Plus, Minus, Share2 } from 'lucide-react';
+import { ShoppingCart, Heart, Star, Package, ArrowLeft, ChevronRight, Zap, Leaf, ShoppingBag, Plus, Minus, Share2, Cloud, Droplets, TreePine as Trees } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -228,6 +228,46 @@ const ProductDetail = () => {
                     {formatCurrency(product.originalPrice)}
                   </span>
                 )}
+              </div>
+
+              {/* Eco Impact Highlights */}
+              <div className="grid grid-cols-2 gap-4 py-4">
+                <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 flex items-center gap-4 group hover:bg-primary/10 transition-colors">
+                  <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white">
+                    <Leaf className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-[8px] font-black text-primary uppercase tracking-widest">CO2 Saved</p>
+                    <p className="text-sm font-black text-gray-900">{product.netSavings || 0}kg</p>
+                  </div>
+                </div>
+                <div className="bg-blue-500/5 border border-blue-500/10 rounded-2xl p-4 flex items-center gap-4 group hover:bg-blue-500/10 transition-colors">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center text-white">
+                    <Droplets className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-[8px] font-black text-blue-500 uppercase tracking-widest">Water Saved</p>
+                    <p className="text-sm font-black text-gray-900">{product.waterSaved || 0}L</p>
+                  </div>
+                </div>
+                <div className="bg-accent/5 border border-accent/10 rounded-2xl p-4 flex items-center gap-4 group hover:bg-accent/10 transition-colors">
+                  <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-white">
+                    <Trees className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-[8px] font-black text-accent uppercase tracking-widest">Trees Offset</p>
+                    <p className="text-sm font-black text-gray-900">{product.treesEquivalent || 0}</p>
+                  </div>
+                </div>
+                <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4 flex items-center gap-4 group hover:bg-gray-100 transition-colors">
+                  <div className="w-10 h-10 rounded-xl bg-gray-900 flex items-center justify-center text-white">
+                    <Cloud className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Footprint</p>
+                    <p className="text-sm font-black text-gray-900">{product.carbonFootprint || 0}kg</p>
+                  </div>
+                </div>
               </div>
             </div>
 

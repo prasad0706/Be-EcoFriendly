@@ -20,19 +20,22 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../utils/api';
 import Button from '../components/common/Button';
 import { formatCurrency } from '../utils/currency';
 import toast from 'react-hot-toast';
+import OrderTrackingModal from '../components/product/OrderTrackingModal';
 
 const Profile = () => {
+  const queryClient = useQueryClient();
   const { user, updateUserProfile, logout } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview'); // overview, orders, settings
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [orders, setOrders] = useState([]);
-  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isTrackingModalOpen, setIsTrackingModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -45,6 +48,29 @@ const Profile = () => {
       country: ''
     }
   });
+
+  // Real-time order fetching with React Query
+  const { data: ordersData, isLoading: ordersLoading } = useQuery({
+    queryKey: ['myOrders'],
+    queryFn: async () => {
+      const response = await api.get('/orders/myorders');
+      return response.data.data;
+    },
+    enabled: !!user,
+    refetchInterval: 5000, // Poll every 5 seconds for real-time updates
+  });
+
+  const orders = ordersData || [];
+
+  // Update selected order details in real-time if modal is open
+  useEffect(() => {
+    if (isTrackingModalOpen && selectedOrder && orders.length > 0) {
+      const updatedOrder = orders.find(o => o._id === selectedOrder._id);
+      if (updatedOrder) {
+        setSelectedOrder(updatedOrder);
+      }
+    }
+  }, [orders, isTrackingModalOpen, selectedOrder]);
 
   useEffect(() => {
     if (user) {
@@ -60,7 +86,6 @@ const Profile = () => {
           country: user.address?.country || ''
         }
       });
-      fetchOrders();
     }
   }, [user]);
 
@@ -77,17 +102,6 @@ const Profile = () => {
     }
   };
 
-  const fetchOrders = async () => {
-    try {
-      setOrdersLoading(true);
-      const response = await api.get('/orders/myorders');
-      setOrders(response.data.data || []);
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-    } finally {
-      setOrdersLoading(false);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -112,7 +126,10 @@ const Profile = () => {
     switch (status) {
       case 'Delivered': return 'bg-green-eco/10 text-green-eco border-green-eco/20';
       case 'Shipped': return 'bg-primary-blue/10 text-primary-blue border-primary-blue/20';
+      case 'Out for Delivery': return 'bg-teal-500/10 text-teal-500 border-teal-500/20';
       case 'Processing': return 'bg-orange-500/10 text-orange-500 border-orange-500/20';
+      case 'Order Placed': return 'bg-primary/10 text-primary border-primary/20';
+      case 'Payment Confirmed': return 'bg-mint text-primary border-primary/10';
       case 'Cancelled': return 'bg-red-500/10 text-red-500 border-red-500/20';
       default: return 'bg-gray-100 text-gray-500 border-gray-200';
     }
@@ -346,7 +363,14 @@ const Profile = () => {
                   ) : orders.length > 0 ? (
                     <div className="grid gap-6">
                       {orders.map((order) => (
-                        <div key={order._id} className="group p-6 rounded-3xl bg-gray-50 hover:bg-white border border-gray-100 hover:border-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 cursor-pointer relative overflow-hidden">
+                        <div 
+                          key={order._id} 
+                          onClick={() => {
+                            setSelectedOrder(order);
+                            setIsTrackingModalOpen(true);
+                          }}
+                          className="group p-6 rounded-3xl bg-gray-50 hover:bg-white border border-gray-100 hover:border-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 cursor-pointer relative overflow-hidden"
+                        >
                           <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-5 transition-opacity duration-500">
                             <Package className="h-32 w-32 rotate-12" />
                           </div>
@@ -425,6 +449,15 @@ const Profile = () => {
           </div>
         </div>
       </div>
+      
+      <OrderTrackingModal 
+        order={selectedOrder}
+        isOpen={isTrackingModalOpen}
+        onClose={() => {
+          setIsTrackingModalOpen(false);
+          setSelectedOrder(null);
+        }}
+      />
     </div>
   );
 };

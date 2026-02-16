@@ -66,14 +66,19 @@ const orderSchema = new mongoose.Schema({
   orderStatus: {
     type: String,
     required: true,
-    enum: ['Processing', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'],
-    default: 'Processing',
+    enum: ['Order Placed', 'Payment Confirmed', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'],
+    default: 'Order Placed',
   },
+  trackingHistory: [{
+    status: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now },
+    comment: String,
+  }],
   paymentStatus: {
     type: String,
     required: true,
     enum: ['Pending', 'Paid', 'Failed'],
-    default: 'Pending',
+    default: 'Paid', // Assuming for now orders are paid immediately in this flow
   },
   isPaid: {
     type: Boolean,
