@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+const apiUrl = import.meta.env.VITE_API_URL;
+console.log('Current API URL:', apiUrl);
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api', // Use environment variable for production
+  baseURL: apiUrl || '/api', // Use environment variable for production
   headers: {
     'Content-Type': 'application/json',
   },
