@@ -70,6 +70,29 @@ const productSchema = new mongoose.Schema({
     usage: { type: Number, default: 0 },
     disposal: { type: Number, default: 0 },
   },
+  features: {
+    ecoScore: { type: Number, default: 0 },
+    ecoDetails: {
+      sustainabilityAnswers: { type: Map, of: Boolean, default: {} },
+      lifecycleAnswers: {
+        reusable: { type: Boolean, default: false },
+        repairable: { type: Boolean, default: false },
+        compostable: { type: Boolean, default: false },
+        lifespan: { type: Number, default: 0 }
+      },
+      materialComposition: {
+        sustainablePercentage: { type: Number, default: 0 }
+      }
+    },
+    lifeCycleAnalysis: {
+      rawMaterials: { type: Number, default: 0 },
+      manufacturing: { type: Number, default: 0 },
+      transportation: { type: Number, default: 0 },
+      usage: { type: Number, default: 0 },
+      disposal: { type: Number, default: 0 },
+      totalCO2: { type: Number, default: 0 }
+    }
+  },
   tags: [{
     type: String,
   }],
