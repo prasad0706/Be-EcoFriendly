@@ -62,6 +62,11 @@ const Navbar = () => {
     }
   }, [debouncedSearch]);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
   const fetchSuggestions = async () => {
     try {
       const response = await api.get('/products', { 
@@ -83,7 +88,8 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 transition-all duration-500 font-sans py-4 pointer-events-none">
+    <>
+      <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 font-sans pointer-events-none ${scrolled ? 'py-2 md:py-3' : 'py-4 md:py-6'}`}>
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 pointer-events-auto">
         <div className={`flex justify-between items-center p-2 rounded-full border transition-all duration-500 ${
           scrolled 
@@ -93,10 +99,10 @@ const Navbar = () => {
           
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group pl-4">
-            <motion.div whileHover={{ rotate: 180 }} transition={{ duration: 0.6 }}>
-              <Leaf className={`h-9 w-9 ${scrolled ? 'text-primary' : 'text-primary'}`} />
+            <motion.div whileHover={{ rotate: 180 }} transition={{ duration: 0.6 }} className="shrink-0">
+              <Leaf className={`h-8 w-8 md:h-9 md:w-9 ${scrolled ? 'text-primary' : 'text-primary'}`} />
             </motion.div>
-            <span className={`text-2xl font-black tracking-tighter ${scrolled ? 'text-gray-900' : 'text-gray-900'}`}>
+            <span className={`text-lg md:text-2xl font-black tracking-tighter whitespace-nowrap ${scrolled ? 'text-gray-900' : 'text-gray-900'}`}>
               Be-Eco<span className="text-accent">Friendly</span>
             </span>
           </Link>
@@ -152,7 +158,7 @@ const Navbar = () => {
           </div>
 
           {/* Right Icons */}
-          <div className="flex items-center space-x-3 pr-2">
+          <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-3 pr-1 md:pr-2">
             {/* Search Bar */}
             <div className="relative hidden xl:block" ref={searchRef}>
               <form onSubmit={handleSearch} className="relative group">
@@ -250,50 +256,59 @@ const Navbar = () => {
             </div>
 
             <button 
-              className="lg:hidden p-2 text-gray-600"
+              className="lg:hidden p-1.5 md:p-2 text-gray-600 hover:text-accent transition-colors"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
-              {mobileMenuOpen ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
+              {mobileMenuOpen ? <X className="h-6 w-6 md:h-7 md:w-7" /> : <Menu className="h-6 w-6 md:h-7 md:w-7" />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      </nav>
+      
+      {/* Mobile Menu - Moved outside nav with higher z-index for better hit detection */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed inset-0 top-0 left-0 w-full h-screen bg-white z-[60] lg:hidden"
+            initial={{ opacity: 0, x: '100%' }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: '100%' }}
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            className="fixed inset-0 w-full h-screen bg-white z-[9999] lg:hidden"
           >
             <div className="p-6 h-full flex flex-col">
               <div className="flex justify-between items-center mb-12">
-                <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center space-x-2">
+                <Link to="/" className="flex items-center space-x-2">
                   <Leaf className="h-8 w-8 text-primary" />
                   <span className="text-2xl font-black tracking-tighter text-gray-900">
                     Be-Eco<span className="text-accent">Friendly</span>
                   </span>
                 </Link>
-                <button onClick={() => setMobileMenuOpen(false)} className="p-2 bg-background rounded-full">
+                <button 
+                  onClick={() => setMobileMenuOpen(false)} 
+                  className="p-3 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors"
+                >
                   <X className="h-7 w-7 text-gray-900" />
                 </button>
               </div>
 
-              <div className="space-y-6 flex-1 overflow-y-auto">
-                <div className="pb-6 border-b border-gray-100">
-                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Quick Links</h3>
-                  <Link to="/about" className="block text-2xl font-black text-gray-900 mb-4" onClick={() => setMobileMenuOpen(false)}>About Us</Link>
-                  <Link to="/shop" className="block text-2xl font-black text-gray-900 mb-4" onClick={() => setMobileMenuOpen(false)}>Shop All</Link>
-                  <Link to="/deals" className="block text-2xl font-black text-accent mb-4" onClick={() => setMobileMenuOpen(false)}>Hot Deals 🔥</Link>
-                  <Link to="/community" className="block text-2xl font-black text-primary mb-4" onClick={() => setMobileMenuOpen(false)}>Community</Link>
+              <div className="space-y-8 flex-1 overflow-y-auto custom-scrollbar">
+                <div className="pb-8 border-b border-gray-100">
+                  <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-6">Quick Links</h3>
+                  <div className="space-y-6">
+                    <Link to="/about" className="block text-3xl font-black text-gray-900 hover:text-primary transition-colors">About Us</Link>
+                    <Link to="/shop" className="block text-3xl font-black text-gray-900 hover:text-primary transition-colors">Shop All</Link>
+                    <Link to="/deals" className="block text-3xl font-black text-accent hover:opacity-80 transition-all flex items-center gap-2">
+                      Hot Deals <span className="animate-pulse">🔥</span>
+                    </Link>
+                    <Link to="/community" className="block text-3xl font-black text-primary hover:opacity-80 transition-all">Community</Link>
+                  </div>
                 </div>
 
-                <div className="pb-6 border-b border-gray-100">
-                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Beyond Shopping</h3>
-                  <div className="grid grid-cols-1 gap-4">
+                <div className="pb-8 border-b border-gray-100">
+                  <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-6">Beyond Shopping</h3>
+                  <div className="grid grid-cols-1 gap-5">
                     {[
                       { name: 'Blogs', path: '/blogs' },
                       { name: 'Refer & Earn', path: '/refer-and-earn' },
@@ -304,24 +319,23 @@ const Navbar = () => {
                       <Link 
                         key={i} 
                         to={item.path}
-                        className="text-lg font-bold text-gray-700 hover:text-primary transition-colors"
-                        onClick={() => setMobileMenuOpen(false)}
+                        className="text-lg font-bold text-gray-700 hover:text-primary transition-colors flex items-center justify-between"
                       >
                         {item.name}
+                        <ChevronDown className="h-4 w-4 -rotate-90 opacity-30" />
                       </Link>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Categories</h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-6">Popular Categories</h3>
+                  <div className="grid grid-cols-2 gap-3">
                     {categories.map((cat, i) => (
                       <Link 
                         key={i} 
                         to={`/shop?category=${encodeURIComponent(cat)}`}
-                        className="bg-background px-4 py-3 rounded-xl font-bold text-gray-700 text-sm"
-                        onClick={() => setMobileMenuOpen(false)}
+                        className="bg-gray-50 px-5 py-4 rounded-2xl font-bold text-gray-700 text-sm hover:bg-primary/5 hover:text-primary transition-all border border-transparent hover:border-primary/10"
                       >
                         {cat}
                       </Link>
@@ -330,36 +344,41 @@ const Navbar = () => {
                 </div>
               </div>
 
-              <div className="pt-8 mt-auto border-top border-gray-100">
+              <div className="pt-8 mt-auto border-t border-gray-100">
                 {!isAuthenticated ? (
                   <div className="grid grid-cols-2 gap-4">
                     <button 
-                      onClick={() => { navigate('/login'); setMobileMenuOpen(false); }}
-                      className="py-4 rounded-2xl bg-background font-bold text-gray-900"
+                      onClick={() => navigate('/login')}
+                      className="py-5 rounded-[1.5rem] bg-gray-50 font-black text-gray-900 text-sm uppercase tracking-widest hover:bg-gray-100 transition-colors"
                     >
                       Login
                     </button>
                     <button 
-                      onClick={() => { navigate('/register'); setMobileMenuOpen(false); }}
-                      className="py-4 rounded-2xl bg-primary text-white font-bold"
+                      onClick={() => navigate('/register')}
+                      className="py-5 rounded-[1.5rem] bg-primary text-white font-black text-sm uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all"
                     >
                       Join Us
                     </button>
                   </div>
                 ) : (
-                  <button 
-                    onClick={logout}
-                    className="w-full py-4 rounded-2xl bg-red-50 text-red-500 font-bold flex items-center justify-center gap-2"
-                  >
-                    <LogOut className="h-5 w-5" /> Sign Out
-                  </button>
+                  <div className="space-y-4">
+                    <Link to="/profile" className="w-full py-5 rounded-[1.5rem] bg-gray-50 text-gray-900 font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3">
+                      <User className="h-5 w-5" /> Account Profile
+                    </Link>
+                    <button 
+                      onClick={logout}
+                      className="w-full py-5 rounded-[1.5rem] bg-red-50 text-red-500 font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3"
+                    >
+                      <LogOut className="h-5 w-5" /> Sign Out
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </nav>
+    </>
   );
 };
 

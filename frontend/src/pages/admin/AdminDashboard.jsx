@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   AreaChart,
   Area,
@@ -121,7 +121,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Eco Store Impact */}
-      <div className="bg-primary p-12 rounded-[3.5rem] relative overflow-hidden shadow-2xl">
+      <div className="bg-primary p-6 md:p-12 rounded-3xl md:rounded-[3.5rem] relative overflow-hidden shadow-2xl">
         <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
            <div className="max-w-xs">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-white text-[10px] font-black uppercase tracking-widest mb-6">
@@ -170,35 +170,43 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          <div className="h-[300px] w-full">
+          <div className="h-[350px] w-full mt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={revenueData}>
+              <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0F4C81" stopOpacity={0.1} />
-                    <stop offset="95%" stopColor="#0F4C81" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#2FB973" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#2FB973" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
                 <XAxis
                   dataKey="name"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 600 }}
+                  tick={{ fontSize: 12, fontWeight: 600, fill: '#64748B' }}
+                  dy={10}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 600 }}
+                  tick={{ fontSize: 12, fontWeight: 600, fill: '#64748B' }}
                 />
                 <Tooltip
-                  contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                  contentStyle={{
+                    backgroundColor: '#fff',
+                    borderRadius: '16px',
+                    border: 'none',
+                    boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)',
+                    padding: '12px'
+                  }}
+                  itemStyle={{ color: '#2FB973', fontWeight: 700 }}
                 />
                 <Area
                   type="monotone"
                   dataKey="value"
-                  stroke="#0F4C81"
-                  strokeWidth={3}
+                  stroke="#2FB973"
+                  strokeWidth={4}
                   fillOpacity={1}
                   fill="url(#colorValue)"
                 />

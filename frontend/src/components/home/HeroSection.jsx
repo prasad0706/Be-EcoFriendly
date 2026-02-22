@@ -71,7 +71,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative w-full h-[70vh] md:h-[85vh] overflow-hidden bg-black group">
+    <section className="relative w-full h-[80vh] sm:h-[60vh] lg:h-[85vh] overflow-hidden bg-black group mt-20 md:mt-28 shadow-2xl">
       <AnimatePresence initial={false} custom={direction}>
         <motion.div
           key={currentIndex}
