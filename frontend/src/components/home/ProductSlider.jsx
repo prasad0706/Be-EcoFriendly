@@ -45,7 +45,7 @@ const ProductSlider = ({ title, queryParams, link }) => {
           </Link>
         </div>
 
-        <div className="relative group">
+        <div className="relative">
           <div className="flex gap-6 overflow-x-auto pb-8 scrollbar-hide snap-x">
             {products.map((product) => (
               <div key={product._id} className="min-w-[280px] md:min-w-[320px] snap-start">

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { MapPin, Phone, Clock, Navigation, Search, Filter } from 'lucide-react';
 import { useState } from 'react';
 import Button from '../components/common/Button';
+import toast from 'react-hot-toast';
 
 const STORES = [
   {
@@ -58,7 +59,15 @@ const StoreLocator = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button className="h-[60px] px-10 rounded-[2rem]">Search</Button>
+            <Button 
+              className="h-[60px] px-10 rounded-[2rem]"
+              onClick={() => {
+                if (!searchTerm.trim()) return toast.error('Please enter a location');
+                toast.success(`Searching for stores in "${searchTerm}"...`);
+              }}
+            >
+              Search
+            </Button>
           </div>
         </div>
       </section>
@@ -108,26 +117,29 @@ const StoreLocator = () => {
               ))}
            </div>
 
-           {/* Map Placeholder */}
-           <div className="flex-1 rounded-[4rem] bg-gray-100 relative overflow-hidden group shadow-inner">
-               <div className="absolute inset-0 bg-mesh opacity-10 group-hover:scale-110 transition-transform duration-[10s]" />
-               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                   <div className="p-8 bg-white/20 backdrop-blur-xl rounded-full border border-white/20 shadow-2xl mb-6">
-                       <MapPin className="h-16 w-16 text-primary" />
-                   </div>
-                   <h3 className="text-3xl font-black text-gray-900">Interactive Map</h3>
-                   <p className="text-gray-500 font-medium mt-2">API Connection Pending...</p>
-               </div>
+           {/* Map Section */}
+           <div className="flex-1 rounded-[4rem] bg-gray-100 relative overflow-hidden group shadow-inner border border-gray-100">
+               <iframe 
+                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d158857.7281066703!2d-0.24168147!3d51.5287718!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47d8a00baf21de75%3A0x52963a5addd52a99!2sLondon!5e0!3m2!1sen!2suk!4v1700000000000!5m2!1sen!2suk" 
+                 width="100%" 
+                 height="100%" 
+                 style={{ border: 0 }} 
+                 allowFullScreen="" 
+                 loading="lazy" 
+                 referrerPolicy="no-referrer-when-downgrade"
+                 title="London Stores Map"
+                 className="grayscale hover:grayscale-0 transition-all duration-1000"
+               />
                
-               {/* Store Markers Mock */}
-               <div className="absolute top-1/4 left-1/3 p-2 bg-primary text-white rounded-full shadow-xl animate-bounce">
-                  <MapPin className="h-6 w-6" />
+               {/* Store Markers Mock - Overlay on map for aesthetic */}
+               <div className="absolute top-1/4 left-1/3 pointer-events-none p-2 bg-primary text-white rounded-full shadow-xl animate-bounce">
+                  <MapPin className="h-4 w-4" />
                </div>
-               <div className="absolute top-1/2 left-2/3 p-2 bg-primary text-white rounded-full shadow-xl animate-bounce delay-100">
-                  <MapPin className="h-6 w-6" />
+               <div className="absolute top-1/2 left-2/3 pointer-events-none p-2 bg-primary text-white rounded-full shadow-xl animate-bounce delay-100">
+                  <MapPin className="h-4 w-4" />
                </div>
-               <div className="absolute top-2/3 left-1/2 p-2 bg-primary text-white rounded-full shadow-xl animate-bounce delay-200">
-                  <MapPin className="h-6 w-6" />
+               <div className="absolute top-2/3 left-1/2 pointer-events-none p-2 bg-primary text-white rounded-full shadow-xl animate-bounce delay-200">
+                  <MapPin className="h-4 w-4" />
                </div>
            </div>
         </div>

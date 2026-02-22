@@ -19,6 +19,11 @@ import ProductDetail from './pages/ProductDetail';
 import Blogs from './pages/Blogs';
 import ReferEarn from './pages/ReferEarn';
 import Careers from './pages/Careers';
+import OpenRoles from './pages/OpenRoles';
+import JobDetail from './pages/JobDetail';
+import Culture from './pages/Culture';
+import Mission from './pages/Mission';
+import ImpactReport from './pages/ImpactReport';
 import SocialResponsibility from './pages/SocialResponsibility';
 import StoreLocator from './pages/StoreLocator';
 import Community from './pages/Community';
@@ -83,6 +88,11 @@ function App() {
                   <Route path="/blog/:id" element={<BlogDetail />} />
                   <Route path="/refer-and-earn" element={<ReferEarn />} />
                   <Route path="/careers" element={<Careers />} />
+                  <Route path="/open-roles" element={<OpenRoles />} />
+                  <Route path="/job/:id" element={<JobDetail />} />
+                  <Route path="/culture" element={<Culture />} />
+                  <Route path="/mission" element={<Mission />} />
+                  <Route path="/impact-report" element={<ImpactReport />} />
                   <Route path="/social-responsibility" element={<SocialResponsibility />} />
                   <Route path="/store-locator" element={<StoreLocator />} />
                   <Route path="/community" element={<Community />} />

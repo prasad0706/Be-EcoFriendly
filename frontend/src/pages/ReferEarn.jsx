@@ -125,7 +125,7 @@ const ReferEarn = () => {
                <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                <h3 className="text-3xl font-black mb-6 relative z-10">Start Earning Today</h3>
                <p className="text-white/60 font-medium mb-10 relative z-10 leading-relaxed">Join 10,000+ eco-warriors who are already sharing and earning rewards while making a difference.</p>
-               <Button className="w-full h-16 rounded-2xl bg-white text-gray-900 hover:bg-white/90 relative z-10">Join Program</Button>
+               <Button className="w-full h-16 rounded-2xl  text-gray-900 hover:bg-white/90 relative z-10">Join Program</Button>
             </div>
           </div>
         </div>

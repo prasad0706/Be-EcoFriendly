@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Heart, Globe, Droplets, Leaf, ArrowRight, ShieldCheck } from 'lucide-react';
 import Button from '../components/common/Button';
 
@@ -30,10 +31,12 @@ const INITIATIVES = [
 ];
 
 const SocialResponsibility = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-white">
       {/* Visual Block Hero */}
-      <section className="relative h-[80vh] flex items-center overflow-hidden pt-20">
+      <section className="relative h-[80vh] mt-24 flex items-center overflow-hidden pt-20">
         <div className="absolute inset-0 bg-gray-900">
           <img 
             src="https://images.unsplash.com/photo-1497250681960-ef046c08a56e?q=80&w=1000&auto=format&fit=crop" 
@@ -65,7 +68,13 @@ const SocialResponsibility = () => {
           >
             We believe that profit should never come at the expense of our planet or people. Our mission is to leave the world better than we found it.
           </motion.p>
-          <Button size="lg" className="h-16 px-12 rounded-2xl bg-white text-gray-900 border-none">Our Mission Statement</Button>
+          <Button 
+            size="lg" 
+            className="h-16 px-12 rounded-2xl text-gray-900 border-none"
+            onClick={() => navigate('/mission')}
+          >
+            Our Mission Statement
+          </Button>
         </div>
       </section>
 
@@ -124,7 +133,13 @@ const SocialResponsibility = () => {
                    </div>
                  ))}
               </div>
-              <Button size="lg" className="h-16 px-10 rounded-2xl">Read Full Impact Report</Button>
+              <Button 
+                size="lg" 
+                className="h-16 px-10 rounded-2xl"
+                onClick={() => navigate('/impact-report')}
+              >
+                Read Full Impact Report
+              </Button>
            </div>
         </div>
       </section>

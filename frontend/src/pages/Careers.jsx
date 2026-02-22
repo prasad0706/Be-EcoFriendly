@@ -1,32 +1,12 @@
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Briefcase, MapPin, Clock, ArrowRight, Star, Users, Map } from 'lucide-react';
 import Button from '../components/common/Button';
-
-const JOBS = [
-  {
-    id: 1,
-    title: "Eco-Product Designer",
-    location: "Stockholm, SE (Remote Friendly)",
-    type: "Full-time",
-    dept: "Design"
-  },
-  {
-    id: 2,
-    title: "Sustainability Strategist",
-    location: "San Francisco, US",
-    type: "Full-time",
-    dept: "Operations"
-  },
-  {
-    id: 3,
-    title: "Community Outreach Lead",
-    location: "London, UK",
-    type: "Contract",
-    dept: "Marketing"
-  }
-];
+import { JOBS } from '../data/jobs';
 
 const Careers = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-white pt-28 pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -56,8 +36,21 @@ const Careers = () => {
             Join a passionate team of innovators, designers, and thinkers working to make conscious consumption the global standard.
           </motion.p>
           <div className="flex justify-center gap-6">
-            <Button size="lg" className="h-16 px-12 rounded-2xl shadow-xl shadow-primary/10">View Open Roles</Button>
-            <Button variant="outline" size="lg" className="h-16 px-12 rounded-2xl border-gray-200">Our Culture</Button>
+            <Button 
+              size="lg" 
+              className="h-16 px-12 rounded-2xl shadow-xl shadow-primary/10"
+              onClick={() => navigate('/open-roles')}
+            >
+              View Open Roles
+            </Button>
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="h-16 px-12 rounded-2xl border-gray-200"
+              onClick={() => navigate('/culture')}
+            >
+              Our Culture
+            </Button>
           </div>
         </section>
 
@@ -95,6 +88,7 @@ const Careers = () => {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
+                onClick={() => navigate(`/job/${job.id}`)}
                 className="group p-8 bg-white border border-gray-100 rounded-[2.5rem] hover:border-primary hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 flex flex-col md:flex-row md:items-center justify-between gap-8 cursor-pointer"
               >
                 <div>

@@ -162,7 +162,7 @@ const Community = () => {
                  <div className="absolute inset-0 bg-gradient-to-br from-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                  <h3 className="text-2xl font-black mb-4 relative z-10">Create Post</h3>
                  <p className="text-white/60 text-sm font-medium mb-8 relative z-10">Share your sustainable journey with 12,000+ members.</p>
-                 <Button className="w-full h-14 rounded-2xl bg-white text-gray-900 font-black uppercase text-xs tracking-widest relative z-10">New Post</Button>
+                 <Button className="w-full h-14 rounded-2xl text-gray-900 font-black uppercase text-xs tracking-widest relative z-10">New Post</Button>
               </div>
            </div>
 
