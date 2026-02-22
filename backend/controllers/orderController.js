@@ -43,10 +43,11 @@ exports.createOrder = async (req, res) => {
     // Create order items from cart items
     const orderItems = cart.items.map(item => {
       console.log('Processing cart item:', item);
+      const unitPrice = item.price || (item.product ? item.product.price : 0);
       return {
         product: item.product._id,
         quantity: item.quantity,
-        price: item.price,
+        price: unitPrice,
       };
     });
 
@@ -62,15 +63,16 @@ exports.createOrder = async (req, res) => {
     }
 
     // Calculate prices
-    const itemsPrice = cart.items.reduce((acc, item) => {
+    const itemsPrice = orderItems.reduce((acc, item) => {
       const itemTotal = (item.price || 0) * (item.quantity || 0);
-      console.log(`Item total for ${item.product?.name || item.product}:`, itemTotal);
+      console.log(`Item total for ${item.product}:`, itemTotal);
       return acc + itemTotal;
     }, 0);
 
-    const shippingPrice = itemsPrice > 100 ? 0 : 10;
-    const taxPrice = Number((0.08 * itemsPrice).toFixed(2));
-    const totalPrice = itemsPrice + shippingPrice + taxPrice;
+    // Thresholds matching frontend (Checkout.jsx)
+    const shippingPrice = itemsPrice > 1000 ? 0 : 50;
+    const taxPrice = Number((0.18 * itemsPrice).toFixed(2));
+    const totalPrice = Number((itemsPrice + shippingPrice + taxPrice).toFixed(2));
 
     console.log('Calculated prices:', { itemsPrice, shippingPrice, taxPrice, totalPrice });
 

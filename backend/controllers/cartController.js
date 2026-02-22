@@ -180,6 +180,7 @@ exports.updateCartItem = async (req, res) => {
     }
 
     item.quantity = quantity;
+    item.price = product.price;
     await cart.save();
     console.log('Cart item updated successfully');
 

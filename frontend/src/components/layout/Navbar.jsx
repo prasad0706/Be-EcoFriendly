@@ -62,6 +62,11 @@ const Navbar = () => {
     }
   }, [debouncedSearch]);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
   const fetchSuggestions = async () => {
     try {
       const response = await api.get('/products', { 
@@ -93,10 +98,10 @@ const Navbar = () => {
           
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group pl-4">
-            <motion.div whileHover={{ rotate: 180 }} transition={{ duration: 0.6 }}>
-              <Leaf className={`h-9 w-9 ${scrolled ? 'text-primary' : 'text-primary'}`} />
+            <motion.div whileHover={{ rotate: 180 }} transition={{ duration: 0.6 }} className="shrink-0">
+              <Leaf className={`h-8 w-8 md:h-9 md:w-9 ${scrolled ? 'text-primary' : 'text-primary'}`} />
             </motion.div>
-            <span className={`text-2xl font-black tracking-tighter ${scrolled ? 'text-gray-900' : 'text-gray-900'}`}>
+            <span className={`text-lg md:text-2xl font-black tracking-tighter whitespace-nowrap ${scrolled ? 'text-gray-900' : 'text-gray-900'}`}>
               Be-Eco<span className="text-accent">Friendly</span>
             </span>
           </Link>
@@ -152,7 +157,7 @@ const Navbar = () => {
           </div>
 
           {/* Right Icons */}
-          <div className="flex items-center space-x-3 pr-2">
+          <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-3 pr-1 md:pr-2">
             {/* Search Bar */}
             <div className="relative hidden xl:block" ref={searchRef}>
               <form onSubmit={handleSearch} className="relative group">
@@ -250,10 +255,10 @@ const Navbar = () => {
             </div>
 
             <button 
-              className="lg:hidden p-2 text-gray-600"
+              className="lg:hidden p-1.5 md:p-2 text-gray-600 hover:text-accent transition-colors"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
-              {mobileMenuOpen ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
+              {mobileMenuOpen ? <X className="h-6 w-6 md:h-7 md:w-7" /> : <Menu className="h-6 w-6 md:h-7 md:w-7" />}
             </button>
           </div>
         </div>
