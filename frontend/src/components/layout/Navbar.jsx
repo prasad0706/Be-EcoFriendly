@@ -192,7 +192,7 @@ const Navbar = () => {
                 <input
                   type="text"
                   placeholder="Find sustainable goods..."
-                  className="pl-10 pr-4 py-2 bg-gray-50 rounded-full border border-transparent focus:border-primary/20 focus:bg-white w-32 xl:w-48 lg:w-40 transition-all duration-500 font-extrabold text-[11px] md:text-[12px] uppercase tracking-widest placeholder:text-gray-300"
+                  className="pl-10 pr-4 py-2 bg-gray-50 rounded-full border border-transparent focus:border-primary/20 focus:bg-white w-32 xl:w-48 lg:w-40 transition-all duration-500 font-extrabold text-[11px] md:text-[12px] tracking-widest placeholder:text-gray-300"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -282,7 +282,7 @@ const Navbar = () => {
                  <input 
                    autoFocus
                    type="text" 
-                   className="flex-1 bg-transparent border-none focus:ring-0 text-sm font-black uppercase tracking-widest text-gray-900 placeholder:text-gray-300 px-4 h-12"
+                   className="flex-1 bg-transparent border-none focus:ring-0 text-sm font-black tracking-widest text-gray-900 placeholder:text-gray-300 px-4 h-12"
                    placeholder="Search products..."
                    value={searchTerm}
                    onChange={(e) => setSearchTerm(e.target.value)}
