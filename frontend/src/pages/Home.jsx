@@ -8,68 +8,63 @@ import { Sparkles, Truck, ShieldCheck, Package, Headphones, Leaf } from 'lucide-
 
 const badges = [
   {
-    icon: <Sparkles className="h-6 w-6 text-accent" />,
+    icon: <Sparkles className="h-5 w-5 md:h-6 md:w-6 text-accent" />,
     title: "100% Verified",
-    desc: "Sustainable standards"
+    desc: "Premium Ethics"
   },
   {
-    icon: <Truck className="h-6 w-6 text-primary" />,
+    icon: <Truck className="h-5 w-5 md:h-6 md:w-6 text-primary" />,
     title: "Eco-Shipping",
-    desc: "Carbon-neutral delivery"
+    desc: "CO2 Neutral"
   },
   {
-    icon: <Package className="h-6 w-6 text-orange-500" />,
+    icon: <Package className="h-5 w-5 md:h-6 md:w-6 text-orange-500" />,
     title: "Plastic-Free",
-    desc: "100% zero-waste boxes"
+    desc: "Zero Waste"
   },
   {
-    icon: <ShieldCheck className="h-6 w-6 text-green-600" />,
+    icon: <ShieldCheck className="h-5 w-5 md:h-6 md:w-6 text-green-600" />,
     title: "Secure Pay",
-    desc: "SSL protected payment"
-  },
-  {
-    icon: <Headphones className="h-6 w-6 text-primary" />,
-    title: "Eco Experts",
-    desc: "24/7 dedicated support"
+    desc: "SSL Protected"
   }
 ];
 
 const Home = () => {
   return (
-    <div className="min-h-screen bg-white font-sans">
-      {/* Dynamic Hero Section */}
+    <div className="min-h-screen bg-white font-sans overflow-x-hidden">
+      {/* Hero Section */}
       <HeroSection />
 
-      {/* Sustainable Picks Slider */}
+      {/* Sustainable Picks */}
       <ProductSlider 
-        title="🌱 Sustainable Picks" 
+        title="Impact Picks" 
         queryParams={{ minEcoScore: 80 }} 
         link="/shop?minEcoScore=80"
       />
 
-      {/* Dynamic Categories */}
+      {/* Categories */}
       <CategorySection />
 
-      {/* New Arrivals Slider */}
+      {/* New Arrivals */}
       <ProductSlider 
-        title="🆕 New Arrivals" 
+        title="Just Dropped" 
         queryParams={{ sort: 'newest' }} 
         link="/shop?sort=newest"
       />
 
-      {/* Big Deals Section */}
+      {/* Deals Section */}
       <DealsSection />
 
-      {/* Trending Slider */}
+      {/* Trending */}
       <ProductSlider 
-        title="🔥 Trending Now" 
+        title="Trending" 
         queryParams={{ sort: 'rating' }} 
         link="/shop?sort=rating"
       />
 
-      {/* Best Sellers Slider */}
+      {/* Best Sellers */}
       <ProductSlider 
-        title="⭐ Best Sellers" 
+        title="Top Rated" 
         queryParams={{ featured: 'true' }} 
         link="/shop?featured=true"
       />
@@ -77,48 +72,42 @@ const Home = () => {
       {/* Newsletter */}
       <NewsletterSection />
 
-      {/* Trust Badges */}
-      <section className="py-20 border-t border-gray-50 bg-background/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-12">
+      {/* Trust Badges - Compact boAt Style */}
+      <section className="py-10 md:py-20 bg-gray-50/50 border-t border-gray-100">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12">
             {badges.map((badge, index) => (
               <motion.div 
                 key={index}
-                whileHover={{ y: -5 }}
-                className="flex flex-col items-center text-center group"
+                className="flex flex-col items-center text-center p-4"
               >
-                <div className="w-16 h-16 bg-white rounded-2xl shadow-premium flex items-center justify-center mb-6 group-hover:shadow-glow transition-all duration-300 border border-gray-50">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-white rounded-xl md:rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center mb-4 transition-transform hover:scale-105">
                   {badge.icon}
                 </div>
-                <h4 className="font-black text-gray-900 mb-1">{badge.title}</h4>
-                <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">{badge.desc}</p>
+                <h4 className="font-black text-xs md:text-sm text-gray-900 mb-1 uppercase tracking-tight">{badge.title}</h4>
+                <p className="text-[9px] md:text-xs text-gray-400 font-bold uppercase tracking-widest">{badge.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Partners/Certifications Trust Section */}
-      <section className="py-16 bg-white border-t border-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-30 hover:opacity-100 transition-opacity duration-700 grayscale hover:grayscale-0">
-             <div className="flex items-center gap-2 font-black text-2xl tracking-tighter text-gray-400">
-               <ShieldCheck className="h-8 w-8" /> B-CORP
+      {/* Partners - Subtle Trust */}
+      <section className="py-12 bg-white flex justify-center items-center opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
+          <div className="flex flex-wrap justify-center gap-8 md:gap-20 px-4">
+             <div className="flex items-center gap-1 font-black text-sm md:text-xl tracking-widest italic text-gray-400">
+               <ShieldCheck className="h-4 w-4 md:h-6 md:w-6" /> CERTIFIED
              </div>
-             <div className="flex items-center gap-2 font-black text-2xl tracking-tighter text-gray-400">
-               <Leaf className="h-8 w-8" /> ORGANIC
+             <div className="flex items-center gap-1 font-black text-sm md:text-xl tracking-widest italic text-gray-400">
+               <Leaf className="h-4 w-4 md:h-6 md:w-6" /> ORGANIC
              </div>
-             <div className="flex items-center gap-2 font-black text-2xl tracking-tighter text-gray-400">
-               <Sparkles className="h-8 w-8" /> FAIR TRADE
+             <div className="flex items-center gap-1 font-black text-sm md:text-xl tracking-widest italic text-gray-400">
+               <Sparkles className="h-4 w-4 md:h-6 md:w-6" /> FAIR-TRADE
              </div>
-             <div className="flex items-center gap-2 font-black text-2xl tracking-tighter text-gray-400">
-               <Package className="h-6 w-6" /> RECYCLED
-             </div>
-             <div className="flex items-center gap-2 font-black text-2xl tracking-tighter text-gray-400 text-sm">
-               CO2 NEUTRAL
+             <div className="flex items-center gap-1 font-black text-sm md:text-xl tracking-widest italic text-gray-400">
+               <Package className="h-4 w-4 md:h-6 md:w-6" /> RECYCLED
              </div>
           </div>
-        </div>
       </section>
     </div>
   );

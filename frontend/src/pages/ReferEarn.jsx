@@ -6,21 +6,21 @@ const ReferEarn = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="pt-32 pb-16 px-4 sm:px-6 lg:px-8 bg-mesh overflow-hidden relative">
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16">
+      <section className="pt-24 md:pt-32 pb-12 md:pb-16 px-4 sm:px-6 lg:px-8 bg-mesh overflow-hidden relative">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-10 md:gap-16">
           <div className="flex-1 text-center lg:text-left z-10">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="inline-flex items-center space-x-2 px-4 py-2 bg-primary/10 rounded-full text-primary mb-8"
+              className="inline-flex items-center space-x-2 px-4 py-2 bg-primary/10 rounded-full text-primary mb-6 md:mb-8 border border-primary/10"
             >
               <Gift className="h-4 w-4" />
-              <span className="text-xs font-black uppercase tracking-widest">Referral Program</span>
+              <span className="text-[10px] md:text-xs font-black uppercase tracking-widest">Referral Program</span>
             </motion.div>
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-6xl md:text-7xl font-black text-gray-900 mb-8 tracking-tighter"
+              className="text-4xl sm:text-5xl md:text-7xl font-black text-gray-900 mb-6 md:mb-8 tracking-tighter leading-tight"
             >
               Spread Love,<br />
               <span className="gradient-text">Earn Green.</span>
@@ -29,7 +29,7 @@ const ReferEarn = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-gray-500 text-xl font-medium mb-10 max-w-xl"
+              className="text-gray-500 text-lg md:text-xl font-medium mb-8 md:mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed"
             >
               Invite your friends to join the eco-friendly movement. They get a discount, and you earn rewards for every successful referral.
             </motion.p>
@@ -39,7 +39,7 @@ const ReferEarn = () => {
               transition={{ delay: 0.2 }}
               className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
             >
-              <Button size="lg" className="h-16 px-10 rounded-2xl text-base shadow-xl shadow-primary/20">
+              <Button size="lg" className="h-14 md:h-16 px-8 md:px-10 rounded-2xl text-base shadow-xl shadow-primary/20 w-full sm:w-auto">
                 Get Your Referral Link
               </Button>
             </motion.div>
@@ -102,30 +102,30 @@ const ReferEarn = () => {
       </section>
 
       {/* Rules */}
-      <section className="py-32 bg-gray-900 text-white rounded-[4rem] mx-4 mb-20">
-        <div className="max-w-5xl mx-auto px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
+      <section className="py-20 md:py-32 bg-gray-900 text-white rounded-[2.5rem] md:rounded-[4rem] mx-4 mb-20">
+        <div className="max-w-5xl mx-auto px-4 md:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
             <div>
-              <h2 className="text-4xl font-black mb-10 leading-tight">The Eco-Referral <span className="text-accent underline decoration-4 underline-offset-8">Manifesto.</span></h2>
-              <div className="space-y-6">
+              <h2 className="text-3xl md:text-4xl font-black mb-6 md:mb-10 leading-tight">The Eco-Referral <span className="text-accent underline decoration-4 underline-offset-8">Manifesto.</span></h2>
+              <div className="space-y-4 md:space-y-6">
                 {[
                   "No limits on successful referrals.",
                   "Friends get 15% off their first order.",
                   "Credit is applied automatically.",
                   "Valid for orders over $50."
                 ].map((rule, i) => (
-                  <div key={i} className="flex items-center space-x-4">
-                    <CheckCircle2 className="h-6 w-6 text-accent" />
-                    <span className="text-lg font-medium opacity-80">{rule}</span>
+                  <div key={i} className="flex items-center space-x-3 md:space-x-4">
+                    <CheckCircle2 className="h-5 w-5 md:h-6 md:w-6 text-accent shrink-0" />
+                    <span className="text-base md:text-lg font-medium opacity-80">{rule}</span>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-12 rounded-[3.5rem] relative group overflow-hidden">
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] relative group overflow-hidden">
                <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-               <h3 className="text-3xl font-black mb-6 relative z-10">Start Earning Today</h3>
-               <p className="text-white/60 font-medium mb-10 relative z-10 leading-relaxed">Join 10,000+ eco-warriors who are already sharing and earning rewards while making a difference.</p>
-               <Button className="w-full h-16 rounded-2xl  text-gray-900 hover:bg-white/90 relative z-10">Join Program</Button>
+               <h3 className="text-2xl md:text-3xl font-black mb-4 md:mb-6 relative z-10">Start Earning Today</h3>
+               <p className="text-white/60 font-medium mb-8 md:mb-10 relative z-10 leading-relaxed text-sm md:text-base">Join 10,000+ eco-warriors who are already sharing and earning rewards while making a difference.</p>
+               <Button className="w-full h-14 md:h-16 rounded-xl md:rounded-2xl text-gray-900 hover:bg-white/90 relative z-10 font-black">Join Program</Button>
             </div>
           </div>
         </div>

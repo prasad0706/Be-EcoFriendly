@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
-import { Search, SlidersHorizontal, Sparkles, X } from 'lucide-react';
+import { Search, SlidersHorizontal, Sparkles, X, ChevronDown } from 'lucide-react';
 import api from '../utils/api';
 import ProductCard from '../components/product/ProductCard';
 import Loading from '../components/common/Loading';
@@ -100,12 +100,12 @@ const Shop = () => {
   if (filters.tags) filters.tags.split(',').forEach(t => activeChips.push({ key: 'tags', label: t, value: t }));
   if (filters.minPrice) activeChips.push({ key: 'minPrice', label: `Min: $${filters.minPrice}` });
   if (filters.maxPrice) activeChips.push({ key: 'maxPrice', label: `Max: $${filters.maxPrice}` });
-  if (filters.rating) activeChips.push({ key: 'rating', label: `${filters.rating}★ & Above` });
+  if (filters.rating) activeChips.push({ key: 'rating', label: `${filters.rating}★` });
   if (filters.ecoScore) activeChips.push({ key: 'ecoScore', label: `Eco: ${filters.ecoScore}+` });
   if (filters.inStock) activeChips.push({ key: 'inStock', label: 'In Stock' });
 
   return (
-    <div className="min-h-screen bg-white pt-28 pb-20">
+    <div className="min-h-screen bg-white pt-20 md:pt-32 pb-12 md:pb-20">
       <FilterDrawer 
         isOpen={isDrawerOpen} 
         onClose={() => setIsDrawerOpen(false)}
@@ -114,95 +114,88 @@ const Shop = () => {
         applyFilters={applyFilters}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-12">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div>
-              <div className="inline-flex items-center space-x-2 bg-mint/50 px-3 py-1 rounded-full mb-4">
-                <Sparkles className="h-4 w-4 text-primary" />
-                <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Premium Collection</span>
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        {/* Header - Compact for Mobile */}
+        <div className="mb-6 md:mb-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
+            <div className="text-left">
+              <div className="inline-flex items-center space-x-2 bg-primary/5 px-2 md:px-3 py-1 rounded-full mb-3 md:mb-4 border border-primary/10 transition-transform active:scale-95">
+                <Sparkles className="h-3 w-3 md:h-3.5 md:w-3.5 text-primary" />
+                <span className="text-[8px] md:text-[10px] font-black text-primary uppercase tracking-widest">Premium Catalog</span>
               </div>
-              <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tighter">
-                Explore <span className="text-primary italic">Better</span>
+              <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-black text-gray-900 mb-2 md:mb-4 tracking-tighter uppercase leading-none italic">
+                Eco <span className="text-primary underline decoration-primary/10">Catalog.</span>
               </h1>
-              <p className="text-gray-500 font-medium max-w-xl">
-                Discover eco-friendly products that don't compromise on quality or style.
+              <p className="hidden md:block text-sm md:text-lg text-gray-400 font-bold uppercase tracking-widest max-w-xl opacity-80 leading-relaxed italic">
+                Performance meets sustainability in every pick.
               </p>
             </div>
 
-            <button
-              onClick={() => setIsDrawerOpen(true)}
-              className="group flex items-center gap-3 bg-white border-2 border-primary/20 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest text-primary hover:bg-primary hover:text-white hover:border-primary transition-all shadow-xl shadow-primary/5 active:scale-95"
-            >
-              <SlidersHorizontal className="h-5 w-5 group-hover:rotate-180 transition-transform duration-500" />
-              Filters
-            </button>
+            <div className="flex items-center gap-2 md:gap-4 scrollbar-hide">
+               <button
+                  onClick={() => setIsDrawerOpen(true)}
+                  className="flex flex-1 md:flex-none items-center justify-center gap-2 bg-white border border-gray-100 px-5 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest text-gray-900 transition-all shadow-sm active:scale-95 min-w-[120px]"
+                >
+                  <SlidersHorizontal className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  Filter
+                </button>
+                <div className="relative flex-1 md:w-64">
+                   <select
+                      value={filters.sort}
+                      onChange={(e) => {
+                        setFilters(prev => ({ ...prev, sort: e.target.value }));
+                        const p = new URLSearchParams(searchParams);
+                        p.set('sort', e.target.value);
+                        setSearchParams(p);
+                      }}
+                      className="w-full px-5 py-3 md:px-8 md:py-4 bg-white border border-gray-100 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest text-gray-600 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:12px_12px] md:bg-[length:16px_16px] bg-[right_1rem_center] md:bg-[right_1.5rem_center] bg-no-repeat shadow-sm outline-none active:scale-95 transition-all min-w-[130px]"
+                    >
+                      <option value="newest">Sort</option>
+                      <option value="price_asc">Price: Low</option>
+                      <option value="price_desc">Price: High</option>
+                      <option value="rating_desc">Ratings</option>
+                    </select>
+                </div>
+            </div>
           </div>
         </div>
 
-        {/* Search & Sort Row */}
-        <div className="mb-8 flex flex-col md:flex-row gap-4 items-center bg-gray-50/50 p-4 rounded-[2.5rem] border border-gray-100">
-          <div className="relative flex-1 w-full">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
-            <input
-              type="text"
-              placeholder="What are you looking for?"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
-              className="w-full pl-14 pr-6 py-4 bg-white border border-gray-100 rounded-[2rem] focus:ring-4 focus:ring-primary/10 outline-none font-bold text-gray-700 transition-all shadow-sm"
-            />
-          </div>
-
-          <div className="w-full md:w-64">
-            <select
-              value={filters.sort}
-              onChange={(e) => {
-                setFilters(prev => ({ ...prev, sort: e.target.value }));
-                const p = new URLSearchParams(searchParams);
-                p.set('sort', e.target.value);
-                setSearchParams(p);
-              }}
-              className="w-full px-8 py-4 bg-white border border-gray-100 rounded-[2rem] font-black text-xs uppercase tracking-widest text-gray-600 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:16px_16px] bg-[right_1.5rem_center] bg-no-repeat shadow-sm outline-none focus:ring-4 focus:ring-primary/10"
-            >
-              <option value="newest">Newest First</option>
-              <option value="price_asc">Price: Low to High</option>
-              <option value="price_desc">Price: High to Low</option>
-              <option value="rating_desc">Top Rated</option>
-            </select>
-          </div>
+        {/* Search Row - Compact for Mobile */}
+        <div className="mb-6 relative group">
+          <Search className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 text-gray-300 h-4 w-4 md:h-5 md:w-5 group-focus-within:text-primary transition-colors" />
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
+            className="w-full pl-11 md:pl-16 pr-6 py-3 md:py-4.5 bg-gray-50/50 border border-gray-100 rounded-xl md:rounded-3xl focus:ring-4 focus:ring-primary/5 outline-none font-black text-gray-900 transition-all text-[10px] md:text-base placeholder:text-gray-300 uppercase tracking-widest h-12 md:h-auto"
+          />
         </div>
 
-        {/* Active Filter Chips */}
+        {/* Active Filter Chips - Standardized Padding */}
         <AnimatePresence>
           {activeChips.length > 0 && (
             <motion.div 
-              initial={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex flex-wrap gap-2 mb-10"
+              className="flex items-center gap-2 mb-6 md:mb-10 overflow-x-auto scrollbar-hide py-1"
             >
               {activeChips.map((chip, i) => (
                 <motion.div
                   key={`${chip.key}-${chip.value || i}`}
                   layout
-                  initial={{ scale: 0.8 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0.8, opacity: 0 }}
-                  className="flex items-center gap-2 px-4 py-2 bg-primary/5 border border-primary/10 rounded-full text-primary font-bold text-[11px] uppercase tracking-wider"
+                  className="flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 bg-primary text-white rounded-lg text-[8px] md:text-[10px] font-black uppercase tracking-widest whitespace-nowrap shadow-lg shadow-primary/10"
                 >
                   {chip.label}
-                  <button 
-                    onClick={() => removeFilter(chip.key, chip.value)}
-                    className="hover:bg-primary/10 rounded-full p-0.5 transition-colors"
-                  >
-                    <X className="h-3 w-3" />
+                  <button onClick={() => removeFilter(chip.key, chip.value)}>
+                    <X className="h-2.5 w-2.5 md:h-3.5 md:w-3.5" />
                   </button>
                 </motion.div>
               ))}
               <button
                 onClick={() => setSearchParams(new URLSearchParams())}
-                className="text-[11px] font-black text-gray-400 uppercase tracking-widest hover:text-red-500 transition-colors ml-2"
+                className="text-[8px] md:text-[10px] font-black text-red-400 uppercase tracking-widest ml-2 shrink-0 italic"
               >
                 Clear All
               </button>
@@ -210,23 +203,23 @@ const Shop = () => {
           )}
         </AnimatePresence>
 
-        {/* Product Grid */}
+        {/* Product Grid - 2 Column on Mobile */}
         {isLoading ? (
           <div className="py-24">
             <Loading size="lg" />
           </div>
         ) : data?.data?.length > 0 ? (
-          <div className="space-y-16">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12">
+          <div className="space-y-10 md:space-y-16">
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-x-8 gap-y-6 md:gap-y-12">
               <AnimatePresence mode="popLayout">
-                {data.data.map((product, index) => (
+                {data.data.map((product) => (
                   <motion.div
                     key={product._id}
                     layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.3 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
                   >
                     <ProductCard product={product} />
                   </motion.div>
@@ -234,28 +227,27 @@ const Shop = () => {
               </AnimatePresence>
             </div>
 
-            {/* Pagination */}
+            {/* Pagination - boAt Style */}
             {data?.pages > 1 && (
-              <div className="flex justify-center items-center space-x-3 pt-12 border-t border-gray-50">
+              <div className="flex justify-center items-center gap-2 pt-10 border-t border-gray-50 flex-wrap">
                 <Button
                   variant="outline"
-                  size="sm"
-                  onClick={() => { setPage(page - 1); window.scrollTo({ top: 300, behavior: 'smooth' }); }}
+                  onClick={() => { setPage(page - 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   disabled={page === 1}
-                  className="rounded-xl px-6"
+                  className="rounded-xl px-4 h-10 md:h-12 text-[10px] font-black uppercase tracking-widest border-gray-100"
                 >
                   Prev
                 </Button>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   {[...Array(data.pages)].map((_, i) => (
                     <button
                       key={i}
-                      onClick={() => { setPage(i + 1); window.scrollTo({ top: 300, behavior: 'smooth' }); }}
-                      className={`w-12 h-12 rounded-xl font-black text-xs transition-all ${
+                      onClick={() => { setPage(i + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                      className={`w-10 h-10 md:w-12 md:h-12 rounded-xl font-black text-[10px] transition-all ${
                         page === i + 1
-                          ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-110'
-                          : 'text-gray-400 hover:bg-gray-100 hover:text-gray-900 border border-transparent hover:border-gray-200'
+                          ? 'bg-gray-900 text-white shadow-xl'
+                          : 'text-gray-400 bg-gray-50 hover:bg-gray-100'
                       }`}
                     >
                       {i + 1}
@@ -265,10 +257,9 @@ const Shop = () => {
 
                 <Button
                   variant="outline"
-                  size="sm"
-                  onClick={() => { setPage(page + 1); window.scrollTo({ top: 300, behavior: 'smooth' }); }}
+                  onClick={() => { setPage(page + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   disabled={page === data.pages}
-                  className="rounded-xl px-6"
+                  className="rounded-xl px-4 h-10 md:h-12 text-[10px] font-black uppercase tracking-widest border-gray-100"
                 >
                   Next
                 </Button>
@@ -277,19 +268,17 @@ const Shop = () => {
           </div>
         ) : (
           <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center py-32 bg-background rounded-[3rem] border-2 border-dashed border-gray-100"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-24 bg-gray-50 rounded-[2rem] border-2 border-dashed border-gray-100"
           >
-            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-premium">
-              <Search className="h-10 w-10 text-gray-200" />
+            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+              <Search className="h-6 w-6 text-gray-200" />
             </div>
-            <h3 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">No products found</h3>
-            <p className="text-gray-500 font-medium mb-12 max-w-sm mx-auto">
-              We couldn't find anything matching your current filters. Try relaxing your search or clear all filters.
-            </p>
-            <Button onClick={() => setSearchParams(new URLSearchParams())} className="font-black px-12 py-5 rounded-2xl shadow-2xl">
-              Clear All Filters
+            <h3 className="text-xl font-black text-gray-900 mb-2 uppercase tracking-tight">Void Encountered.</h3>
+            <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] mb-8">No results in this coordinate system.</p>
+            <Button onClick={() => setSearchParams(new URLSearchParams())} className="font-black px-10 py-4 h-12 rounded-xl shadow-xl shadow-primary/10 uppercase tracking-widest text-xs border-none">
+              Reset Filters
             </Button>
           </motion.div>
         )}

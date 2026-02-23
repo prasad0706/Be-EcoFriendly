@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ShoppingCart, Heart, Star, Eye, Leaf } from 'lucide-react';
+import { ShoppingCart, Heart, Star, Eye, Leaf, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
@@ -19,15 +19,24 @@ const ProductCard = ({ product }) => {
 
   const handleAddToCart = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!isAuthenticated) {
       toast.error('Please login to add items to cart');
       return;
     }
     try {
       await addToCart(product._id, 1);
+      toast.success('Added to cart!');
     } catch (error) {
       console.error('Error adding to cart:', error);
     }
+  };
+
+  const handleWishlist = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isAuthenticated) return toast.error('Login required');
+    await addToWishlist(product._id);
   };
 
   const renderStars = () => {
@@ -36,7 +45,7 @@ const ProductCard = ({ product }) => {
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
-            className={`h-3 w-3 ${star <= (product.ratings?.average || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200'}`}
+            className={`h-2 w-2 md:h-3 md:w-3 ${star <= (product.ratings?.average || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200'}`}
           />
         ))}
       </div>
@@ -45,100 +54,102 @@ const ProductCard = ({ product }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, scale: 0.98 }}
+      whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
-      className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300"
+      className="group bg-white rounded-xl md:rounded-[2rem] overflow-hidden border border-gray-100 shadow-sm md:hover:shadow-glow transition-all duration-300 relative h-full flex flex-col"
     >
-      <Link to={`/product/${product._id}`} className="block">
-        {/* Product Image */}
-        <div className="relative h-64 overflow-hidden bg-gray-50">
+      <Link to={`/product/${product._id}`} className="flex flex-col h-full">
+        {/* Product Image Area */}
+        <div className="relative aspect-square md:aspect-auto md:h-72 overflow-hidden bg-gray-50/50">
           <ProductImage
             src={product.images?.[0]?.url}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+            className="w-full h-full object-cover transition-transform duration-[1s] group-hover:scale-105"
           />
 
-          {/* Badges */}
-          <div className="absolute top-4 left-4 flex flex-col gap-2">
+          {/* Badges Overlay - Compact on mobile */}
+          <div className="absolute top-2 left-2 md:top-5 md:left-5 flex flex-col gap-1 md:gap-2 z-10">
             {discount > 0 && (
-              <span className="px-3 py-1 bg-red-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-lg shadow-md">
-                {discount}% OFF
+              <span className="px-1.5 py-0.5 md:px-3 md:py-1.5 bg-red-500 text-white text-[7px] md:text-[10px] font-black uppercase tracking-widest rounded md:rounded-lg shadow-lg">
+                -{discount}%
               </span>
             )}
             {product.featured && (
-              <span className="px-3 py-1 bg-primary text-white text-[10px] font-bold uppercase tracking-wider rounded-lg shadow-md">
-                Featured
+              <span className="px-1.5 py-0.5 md:px-3 md:py-1.5 bg-primary text-white text-[7px] md:text-[10px] font-black uppercase tracking-widest rounded md:rounded-lg shadow-lg flex items-center gap-0.5 md:gap-1">
+                <Sparkles className="h-2 w-2 md:h-2.5 md:w-2.5" /> HOT
               </span>
             )}
-            {product.ecoScore > 80 && (
-              <span className="px-3 py-1 bg-accent text-white text-[10px] font-bold uppercase tracking-wider rounded-lg shadow-md flex items-center gap-1">
-                <Leaf className="h-3 w-3" /> {product.ecoScore} Eco
+            {product.ecoScore >= 70 && (
+              <span className="px-1.5 py-0.5 md:px-3 md:py-1.5 bg-accent text-white text-[7px] md:text-[10px] font-black uppercase tracking-widest rounded md:rounded-lg shadow-lg flex items-center gap-0.5 md:gap-1">
+                <Leaf className="h-2 w-2 md:h-2.5 md:w-2.5" /> {product.ecoScore}
               </span>
             )}
           </div>
 
-          {/* Quick Actions Overlay */}
-          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2 backdrop-blur-[2px]">
-            <button
-              onClick={async (e) => {
-                e.preventDefault();
-                if (!isAuthenticated) return toast.error('Login required');
-                await addToWishlist(product._id);
-              }}
-              className={`p-3 rounded-xl shadow-lg transition-all ${isInWishlist(product._id) ? 'bg-red-500 text-white' : 'bg-white text-gray-900 hover:bg-red-50'}`}
-            >
-              <Heart className={`h-5 w-5 ${isInWishlist(product._id) ? 'fill-current' : ''}`} />
-            </button>
-
-            <div className="p-3 bg-white text-gray-900 rounded-xl shadow-lg hover:bg-gray-50">
-              <Eye className="h-5 w-5" />
-            </div>
+          {/* Desktop Only Hover Actions */}
+          <div className="absolute top-3 right-3 md:top-5 md:right-5 flex flex-col gap-2 z-10 translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 hidden md:flex">
+             <button
+                onClick={handleWishlist}
+                className={`p-3 rounded-xl shadow-xl backdrop-blur-md transition-all ${isInWishlist(product._id) ? 'bg-red-500 text-white' : 'bg-white/90 text-gray-900 hover:bg-red-50 hover:text-red-500'}`}
+             >
+                <Heart className={`h-4.5 w-4.5 ${isInWishlist(product._id) ? 'fill-current' : ''}`} />
+             </button>
+             <div className="p-3 bg-white/90 backdrop-blur-md text-gray-900 rounded-xl shadow-xl hover:bg-gray-50 flex items-center justify-center">
+                <Eye className="h-4.5 w-4.5" />
+             </div>
           </div>
+          
+          {/* Mobile persistent wishlist button - Small & Clean */}
+          <button
+                onClick={handleWishlist}
+                className={`md:hidden absolute top-2 right-2 p-1.5 rounded-lg shadow-sm backdrop-blur-md transition-all z-20 ${isInWishlist(product._id) ? 'text-red-500' : 'text-gray-400 bg-white/80'}`}
+             >
+                <Heart className={`h-3.5 w-3.5 ${isInWishlist(product._id) ? 'fill-current' : ''}`} />
+          </button>
 
-          {/* Out of Stock */}
+          {/* Out of Stock Overlay */}
           {product.stock === 0 && (
-            <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center">
-              <span className="bg-gray-900 text-white px-6 py-2 rounded-xl font-bold text-xs uppercase tracking-widest shadow-xl">
-                Out of Stock
+            <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex items-center justify-center z-20">
+              <span className="bg-gray-900 text-white px-3 py-1 md:px-5 md:py-2 rounded-lg md:rounded-xl font-black text-[8px] md:text-[10px] uppercase tracking-widest shadow-2xl">
+                Sold Out
               </span>
             </div>
           )}
         </div>
 
-        {/* Product Info */}
-        <div className="p-6">
-          <div className="mb-4">
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+        {/* Product Information - Compact on mobile */}
+        <div className="p-2.5 md:p-6 lg:p-7 flex-1 flex flex-col">
+          <div className="mb-2 md:mb-4">
+            <span className="text-[7px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5 block truncate">
               {product.category}
             </span>
-            <h3 className="text-lg font-bold text-gray-900 line-clamp-1 group-hover:text-primary transition-colors">
+            <h3 className="text-[10px] sm:text-xs md:text-lg font-black text-gray-900 line-clamp-2 md:line-clamp-1 group-hover:text-primary transition-colors tracking-tight leading-tight md:leading-snug">
               {product.name}
             </h3>
-            <div className="mt-1.5 flex items-center space-x-2">
+            {/* Rating Section - Compact */}
+            <div className="mt-1 md:mt-2 flex items-center gap-1">
               {renderStars()}
-              <span className="text-[10px] font-bold text-gray-400">({product.ratings?.count || 0})</span>
+              <span className="text-[7px] md:text-[10px] font-bold text-gray-300 uppercase tracking-tighter">({product.ratings?.count || 0})</span>
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t border-gray-50">
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="text-xl font-bold text-gray-900">{formatCurrency(product.price)}</span>
-                {product.originalPrice > product.price && (
-                  <span className="text-sm font-medium text-gray-300 line-through">
-                    {formatCurrency(product.originalPrice)}
-                  </span>
-                )}
-              </div>
+          <div className="mt-auto flex items-center justify-between pt-2 md:pt-4 border-t border-gray-50">
+            <div className="flex flex-col">
+              <span className="text-xs sm:text-sm md:text-2xl font-black text-primary tracking-tighter leading-none">{formatCurrency(product.price)}</span>
+              {product.originalPrice > product.price && (
+                <span className="text-[8px] md:text-sm font-bold text-gray-300 line-through decoration-red-400/10">
+                  {formatCurrency(product.originalPrice)}
+                </span>
+              )}
             </div>
 
             <button
               disabled={product.stock === 0}
               onClick={handleAddToCart}
-              className="p-3 bg-primary text-white rounded-xl hover:bg-primary/90 hover:scale-105 transition-all shadow-md disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none"
+              className="w-7 h-7 sm:w-8 sm:h-8 md:w-14 md:h-14 bg-primary text-white rounded-lg md:rounded-2xl hover:bg-primary/90 transition-all shadow-md flex items-center justify-center disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none"
             >
-              <ShoppingCart className="h-5 w-5" />
+              <ShoppingCart className="h-3.5 w-3.5 md:h-6 md:w-6" />
             </button>
           </div>
         </div>

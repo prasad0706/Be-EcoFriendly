@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Sustainability from './pages/Sustainability';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
@@ -96,6 +97,7 @@ function App() {
                   <Route path="/social-responsibility" element={<SocialResponsibility />} />
                   <Route path="/store-locator" element={<StoreLocator />} />
                   <Route path="/community" element={<Community />} />
+                  <Route path="/sustainability" element={<Sustainability />} />
                 </Route>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />

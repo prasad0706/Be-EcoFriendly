@@ -135,7 +135,7 @@ const BlogDetail = () => {
 
   if (!post) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center px-4">
         <div className="text-center">
           <h2 className="text-2xl font-black mb-4">Post Not Found</h2>
           <Link to="/blogs">
@@ -149,7 +149,7 @@ const BlogDetail = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Header */}
-      <section className="relative h-[60vh] flex items-center overflow-hidden">
+      <section className="relative h-[50vh] md:h-[60vh] flex items-center overflow-hidden">
         <div className="absolute inset-0 bg-gray-900">
           <img 
             src={post.image} 
@@ -157,19 +157,19 @@ const BlogDetail = () => {
             alt={post.title}
           />
         </div>
-        <div className="max-w-4xl mx-auto px-8 relative z-10 w-full text-center">
+        <div className="max-w-4xl mx-auto px-4 md:px-8 relative z-10 w-full text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center space-x-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-white mb-8 border border-white/20"
+            className="inline-flex items-center space-x-2 px-3 md:px-4 py-1.5 md:py-2 bg-white/20 backdrop-blur-md rounded-full text-white mb-6 md:mb-8 border border-white/20"
           >
-            <Leaf className="h-4 w-4" />
-            <span className="text-xs font-black uppercase tracking-widest">{post.category}</span>
+            <Leaf className="h-3.5 w-3.5 md:h-4 md:w-4" />
+            <span className="text-[10px] md:text-xs font-black uppercase tracking-widest">{post.category}</span>
           </motion.div>
           <motion.h1 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-5xl md:text-7xl font-black text-white tracking-tighter mb-10 leading-tight"
+            className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter mb-6 md:mb-10 leading-tight"
           >
             {post.title}
           </motion.h1>
@@ -177,18 +177,18 @@ const BlogDetail = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="flex items-center justify-center gap-8 text-white/80 font-bold"
+            className="flex flex-wrap items-center justify-center gap-4 md:gap-8 text-white/80 font-bold text-xs md:text-base"
           >
             <div className="flex items-center gap-2">
-              <User className="h-5 w-5" />
+              <User className="h-4 w-4 md:h-5 md:w-5" />
               <span>{post.author}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
+              <Calendar className="h-4 w-4 md:h-5 md:w-5" />
               <span>{post.date}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
+              <Clock className="h-4 w-4 md:h-5 md:w-5" />
               <span>{post.readTime}</span>
             </div>
           </motion.div>
@@ -196,14 +196,14 @@ const BlogDetail = () => {
       </section>
 
       {/* Content */}
-      <section className="py-24 px-8">
+      <section className="py-12 md:py-24 px-4 md:px-8">
         <div className="max-w-3xl mx-auto">
-          <Link to="/blogs" className="inline-flex items-center text-primary font-black uppercase text-xs tracking-widest mb-12 hover:gap-3 transition-all">
+          <Link to="/blogs" className="inline-flex items-center text-primary font-black uppercase text-[10px] md:text-xs tracking-widest mb-8 md:mb-12 hover:gap-3 transition-all">
             <ArrowLeft className="h-4 w-4 mr-2" /> Back to Journal
           </Link>
           
           <div 
-            className="prose prose-lg prose-primary max-w-none 
+            className="prose prose-sm md:prose-lg prose-primary max-w-none 
               prose-headings:font-black prose-headings:tracking-tight 
               prose-p:text-gray-600 prose-p:leading-relaxed prose-p:font-medium
               prose-li:text-gray-600 prose-li:font-medium
@@ -212,36 +212,36 @@ const BlogDetail = () => {
           />
 
           {/* Social Interactions */}
-          <div className="mt-20 pt-10 border-t border-gray-100 flex items-center justify-between">
+          <div className="mt-12 md:mt-20 pt-10 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-6">
-              <button className="flex items-center gap-2 text-gray-400 hover:text-red-500 transition-colors font-bold">
-                <Heart className="h-6 w-6" /> <span>2.4k</span>
+              <button className="flex items-center gap-2 text-gray-400 hover:text-red-500 transition-colors font-bold text-sm md:text-base">
+                <Heart className="h-5 w-5 md:h-6 md:w-6" /> <span>2.4k</span>
               </button>
-              <button className="flex items-center gap-2 text-gray-400 hover:text-primary transition-colors font-bold">
-                <MessageCircle className="h-6 w-6" /> <span>48 Comments</span>
+              <button className="flex items-center gap-2 text-gray-400 hover:text-primary transition-colors font-bold text-sm md:text-base">
+                <MessageCircle className="h-5 w-5 md:h-6 md:w-6" /> <span>48 Comments</span>
               </button>
             </div>
-            <button className="flex items-center gap-2 text-gray-400 hover:text-gray-900 transition-colors font-bold">
-              <Share2 className="h-6 w-6" /> <span>Share</span>
+            <button className="flex items-center gap-2 text-gray-400 hover:text-gray-900 transition-colors font-bold text-sm md:text-base">
+              <Share2 className="h-5 w-5 md:h-6 md:w-6" /> <span>Share</span>
             </button>
           </div>
         </div>
       </section>
 
       {/* Newsletter / Related */}
-      <section className="py-24 bg-gray-50 px-8">
-        <div className="max-w-5xl mx-auto bg-primary rounded-[3rem] p-12 md:p-20 relative overflow-hidden text-center text-white">
+      <section className="py-12 md:py-24 bg-gray-50 px-4 md:px-8">
+        <div className="max-w-5xl mx-auto bg-primary rounded-[2rem] md:rounded-[3rem] p-8 md:p-20 relative overflow-hidden text-center text-white">
           <div className="relative z-10">
-            <h2 className="text-3xl md:text-5xl font-black mb-8 leading-tight">Join our sustainable<br /> newsletter community.</h2>
-            <p className="text-xl text-white/60 font-medium mb-12 max-w-xl mx-auto">Get weekly guides, eco-tips, and exclusive offers delivered straight to your inbox.</p>
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-black mb-6 md:mb-8 leading-tight">Join our sustainable<br /> newsletter community.</h2>
+            <p className="text-base md:text-xl text-white/60 font-medium mb-8 md:mb-12 max-w-xl mx-auto leading-relaxed">Get weekly guides, eco-tips, and exclusive offers delivered straight to your inbox.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <input type="email" placeholder="Email address" className="h-16 px-8 rounded-2xl bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:outline-none focus:bg-white/20 transition-all font-bold text-lg min-w-[300px]" />
-              <Button variant="white" className="h-16 px-10 rounded-2xl text-primary font-black">Subscribe Now</Button>
+              <input type="email" placeholder="Email address" className="h-14 md:h-16 px-6 md:px-8 rounded-xl md:rounded-2xl bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:outline-none focus:bg-white/20 transition-all font-bold text-base md:text-lg w-full sm:min-w-[300px]" />
+              <Button variant="white" className="h-14 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl text-primary font-black uppercase tracking-widest text-xs md:text-sm">Subscribe Now</Button>
             </div>
           </div>
           {/* Decorative Pattern */}
-          <div className="absolute top-0 right-0 p-12 opacity-10">
-            <Leaf className="w-64 h-64" />
+          <div className="absolute top-0 right-0 p-8 md:p-12 opacity-10 hidden sm:block">
+            <Leaf className="w-48 h-48 md:w-64 md:h-64" />
           </div>
         </div>
       </section>
