@@ -14,13 +14,15 @@ exports.getProducts = async (req, res) => {
       sort, 
       page = 1, 
       limit = 12, 
-      featured,
       minPrice,
       maxPrice,
       rating,
       ecoScore,
       inStock,
       tags,
+      featured,
+      trending,
+      topRated,
       exclude
     } = req.query;
 
@@ -43,8 +45,16 @@ exports.getProducts = async (req, res) => {
       ];
     }
 
-    if (featured === 'true') {
+    if (featured === 'true' || featured === true) {
       query.featured = true;
+    }
+
+    if (trending === 'true' || trending === true) {
+      query.trending = true;
+    }
+
+    if (topRated === 'true' || topRated === true) {
+      query.topRated = true;
     }
 
     // Advanced Filters

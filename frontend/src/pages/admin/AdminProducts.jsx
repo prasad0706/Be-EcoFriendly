@@ -29,6 +29,9 @@ const AdminProducts = () => {
     category: 'Reusable Products',
     stock: '',
     featured: false,
+    trending: false,
+    topRated: false,
+    ecoScore: 0,
     tags: '',
     images: [],
     features: {
@@ -46,6 +49,14 @@ const AdminProducts = () => {
         disposal: 0,
         totalCO2: 0
       }
+    },
+    environmentImpact: {
+      co2Saved: 0,
+      treesSaved: 0,
+      airPollutionSaved: 0,
+      waterPollutionSaved: 0,
+      landPollutionSaved: 0,
+      ecoScore: 0
     }
   });
   const [imagePreview, setImagePreview] = useState([]);
@@ -177,6 +188,9 @@ const AdminProducts = () => {
       category: product.category,
       stock: product.stock,
       featured: product.featured,
+      trending: product.trending || false,
+      topRated: product.topRated || false,
+      ecoScore: product.ecoScore || 0,
       tags: product.tags?.join(', ') || '',
       images: product.images || [],
       features: product.features || {
@@ -194,6 +208,14 @@ const AdminProducts = () => {
           disposal: 0,
           totalCO2: 0
         }
+      },
+      environmentImpact: product.environmentImpact || {
+        co2Saved: 0,
+        treesSaved: 0,
+        airPollutionSaved: 0,
+        waterPollutionSaved: 0,
+        landPollutionSaved: 0,
+        ecoScore: 0
       }
     });
     setImagePreview(product.images?.map(img => img.url) || []);
@@ -209,8 +231,12 @@ const AdminProducts = () => {
       category: 'Reusable Products',
       stock: '',
       featured: false,
+      trending: false,
+      topRated: false,
+      ecoScore: 0,
       tags: '',
       images: [],
+      ecoScore: 0,
       features: {
         ecoScore: 0,
         ecoDetails: {
@@ -226,6 +252,14 @@ const AdminProducts = () => {
           disposal: 0,
           totalCO2: 0
         }
+      },
+      environmentImpact: {
+        co2Saved: 0,
+        treesSaved: 0,
+        airPollutionSaved: 0,
+        waterPollutionSaved: 0,
+        landPollutionSaved: 0,
+        ecoScore: 0
       }
     });
     setImagePreview([]);
@@ -387,15 +421,15 @@ const AdminProducts = () => {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-primary" />
-                        <span className="text-xs font-black text-gray-900">{product.netSavings || 0}kg CO2</span>
+                        <span className="text-xs font-black text-gray-900">{product.environmentImpact?.co2Saved || product.netSavings || 0}kg CO2 Saved</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-blue-500" />
-                        <span className="text-xs font-black text-gray-900">{product.waterSaved || 0}L Water</span>
+                        <span className="text-xs font-black text-gray-900">{product.environmentImpact?.waterPollutionSaved || product.waterSaved || 0}L Water</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-accent" />
-                        <span className="text-xs font-black text-gray-900">{product.treesEquivalent || 0} Trees</span>
+                        <span className="text-xs font-black text-gray-900">{product.environmentImpact?.treesSaved || product.treesEquivalent || 0} Trees</span>
                       </div>
                     </div>
                   </td>
@@ -508,17 +542,97 @@ const AdminProducts = () => {
                     placeholder="eco, organic, local"
                   />
 
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                    <div>
-                      <p className="font-bold text-gray-900">Featured Product</p>
-                      <p className="text-xs text-gray-500 font-medium">Show this product on the home page</p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                      <div>
+                        <p className="font-bold text-gray-900">Featured</p>
+                        <p className="text-[10px] text-gray-500 font-medium">Home page visibility</p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary"
+                        checked={formData.featured}
+                        onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                      />
                     </div>
-                    <input
-                      type="checkbox"
-                      className="w-6 h-6 rounded border-gray-300 text-primary focus:ring-primary"
-                      checked={formData.featured}
-                      onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                    />
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                      <div>
+                        <p className="font-bold text-gray-900">Trending</p>
+                        <p className="text-[10px] text-gray-500 font-medium">Trending section</p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary"
+                        checked={formData.trending}
+                        onChange={(e) => setFormData({ ...formData, trending: e.target.checked })}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                      <div>
+                        <p className="font-bold text-gray-900">Top Rated</p>
+                        <p className="text-[10px] text-gray-500 font-medium">Top rated section</p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary"
+                        checked={formData.topRated}
+                        onChange={(e) => setFormData({ ...formData, topRated: e.target.checked })}
+                      />
+                    </div>
+                  </div>
+
+                  {/* New Environmental Impact Section */}
+                  <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 space-y-4">
+                    <h3 className="text-lg font-bold text-gray-900 border-b border-gray-200 pb-2 flex items-center gap-2">
+                       <Leaf className="h-5 w-5 text-primary" /> Environmental Impact
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input
+                        label="CO2 Saved (Kgs)"
+                        type="number"
+                        value={formData.environmentImpact?.co2Saved}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          environmentImpact: { ...formData.environmentImpact, co2Saved: parseFloat(e.target.value) || 0 } 
+                        })}
+                      />
+                      <Input
+                        label="Trees Saved (Number)"
+                        type="number"
+                        value={formData.environmentImpact?.treesSaved}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          environmentImpact: { ...formData.environmentImpact, treesSaved: parseInt(e.target.value) || 0 } 
+                        })}
+                      />
+                      <Input
+                        label="Air Pollution Saved (Kgs)"
+                        type="number"
+                        value={formData.environmentImpact?.airPollutionSaved}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          environmentImpact: { ...formData.environmentImpact, airPollutionSaved: parseFloat(e.target.value) || 0 } 
+                        })}
+                      />
+                      <Input
+                        label="Water Pollution Saved (Litres)"
+                        type="number"
+                        value={formData.environmentImpact?.waterPollutionSaved}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          environmentImpact: { ...formData.environmentImpact, waterPollutionSaved: parseFloat(e.target.value) || 0 } 
+                        })}
+                      />
+                      <Input
+                        label="Land Pollution Saved (Sq Meters)"
+                        type="number"
+                        value={formData.environmentImpact?.landPollutionSaved}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          environmentImpact: { ...formData.environmentImpact, landPollutionSaved: parseFloat(e.target.value) || 0 } 
+                        })}
+                      />
+                    </div>
                   </div>
 
                   {/* New Eco Impact Assessment Section */}

@@ -160,7 +160,7 @@ const Navbar = () => {
                 <div className="grid grid-cols-2 gap-x-2 px-4">
                   {[
                     { name: 'New Arrivals', path: '/shop?sort=newest', icon: Zap, color: 'text-orange-500' },
-                    { name: 'Best Sellers', path: '/shop?featured=true', icon: TrendingUp, color: 'text-primary' },
+                    { name: 'Best Sellers', path: '/shop?topRated=true', icon: TrendingUp, color: 'text-primary' },
                     { name: 'Refer & Earn', path: '/refer-and-earn', icon: Gift, color: 'text-accent' },
                     { name: 'Impact Blogs', path: '/blogs', icon: Newspaper, color: 'text-blue-500' },
                     { name: 'Store Finder', path: '/store-locator', icon: MapPin, color: 'text-red-500' },
@@ -364,7 +364,7 @@ const Navbar = () => {
                    <div className="space-y-1">
                       {[
                         { name: 'Latest Arrivals', path: '/shop?sort=newest', icon: Zap, color: 'text-orange-500' },
-                        { name: 'Best Sellers', path: '/shop?featured=true', icon: TrendingUp, color: 'text-primary' },
+                        { name: 'Best Sellers', path: '/shop?topRated=true', icon: TrendingUp, color: 'text-primary' },
                         { name: 'All Products', path: '/shop', icon: ShoppingBag },
                         { name: 'Daily Deals', path: '/deals', icon: Sparkles, color: 'text-accent' }
                       ].map((item, i) => (

@@ -58,15 +58,15 @@ const Home = () => {
       {/* Trending */}
       <ProductSlider 
         title="Trending" 
-        queryParams={{ sort: 'rating' }} 
-        link="/shop?sort=rating"
+        queryParams={{ trending: 'true' }} 
+        link="/shop?trending=true"
       />
 
       {/* Best Sellers */}
       <ProductSlider 
         title="Top Rated" 
-        queryParams={{ featured: 'true' }} 
-        link="/shop?featured=true"
+        queryParams={{ topRated: 'true' }} 
+        link="/shop?topRated=true"
       />
 
       {/* Newsletter */}

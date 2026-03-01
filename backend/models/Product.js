@@ -41,6 +41,14 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  trending: {
+    type: Boolean,
+    default: false,
+  },
+  topRated: {
+    type: Boolean,
+    default: false,
+  },
   ecoScore: {
     type: Number,
     default: 0,
@@ -146,6 +154,14 @@ const productSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  environmentImpact: {
+    co2Saved: { type: Number, default: 0 },
+    treesSaved: { type: Number, default: 0 },
+    airPollutionSaved: { type: Number, default: 0 },
+    waterPollutionSaved: { type: Number, default: 0 },
+    landPollutionSaved: { type: Number, default: 0 },
+    ecoScore: { type: Number, default: 0, min: 0, max: 100 }
+  }
 });
 
 // Update timestamp on save

@@ -211,7 +211,7 @@ const ProductDetail = () => {
                 </div>
                 <div className="flex items-center gap-2 bg-accent/5 px-2.5 py-1 rounded-lg border border-accent/10">
                   <Zap className="h-3 w-3 md:h-3.5 md:w-3.5 text-accent fill-accent" />
-                  <span className="text-[9px] font-black text-accent uppercase tracking-widest">Score {product.ecoScore}</span>
+                  <span className="text-[9px] font-black text-accent uppercase tracking-widest">Score {product.features?.ecoScore || product.ecoScore}</span>
                 </div>
               </div>
 
@@ -229,9 +229,9 @@ const ProductDetail = () => {
               {/* Eco Impact Highlights - Compact for boAt feel */}
               <div className="grid grid-cols-2 gap-2 md:gap-4 py-4 mt-2">
                  {[
-                   { icon: Leaf, label: 'CO2 Saved', value: `${product.netSavings || 0}kg`, color: 'text-primary' },
-                   { icon: Droplets, label: 'Water Saved', value: `${product.waterSaved || 0}L`, color: 'text-blue-500' },
-                   { icon: Trees, label: 'Trees Offset', value: product.treesEquivalent || 0, color: 'text-accent' },
+                   { icon: Leaf, label: 'CO2 Saved', value: `${product.environmentImpact?.co2Saved || product.netSavings || 0}kg`, color: 'text-primary' },
+                   { icon: Droplets, label: 'Water Saved', value: `${product.environmentImpact?.waterPollutionSaved || product.waterSaved || 0}L`, color: 'text-blue-500' },
+                   { icon: Trees, label: 'Trees Offset', value: product.environmentImpact?.treesSaved || product.treesEquivalent || 0, color: 'text-accent' },
                    { icon: Cloud, label: 'Footprint', value: `${product.carbonFootprint || 0}kg`, color: 'text-gray-900' }
                  ].map((item, i) => (
                    <div key={i} className="bg-gray-50 border border-gray-100 rounded-xl md:rounded-2xl p-3 md:p-5 flex items-center gap-3 group transition-all hover:bg-white hover:shadow-sm">
@@ -295,13 +295,13 @@ const ProductDetail = () => {
                         <circle cx="48" md:cx="64" cy="48" md:cy="64" r="44" md:r="60" fill="transparent" stroke="white" strokeWidth="8" />
                         <motion.circle 
                            initial={{ pathLength: 0 }}
-                           animate={{ pathLength: product.ecoScore / 100 }}
+                           animate={{ pathLength: (product.features?.ecoScore || product.ecoScore) / 100 }}
                            transition={{ duration: 1.5 }}
                            cx="48" md:cx="64" cy="48" md:cy="64" r="44" md:r="60" fill="transparent" stroke="currentColor" strokeWidth="8" strokeDasharray="376" strokeLinecap="round" className="text-secondary-blue"
                         />
                      </svg>
                      <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-2xl md:text-4xl font-black text-gray-900">{product.ecoScore}</span>
+                        <span className="text-2xl md:text-4xl font-black text-gray-900">{product.features?.ecoScore || product.ecoScore}</span>
                         <span className="text-[8px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Score</span>
                      </div>
                   </div>
@@ -321,6 +321,59 @@ const ProductDetail = () => {
                </div>
             </div>
 
+            {/* Environmental Impact Details Section */}
+            {(product.environmentImpact?.co2Saved > 0 || 
+              product.environmentImpact?.treesSaved > 0 || 
+              product.environmentImpact?.airPollutionSaved > 0 || 
+              product.environmentImpact?.waterPollutionSaved > 0 || 
+              product.environmentImpact?.landPollutionSaved > 0 || 
+              product.features?.ecoScore > 0 || 
+              product.ecoScore > 0) && (
+              <div className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm mt-6">
+                <h3 className="text-xl font-black text-gray-900 mb-6 uppercase italic tracking-tighter shrink-0 flex items-center gap-2">
+                   Environmental <span className="text-primary italic">Impact.</span>
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                  {product.environmentImpact?.co2Saved > 0 && (
+                    <div className="flex justify-between items-center py-2 border-b border-gray-50">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">CO2 Saved</span>
+                      <span className="text-xs font-black text-gray-900">{product.environmentImpact.co2Saved} Kgs</span>
+                    </div>
+                  )}
+                  {product.environmentImpact?.treesSaved > 0 && (
+                    <div className="flex justify-between items-center py-2 border-b border-gray-50">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Trees Saved</span>
+                      <span className="text-xs font-black text-gray-900">{product.environmentImpact.treesSaved} Trees</span>
+                    </div>
+                  )}
+                  {product.environmentImpact?.airPollutionSaved > 0 && (
+                    <div className="flex justify-between items-center py-2 border-b border-gray-50">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Air Pollution Saved</span>
+                      <span className="text-xs font-black text-gray-900">{product.environmentImpact.airPollutionSaved} Kgs</span>
+                    </div>
+                  )}
+                  {product.environmentImpact?.waterPollutionSaved > 0 && (
+                    <div className="flex justify-between items-center py-2 border-b border-gray-50">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Water Pollution Saved</span>
+                      <span className="text-xs font-black text-gray-900">{product.environmentImpact.waterPollutionSaved} Litres</span>
+                    </div>
+                  )}
+                  {product.environmentImpact?.landPollutionSaved > 0 && (
+                    <div className="flex justify-between items-center py-2 border-b border-gray-50">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Land Pollution Saved</span>
+                      <span className="text-xs font-black text-gray-900">{product.environmentImpact.landPollutionSaved} Sq Meters</span>
+                    </div>
+                  )}
+                  {product.features?.ecoScore > 0 || product.ecoScore > 0 ? (
+                    <div className="flex justify-between items-center py-2 border-b border-gray-50">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Eco Score</span>
+                      <span className="text-xs font-black text-primary">{product.features?.ecoScore || product.ecoScore} / 100</span>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            )}
+
             {/* Description Short */}
             <div className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm">
                <h3 className="text-[10px] md:text-xs font-black text-gray-400 uppercase tracking-[0.3em] mb-4">Engineer's Note</h3>
@@ -338,7 +391,7 @@ const ProductDetail = () => {
               <h2 className="text-2xl md:text-5xl font-black text-gray-900 uppercase italic tracking-tighter">Technical <span className="text-primary italic">Specifications.</span></h2>
               <div className="w-12 h-1 bg-primary mx-auto mt-4 rounded-full" />
            </div>
-           <SpecsAccordion specifications={product.specifications} ecoScore={product.ecoScore} />
+           <SpecsAccordion specifications={product.specifications} ecoScore={product.features?.ecoScore || product.ecoScore} />
         </div>
 
         {/* Related Products Slider */}

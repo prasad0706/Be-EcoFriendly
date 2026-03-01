@@ -73,9 +73,10 @@ const EcoImpactForm = ({ data, onChange }) => {
 
   // Update parent when scores change (only if they actually changed to avoid infinite loops)
   React.useEffect(() => {
-    if (data.features?.ecoScore !== scores.total) {
+    if (data.features?.ecoScore !== scores.total || data.ecoScore !== scores.total) {
       onChange({
         ...data,
+        ecoScore: scores.total,
         features: {
           ...data.features,
           ecoScore: scores.total,
