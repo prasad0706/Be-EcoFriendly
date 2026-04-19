@@ -283,7 +283,7 @@ const EcoImpactForm = ({ data, onChange }) => {
               </div>
               <div>
                 <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Aggregate Climate Impact</p>
-                <p className="text-xl font-black">Total CO2 Emissions</p>
+                <p className="text-xl font-black">Total CO2 Saved</p>
               </div>
             </div>
             <div className="text-right">
