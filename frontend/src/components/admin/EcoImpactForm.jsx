@@ -52,13 +52,13 @@ const EcoImpactForm = ({ data, onChange }) => {
     // Cap at 60
     const finalSustainabilityScore = Math.min(60, sustainabilityScore);
 
-    // Life Cycle Carbon Score
-    const totalCO2 = lifeCycleAnalysis.totalCO2 || 0;
+    // Life Cycle Savings Score (Higher Savings = Higher Score)
+    const totalCO2Saved = lifeCycleAnalysis.totalCO2Saved || 0;
     let lifecycleScore = 0;
-    if (totalCO2 < 5) lifecycleScore = 40;
-    else if (totalCO2 <= 10) lifecycleScore = 30;
-    else if (totalCO2 <= 20) lifecycleScore = 20;
-    else if (totalCO2 <= 30) lifecycleScore = 10;
+    if (totalCO2Saved >= 40) lifecycleScore = 40;
+    else if (totalCO2Saved >= 30) lifecycleScore = 30;
+    else if (totalCO2Saved >= 20) lifecycleScore = 20;
+    else if (totalCO2Saved >= 10) lifecycleScore = 10;
     else lifecycleScore = 0;
 
     const totalEcoScore = Math.min(100, Math.round(finalSustainabilityScore + lifecycleScore));
@@ -67,7 +67,7 @@ const EcoImpactForm = ({ data, onChange }) => {
       sustainability: finalSustainabilityScore,
       lifecycle: lifecycleScore,
       total: totalEcoScore,
-      totalCO2
+      totalCO2Saved
     };
   }, [ecoDetails, lifeCycleAnalysis]);
 
@@ -82,7 +82,7 @@ const EcoImpactForm = ({ data, onChange }) => {
           ecoScore: scores.total,
           lifeCycleAnalysis: {
             ...lifeCycleAnalysis,
-            totalCO2: scores.totalCO2
+            totalCO2Saved: scores.totalCO2Saved
           }
         }
       });
@@ -124,7 +124,7 @@ const EcoImpactForm = ({ data, onChange }) => {
       ...data,
       features: {
         ...data.features,
-        lifeCycleAnalysis: { ...newLCA, totalCO2: newTotal }
+        lifeCycleAnalysis: { ...newLCA, totalCO2Saved: newTotal }
       }
     });
   };
@@ -252,17 +252,17 @@ const EcoImpactForm = ({ data, onChange }) => {
         
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-8">
-            <Trash2 className="h-5 w-5 text-primary" />
-            <h4 className="text-lg font-black uppercase tracking-tighter">Life Cycle Analysis (CO2e)</h4>
+            <Leaf className="h-5 w-5 text-primary" />
+            <h4 className="text-lg font-black uppercase tracking-tighter">Life Cycle Savings (CO2 Saved)</h4>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
             {[
-              { label: 'Raw Materials', key: 'rawMaterials' },
-              { label: 'Manufacturing', key: 'manufacturing' },
-              { label: 'Transportation', key: 'transportation' },
-              { label: 'Usage', key: 'usage' },
-              { label: 'Disposal', key: 'disposal' }
+              { label: 'CO2 Saved (Materials)', key: 'rawMaterials' },
+              { label: 'CO2 Saved (Production)', key: 'manufacturing' },
+              { label: 'CO2 Saved (Logistics)', key: 'transportation' },
+              { label: 'CO2 Saved (Usage)', key: 'usage' },
+              { label: 'CO2 Saved (End-of-life)', key: 'disposal' }
             ].map(field => (
               <div key={field.key}>
                 <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest mb-3">{field.label}</label>
@@ -287,8 +287,8 @@ const EcoImpactForm = ({ data, onChange }) => {
               </div>
             </div>
             <div className="text-right">
-              <span className="text-4xl font-black text-primary tracking-tighter">{scores.totalCO2}</span>
-              <span className="ml-2 text-sm font-bold text-white/40">kg CO2e</span>
+              <span className="text-4xl font-black text-primary tracking-tighter">{scores.totalCO2Saved}</span>
+              <span className="ml-2 text-sm font-bold text-white/40">kg Saved</span>
             </div>
           </div>
         </div>
